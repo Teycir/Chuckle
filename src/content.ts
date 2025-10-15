@@ -2,6 +2,7 @@ import type { GeminiResponse } from './types';
 import { geminiCache } from './cache';
 import { CONFIG } from './config';
 import { showLoading, hideLoading } from './loading';
+import { logger } from './logger';
 
 chrome.runtime.onMessage.addListener((message) => {
   if (message.action === "generateMeme") {
@@ -23,7 +24,7 @@ export async function generateMeme(text: string): Promise<void> {
     });
   } catch (error) {
     hideLoading();
-    console.error('Meme generation failed:', error);
+    logger.error('Meme generation failed', error);
   }
 }
 
@@ -68,7 +69,7 @@ async function generateMemeImage(template: string): Promise<string> {
     if (!response.ok) throw new Error('Template unavailable');
     return url;
   } catch (error) {
-    console.error('Meme image generation failed:', error);
+    logger.error('Meme image generation failed', error);
     return CONFIG.FALLBACK_IMAGE_URL;
   }
 }
