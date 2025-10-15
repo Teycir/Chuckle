@@ -1,5 +1,5 @@
 describe('Content Script', () => {
-  const testApiKey = process.env.GEMINI_API_KEY || 'AIzaSyBlWG7PpQOAah7dkkmy03kWJwPUUq2e40I';
+  const testApiKey = process.env.GEMINI_API_KEY || 'AIzaSyDummyTestKey1234567890ABCDEFGHIJK';
   
   beforeEach(() => {
     global.chrome = {
@@ -11,11 +11,10 @@ describe('Content Script', () => {
             if (callback) {
               callback({ geminiApiKey: testApiKey });
             }
-            return Promise.resolve({ geminiApiKey: testApiKey });
+            return Promise.resolve({ geminiApiKey: testApiKey, language: 'English' });
           })
         } 
       },
-      action: { openPopup: jest.fn() }
     } as any;
     global.fetch = jest.fn();
   });

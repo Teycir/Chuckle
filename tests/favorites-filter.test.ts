@@ -3,8 +3,9 @@ import { saveMeme } from '../src/storage';
 import type { MemeData } from '../src/types';
 
 describe('Favorites Filter - Integration Tests', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     document.body.innerHTML = '';
+    await chrome.storage.local.clear();
   });
 
   afterEach(() => {
@@ -35,6 +36,7 @@ describe('Favorites Filter - Integration Tests', () => {
     });
 
     test('should toggle back to inactive state', async () => {
+      await chrome.storage.local.clear();
       await createHistoryPanel();
 
       await filterFavorites();
@@ -80,6 +82,7 @@ describe('Favorites Filter - Integration Tests', () => {
     });
 
     test('should show all memes when filter is off', async () => {
+      await chrome.storage.local.clear();
       const meme1: MemeData = {
         text: 'Favorite meme',
         imageUrl: 'https://example.com/1.png',
@@ -112,6 +115,7 @@ describe('Favorites Filter - Integration Tests', () => {
     });
 
     test('should hide non-favorite memes', async () => {
+      await chrome.storage.local.clear();
       const meme: MemeData = {
         text: 'Regular meme',
         imageUrl: 'https://example.com/test.png',
@@ -188,6 +192,7 @@ describe('Favorites Filter - Integration Tests', () => {
     });
 
     test('should update button appearance when inactive', async () => {
+      await chrome.storage.local.clear();
       await createHistoryPanel();
 
       const filterBtn = document.querySelector('.favorites-filter') as HTMLElement;
@@ -237,6 +242,7 @@ describe('Favorites Filter - Integration Tests', () => {
     });
 
     test('should handle multiple filter toggles', async () => {
+      await chrome.storage.local.clear();
       const meme: MemeData = {
         text: 'Favorite meme',
         imageUrl: 'https://example.com/test.png',

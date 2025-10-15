@@ -425,24 +425,35 @@ describe('Tag Autocomplete', () => {
       expect(tags.filter(t => t === 'funny').length).toBe(1);
     });
 
-    test('should return sorted tags', async () => {
-      const meme: MemeData = {
-        text: 'Test',
-        imageUrl: 'https://example.com/test.png',
+    test('should return tags sorted by frequency', async () => {
+      const meme1: MemeData = {
+        text: 'Test 1',
+        imageUrl: 'https://example.com/1.png',
         template: 'drake',
         timestamp: Date.now(),
         language: 'English',
         isFavorite: false,
-        tags: ['zebra', 'apple', 'mango']
+        tags: ['zebra', 'apple']
       };
 
-      await saveMeme(meme);
+      const meme2: MemeData = {
+        text: 'Test 2',
+        imageUrl: 'https://example.com/2.png',
+        template: 'drake',
+        timestamp: Date.now() + 1,
+        language: 'English',
+        isFavorite: false,
+        tags: ['zebra', 'mango']
+      };
+
+      await saveMeme(meme1);
+      await saveMeme(meme2);
 
       const tags = await getAllTags();
       
-      expect(tags[0]).toBe('apple');
-      expect(tags[1]).toBe('mango');
-      expect(tags[2]).toBe('zebra');
+      expect(tags[0]).toBe('zebra');
+      expect(tags).toContain('apple');
+      expect(tags).toContain('mango');
     });
 
     test('should return empty array when no tags', async () => {

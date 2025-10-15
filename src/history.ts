@@ -6,12 +6,23 @@ let currentPanel: HTMLElement | null = null;
 let allMemes: MemeData[] = [];
 let favoritesFilterActive = false;
 const activeTagFilters: Set<string> = new Set();
+let recentFilterActive = false;
+let untaggedFilterActive = false;
 
 export async function createHistoryPanel(): Promise<void> {
   if (currentPanel) {
     currentPanel.remove();
   }
-  favoritesFilterActive = false;
+  const prefs = await chrome.storage.local.get(['historyFilters']);
+  if (prefs.historyFilters) {
+    favoritesFilterActive = prefs.historyFilters.favorites || false;
+    recentFilterActive = prefs.historyFilters.recent || false;
+    untaggedFilterActive = prefs.historyFilters.untagged || false;
+  } else {
+    favoritesFilterActive = false;
+    recentFilterActive = false;
+    untaggedFilterActive = false;
+  }
   activeTagFilters.clear();
 
   const { darkMode } = await chrome.storage.local.get(['darkMode']);
@@ -90,13 +101,18 @@ export async function createHistoryPanel(): Promise<void> {
     fontSize: '14px'
   });
 
-  const filterBtn = document.createElement('button');
-  filterBtn.className = 'favorites-filter';
-  filterBtn.textContent = '⭐';
-  filterBtn.setAttribute('aria-label', 'Filter favorites');
-  filterBtn.setAttribute('aria-pressed', 'false');
-  filterBtn.onclick = async () => await filterFavorites();
-  Object.assign(filterBtn.style, {
+  const filterBtns = document.createElement('div');
+  Object.assign(filterBtns.style, {
+    display: 'flex',
+    gap: '6px'
+  });
+
+  const favBtn = document.createElement('button');
+  favBtn.className = 'favorites-filter';
+  favBtn.textContent = '⭐';
+  favBtn.setAttribute('aria-label', 'Filter favorites');
+  favBtn.onclick = async () => await filterFavorites();
+  Object.assign(favBtn.style, {
     padding: '8px 12px',
     borderRadius: '6px',
     border: 'none',
@@ -106,8 +122,42 @@ export async function createHistoryPanel(): Promise<void> {
     opacity: favoritesFilterActive ? '1' : '0.5'
   });
 
+  const recentBtn = document.createElement('button');
+  recentBtn.className = 'recent-filter';
+  recentBtn.textContent = '🕐';
+  recentBtn.setAttribute('aria-label', 'Filter recent');
+  recentBtn.onclick = async () => await filterRecent();
+  Object.assign(recentBtn.style, {
+    padding: '8px 12px',
+    borderRadius: '6px',
+    border: 'none',
+    backgroundColor: darkMode ? '#2a2a3e' : '#f5f5f5',
+    cursor: 'pointer',
+    fontSize: '16px',
+    opacity: recentFilterActive ? '1' : '0.5'
+  });
+
+  const untaggedBtn = document.createElement('button');
+  untaggedBtn.className = 'untagged-filter';
+  untaggedBtn.textContent = '🏷️';
+  untaggedBtn.setAttribute('aria-label', 'Filter untagged');
+  untaggedBtn.onclick = async () => await filterUntagged();
+  Object.assign(untaggedBtn.style, {
+    padding: '8px 12px',
+    borderRadius: '6px',
+    border: 'none',
+    backgroundColor: darkMode ? '#2a2a3e' : '#f5f5f5',
+    cursor: 'pointer',
+    fontSize: '16px',
+    opacity: untaggedFilterActive ? '1' : '0.5'
+  });
+
+  filterBtns.appendChild(favBtn);
+  filterBtns.appendChild(recentBtn);
+  filterBtns.appendChild(untaggedBtn);
+
   controls.appendChild(searchInput);
-  controls.appendChild(filterBtn);
+  controls.appendChild(filterBtns);
   panel.appendChild(controls);
 
   const noResults = document.createElement('div');
@@ -173,7 +223,7 @@ export async function createHistoryPanel(): Promise<void> {
       const text = document.createElement('div');
       text.className = 'meme-text';
       const displayText = meme.text.length > 50 ? meme.text.slice(0, 50) + '...' : meme.text;
-      text.textContent = displayText;
+      text.innerHTML = displayText;
       Object.assign(text.style, {
         fontSize: '12px',
         color: darkMode ? '#ccc' : '#555',
@@ -267,7 +317,17 @@ export async function applyFilters(): Promise<void> {
   const searchInput = currentPanel.querySelector('.history-search') as HTMLInputElement;
   const searchQuery = searchInput?.value.toLowerCase() || '';
   
+  await chrome.storage.local.set({
+    historyFilters: {
+      favorites: favoritesFilterActive,
+      recent: recentFilterActive,
+      untagged: untaggedFilterActive
+    }
+  });
+  
   let visibleCount = 0;
+  const now = Date.now();
+  const dayMs = 24 * 60 * 60 * 1000;
 
   items.forEach((item) => {
     const memeId = (item as HTMLElement).dataset.memeId;
@@ -279,13 +339,23 @@ export async function applyFilters(): Promise<void> {
       meme.template.toLowerCase().includes(searchQuery);
     
     const matchesFavorites = !favoritesFilterActive || meme.isFavorite;
+    const matchesRecent = !recentFilterActive || (now - meme.timestamp < dayMs);
+    const matchesUntagged = !untaggedFilterActive || meme.tags.length === 0;
     
     const matchesTags = activeTagFilters.size === 0 || 
       Array.from(activeTagFilters).every(tag => meme.tags.includes(tag));
 
-    if (matchesSearch && matchesFavorites && matchesTags) {
+    if (matchesSearch && matchesFavorites && matchesRecent && matchesUntagged && matchesTags) {
       (item as HTMLElement).style.display = 'block';
       visibleCount++;
+      
+      if (searchQuery) {
+        const textEl = item.querySelector('.meme-text') as HTMLElement;
+        if (textEl) {
+          const originalText = meme.text.length > 50 ? meme.text.slice(0, 50) + '...' : meme.text;
+          textEl.innerHTML = highlightText(originalText, searchQuery);
+        }
+      }
     } else {
       (item as HTMLElement).style.display = 'none';
     }
@@ -334,4 +404,35 @@ export async function filterFavorites(): Promise<void> {
   }
 
   await applyFilters();
+}
+
+export async function filterRecent(): Promise<void> {
+  if (!currentPanel) return;
+
+  recentFilterActive = !recentFilterActive;
+
+  const filterBtn = currentPanel.querySelector('.recent-filter') as HTMLElement;
+  if (filterBtn) {
+    filterBtn.style.opacity = recentFilterActive ? '1' : '0.5';
+  }
+
+  await applyFilters();
+}
+
+export async function filterUntagged(): Promise<void> {
+  if (!currentPanel) return;
+
+  untaggedFilterActive = !untaggedFilterActive;
+
+  const filterBtn = currentPanel.querySelector('.untagged-filter') as HTMLElement;
+  if (filterBtn) {
+    filterBtn.style.opacity = untaggedFilterActive ? '1' : '0.5';
+  }
+
+  await applyFilters();
+}
+
+function highlightText(text: string, query: string): string {
+  const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+  return text.replace(regex, '<mark style="background:#ffeb3b;color:#000;padding:2px 0;">$1</mark>');
 }

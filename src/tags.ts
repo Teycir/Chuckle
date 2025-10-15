@@ -29,13 +29,15 @@ export async function removeTag(memeKey: string, tag: string): Promise<void> {
 
 export async function getAllTags(): Promise<string[]> {
   const memes = await getAllMemes();
-  const tagSet = new Set<string>();
+  const tagCount = new Map<string, number>();
   
   memes.forEach(meme => {
-    meme.tags.forEach(tag => tagSet.add(tag));
+    meme.tags.forEach(tag => tagCount.set(tag, (tagCount.get(tag) || 0) + 1));
   });
   
-  return Array.from(tagSet).sort();
+  return Array.from(tagCount.entries())
+    .sort((a, b) => b[1] - a[1])
+    .map(([tag]) => tag);
 }
 
 export function filterTags(tags: string[], query: string): string[] {
