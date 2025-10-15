@@ -6,7 +6,7 @@ export interface Analytics {
   topTags: Array<{ name: string; count: number }>;
   favoritesCount: number;
   favoritesPercent: number;
-  shareStats: { twitter: number; reddit: number; facebook: number };
+  shareStats: { twitter: number; reddit: number; linkedin: number; email: number };
 }
 
 export async function getAnalytics(): Promise<Analytics> {
@@ -46,7 +46,8 @@ export async function getAnalytics(): Promise<Analytics> {
     shareStats: {
       twitter: (data.share_twitter as number) || 0,
       reddit: (data.share_reddit as number) || 0,
-      facebook: (data.share_facebook as number) || 0
+      linkedin: (data.share_linkedin as number) || 0,
+      email: (data.share_email as number) || 0
     }
   };
 }

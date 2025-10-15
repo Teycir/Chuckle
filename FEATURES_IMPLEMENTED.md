@@ -7,18 +7,19 @@
 
 **What's New:**
 - **Share Button** added to meme overlay (🚀 icon next to regenerate button)
-- **One-click sharing** to Twitter, Reddit, and Facebook
+- **One-click sharing** to Twitter, Reddit, LinkedIn, and Email
 - **Platform-specific optimizations:**
   - Twitter: Text + image URL in tweet
   - Reddit: Image URL with title
-  - Facebook: Direct image sharing
+  - LinkedIn: Professional sharing with image URL
+  - Email: Opens default email client with meme link
 - **Share Analytics Tracking** - tracks shares per platform for stats dashboard
 
 **How to Use:**
 1. Generate a meme
 2. Click the 🚀 button in the overlay
-3. Select your platform (𝕏 Twitter, 🔴 Reddit, 📘 Facebook)
-4. Share opens in new tab with pre-filled content
+3. Select your platform (𝕏 Twitter, 🔴 Reddit, 💼 LinkedIn, 📧 Email)
+4. Share opens in new tab or email client with pre-filled content
 
 **Files Added:**
 - `src/social-share.ts` - Social sharing module with platform integrations
@@ -40,7 +41,7 @@
   - Favorites count and percentage
   - Top 5 most-used templates
   - Top 5 most-used tags
-  - Share statistics (Twitter, Reddit, Facebook)
+  - Share statistics (Twitter, Reddit, LinkedIn, Email)
 - **Export Data** button - downloads all memes as JSON
 - **Template Browser** - view all 20 available meme templates
 

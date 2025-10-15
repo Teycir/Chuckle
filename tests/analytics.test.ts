@@ -19,7 +19,7 @@ describe('Analytics', () => {
       meme_3: { text: 'Test 3', template: 'Stonks', tags: ['work'], isFavorite: true },
       share_twitter: 10,
       share_reddit: 5,
-      share_facebook: 3
+      share_email: 3
     };
     
     global.chrome.storage.local.get = jest.fn().mockResolvedValue(mockData);
@@ -32,6 +32,7 @@ describe('Analytics', () => {
     expect(stats.topTemplates[0]).toEqual({ name: 'Drake', count: 2 });
     expect(stats.topTags[0]).toEqual({ name: 'funny', count: 2 });
     expect(stats.shareStats.twitter).toBe(10);
+    expect(stats.shareStats.email).toBe(3);
   });
 
   test('handles empty data', async () => {

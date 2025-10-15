@@ -16,9 +16,14 @@ const PLATFORMS: SharePlatform[] = [
     getUrl: (img, txt) => `https://reddit.com/submit?url=${encodeURIComponent(img)}&title=${encodeURIComponent(txt)}`
   },
   {
-    name: 'Facebook',
-    icon: '📘',
-    getUrl: (img) => `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(img)}`
+    name: 'LinkedIn',
+    icon: '💼',
+    getUrl: (img) => `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(img)}`
+  },
+  {
+    name: 'Email',
+    icon: '📧',
+    getUrl: (img, txt) => `mailto:?subject=${encodeURIComponent('Check out this meme!')}&body=${encodeURIComponent(txt + '\n\n' + img)}`
   }
 ];
 
@@ -39,7 +44,8 @@ function createShareMenu(imageUrl: string, text: string): HTMLDivElement {
     borderRadius: '8px',
     boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
     padding: '8px',
-    display: 'flex',
+    display: 'grid',
+    gridTemplateColumns: 'repeat(2, 1fr)',
     gap: '8px',
     zIndex: '1000'
   });

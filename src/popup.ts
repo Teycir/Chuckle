@@ -102,7 +102,8 @@ async function loadStats() {
         <div style="font-size: 11px; font-weight: 600; margin-bottom: 6px;">📤 Shares</div>
         <div style="font-size: 10px; color: #666;">𝕏 Twitter: ${stats.shareStats.twitter}</div>
         <div style="font-size: 10px; color: #666;">🔴 Reddit: ${stats.shareStats.reddit}</div>
-        <div style="font-size: 10px; color: #666;">📘 Facebook: ${stats.shareStats.facebook}</div>
+        <div style="font-size: 10px; color: #666;">💼 LinkedIn: ${stats.shareStats.linkedin}</div>
+        <div style="font-size: 10px; color: #666;">📧 Email: ${stats.shareStats.email}</div>
       </div>
     </div>
   `;

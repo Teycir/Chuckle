@@ -14,13 +14,18 @@ Think of it as your personal meme generator that lives in your browser. No desig
 - 🔒 **Your Privacy is Safe** - Everything stays on your computer, no tracking
 - 🌍 **Speaks Your Language** - Available in English, Spanish, French, and German
 - 🌙 **Dark Mode** - Beautiful animated backgrounds that are easy on your eyes
-- 📋 **One-Click Sharing** - Copy to clipboard or share directly to social media
+- 🚀 **Social Sharing** - Share instantly to Twitter, Reddit, LinkedIn, or Email
+- 📊 **Analytics Dashboard** - Track your meme stats, top templates, and share counts
+- ✏️ **Edit Meme Text** - Click to edit text directly, no need to regenerate
+- 🎨 **Template Browser** - Discover all 20 available meme templates
+- 📋 **One-Click Copy** - Copy to clipboard instantly
 - 🆓 **Free to Use** - Get 1,500 free memes every day using Google AI Studio's free tier
 - 🏷️ **Smart Organization** - Tag and favorite your memes for easy access
 - 📚 **History Panel** - Browse all your created memes with search and filters
 - ⚡ **Batch Generation** - Create multiple meme variants at once
-- ⌨️ **Keyboard Shortcuts** - R (regenerate), F (favorite), C (copy), T (tag), H (history), Ctrl+Z (undo)
+- ⌨️ **Keyboard Shortcuts** - Alt+M (generate), R (regenerate), F (favorite), C (copy), T (tag), H (history)
 - 🔄 **Undo Support** - Easily revert changes to favorites and tags
+- 📤 **Export Data** - Download all your memes as JSON backup
 
 ### Why Use Chuckle?
 
@@ -30,9 +35,9 @@ Think of it as your personal meme generator that lives in your browser. No desig
 - Professional-looking memes in seconds
 
 **⚡ Super Fast**
-- 2 clicks from text to meme
+- 1 click from text to meme (Alt+M shortcut)
 - No uploading images or typing captions
-- Share instantly to social media
+- Share instantly to Twitter, Reddit, LinkedIn, or Email
 
 **🔒 Private & Secure**
 - Your API key stays on your computer
@@ -113,6 +118,7 @@ Think of it as your personal meme generator that lives in your browser. No desig
 5. Generate all at once
 
 **⌨️ Keyboard Shortcuts**
+- **Alt+M**: Generate meme from selected text (anywhere on any page)
 - **R**: Regenerate meme (when viewing a meme)
 - **F**: Toggle favorite (when viewing a meme)
 - **C**: Copy to clipboard (when viewing a meme)
@@ -133,16 +139,44 @@ Think of it as your personal meme generator that lives in your browser. No desig
 3. Click "Save Settings"
 4. All popups now use dark colors (easier on your eyes at night!)
 
+**✏️ Edit Meme Text**
+- Click on the meme text to edit it
+- Make any changes you want
+- Click outside to save automatically
+- Regenerate uses your edited text
+
 **📋 Copy Your Meme**
 - Click the copy button in the meme popup
 - The meme is copied to your clipboard
 - Paste it anywhere: Twitter, Discord, Slack, emails
 
 **🚀 Share to Social Media**
-- Click the share button in the meme popup
-- Choose your platform (Twitter, Facebook, etc.)
-- The meme is automatically attached
+- Click the share button (🚀) in the meme popup
+- Choose your platform:
+  - **𝕏 Twitter** - Share publicly with your followers
+  - **🔴 Reddit** - Post to your favorite subreddit
+  - **💼 LinkedIn** - Share professionally with your network
+  - **📧 Email** - Send privately to friends, family, or coworkers
+- Share opens in new tab or email client
 - Add your caption and post!
+
+**📊 View Your Stats**
+- Click the Chuckle icon in your browser
+- Click the "📊 Stats" tab
+- See your meme creation statistics:
+  - Total memes created
+  - Favorites count and percentage
+  - Top 5 most-used templates
+  - Top 5 most-used tags
+  - Share counts (Twitter, Reddit, LinkedIn, Email)
+- Click "📥 Export Data" to download all your memes as JSON
+- Click "🎨 Browse Templates" to see all 20 available templates
+
+**⚡ Alt+M Quick Generate**
+- Highlight any text on any webpage
+- Press **Alt+M** (or **Option+M** on Mac)
+- Meme generates instantly
+- No need to right-click!
 
 ### Real-Life Examples
 
@@ -231,7 +265,22 @@ A: Chuckle's AI picks from popular meme templates based on your text's context a
 A: Use tags to categorize memes (e.g., "work", "funny", "relatable"). Mark favorites with the star button. Use History panel to search and filter.
 
 **Q: What are the keyboard shortcuts?**
-A: When viewing a meme: R (regenerate), F (favorite), C (copy), T (tag). Global: H (history), Ctrl+Z (undo), Esc (close).
+A: Alt+M (generate from selection), R (regenerate), F (favorite), C (copy), T (tag), H (history), Ctrl+Z (undo), Esc (close).
+
+**Q: Can I edit the meme text?**
+A: Yes! Click on the meme text to edit it. Changes save automatically when you click outside.
+
+**Q: How do I share memes?**
+A: Click the 🚀 button in the meme overlay and choose Twitter, Reddit, LinkedIn, or Email.
+
+**Q: Where can I see my meme statistics?**
+A: Click the Chuckle icon, then click the "📊 Stats" tab to see all your analytics.
+
+**Q: Can I export my memes?**
+A: Yes! Go to the Stats tab and click "📥 Export Data" to download all your memes as JSON.
+
+**Q: What templates are available?**
+A: Click the Chuckle icon, go to Stats tab, and click "🎨 Browse Templates" to see all 20 templates.
 
 **Q: Can I create multiple meme variants?**
 A: Yes! Click the 🎲 button on any meme to instantly regenerate with a different template. You can also use the Batch Generate feature to create 1-3 variants at once.
@@ -243,8 +292,11 @@ A: Yes! Click the 🎲 button on any meme to instantly regenerate with a differe
 - Use text with clear emotions or situations
 - Try different phrases to see what works
 - Press R or double-click to try different templates
-- Use keyboard shortcuts for faster workflow
-- Share your best memes with friends
+- Use Alt+M shortcut for instant generation
+- Edit text directly if AI gets it wrong
+- Share via Twitter, Reddit, LinkedIn, or Email
+- Check your stats to see what works best
+- Export your memes regularly as backup
 
 **❌ Don't:**
 - Highlight very long paragraphs (keep it short!)
@@ -327,10 +379,15 @@ A: Yes! Click the 🎲 button on any meme to instantly regenerate with a differe
 - **TypeScript** - Type-safe code
 - **Chrome Extension API** - Browser integration
 - **Gemini 2.5 Flash** - AI-powered template selection
-- **Jest** - 237 passing tests (100% coverage)
+- **Jest** - 255 passing tests (100% coverage)
 - **ESLint + Prettier** - Code quality
 
 ### Key Features
+- **Social Sharing** - Twitter, Reddit, LinkedIn, Email integration
+- **Analytics Dashboard** - Track stats, export data
+- **Editable Text** - Click to edit meme text inline
+- **Template Browser** - Discover 20 meme templates
+- **Keyboard Shortcuts** - Alt+M for instant generation
 - **LRU Cache** - 1-hour TTL for API responses
 - **Lazy Loading** - Tags module loaded on demand
 - **Parallel Processing** - Batch operations optimized
@@ -342,6 +399,8 @@ A: Yes! Click the 🎲 button on any meme to instantly regenerate with a differe
 - [SECURITY_FIXES.md](docs/SECURITY_FIXES.md) - Security improvements
 - [IMPROVEMENTS_APPLIED.md](docs/IMPROVEMENTS_APPLIED.md) - Recent enhancements
 - [TESTING_GUIDE.md](docs/TESTING_GUIDE.md) - Testing checklist
+- [FEATURES_IMPLEMENTED.md](FEATURES_IMPLEMENTED.md) - New features (v1.1.0)
+- [WHY_EMAIL_NOT_FACEBOOK.md](WHY_EMAIL_NOT_FACEBOOK.md) - Platform decisions
 
 ### Build & Test
 ```bash

@@ -29,7 +29,7 @@ describe('Social Share', () => {
     
     const menu = document.querySelector('.share-menu');
     expect(menu).toBeTruthy();
-    expect(menu?.querySelectorAll('button').length).toBe(3);
+    expect(menu?.querySelectorAll('button').length).toBe(4);
   });
 
   test('tracks share clicks', async () => {
@@ -51,5 +51,19 @@ describe('Social Share', () => {
     
     await new Promise(resolve => setTimeout(resolve, 10));
     expect(mockSet).toHaveBeenCalledWith({ share_twitter: 6 });
+  });
+
+  test('email share uses mailto protocol', () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const btn = createShareButton('https://example.com/meme.jpg', 'Test meme');
+    container.appendChild(btn);
+    
+    btn.click();
+    const emailBtn = Array.from(document.querySelectorAll('.share-menu button'))
+      .find(b => b.textContent === '📧') as HTMLButtonElement;
+    
+    expect(emailBtn).toBeTruthy();
+    expect(emailBtn?.title).toBe('Share on Email');
   });
 });
