@@ -325,10 +325,10 @@ A: Yes! Use the Batch Generate feature to create 1-3 variants per text. Great fo
 - **Performance** - Debounced inputs, optimized rendering
 
 ### Documentation
-- [ARCHITECTURE.md](ARCHITECTURE.md) - System design and architecture
-- [SECURITY_FIXES.md](SECURITY_FIXES.md) - Security improvements
-- [IMPROVEMENTS_APPLIED.md](IMPROVEMENTS_APPLIED.md) - Recent enhancements
-- [TESTING_GUIDE.md](TESTING_GUIDE.md) - Testing checklist
+- [ARCHITECTURE.md](docs/ARCHITECTURE.md) - System design and architecture
+- [SECURITY_FIXES.md](docs/SECURITY_FIXES.md) - Security improvements
+- [IMPROVEMENTS_APPLIED.md](docs/IMPROVEMENTS_APPLIED.md) - Recent enhancements
+- [TESTING_GUIDE.md](docs/TESTING_GUIDE.md) - Testing checklist
 
 ### Build & Test
 ```bash
@@ -349,4 +349,4 @@ Contributions welcome! Please:
 
 ---
 
-*Technical documentation: [ARCHITECTURE.md](ARCHITECTURE.md) | Security: [SECURITY_FIXES.md](SECURITY_FIXES.md)*
+*Technical documentation: [ARCHITECTURE.md](docs/ARCHITECTURE.md) | Security: [SECURITY_FIXES.md](docs/SECURITY_FIXES.md)*

@@ -74,11 +74,16 @@ function createTagBadge(tag: string, memeData: MemeData, renderTags: () => void)
   removeBtn.onclick = async () => {
     if (currentMemeKey) {
       const oldTags = [...memeData.tags];
-      const tags = await loadTagsModule();
-      await tags.removeTag(currentMemeKey, tag);
-      memeData.tags = memeData.tags.filter(t => t !== tag);
-      pushUndo({ type: 'tag', memeKey: currentMemeKey, oldValue: oldTags, newValue: memeData.tags });
-      renderTags();
+      try {
+        const tags = await loadTagsModule();
+        await tags.removeTag(currentMemeKey, tag);
+        memeData.tags = memeData.tags.filter(t => t !== tag);
+        pushUndo({ type: 'tag', memeKey: currentMemeKey, oldValue: oldTags, newValue: memeData.tags });
+        renderTags();
+      } catch (error) {
+        memeData.tags = oldTags;
+        renderTags();
+      }
     }
   };
 
@@ -94,13 +99,18 @@ function createTagSuggestion(tag: string, memeData: MemeData, tagInput: HTMLInpu
   item.onclick = async () => {
     if (currentMemeKey) {
       const oldTags = [...memeData.tags];
-      const tags = await loadTagsModule();
-      await tags.addTag(currentMemeKey, tag);
-      memeData.tags.push(tag);
-      pushUndo({ type: 'tag', memeKey: currentMemeKey, oldValue: oldTags, newValue: memeData.tags });
-      renderTags();
-      tagInput.value = '';
-      dropdown.style.display = 'none';
+      try {
+        const tags = await loadTagsModule();
+        await tags.addTag(currentMemeKey, tag);
+        memeData.tags.push(tag);
+        pushUndo({ type: 'tag', memeKey: currentMemeKey, oldValue: oldTags, newValue: memeData.tags });
+        renderTags();
+        tagInput.value = '';
+        dropdown.style.display = 'none';
+      } catch (error) {
+        memeData.tags = oldTags;
+        renderTags();
+      }
     }
   };
 
@@ -182,6 +192,9 @@ function handleKeyboardNavigation(
             renderTags();
             tagInput.value = '';
             dropdown.style.display = 'none';
+          }).catch(() => {
+            memeData.tags = oldTags;
+            renderTags();
           });
         });
       }

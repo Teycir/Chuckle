@@ -5,7 +5,7 @@ import type { MemeData } from './types';
 let currentPanel: HTMLElement | null = null;
 let allMemes: MemeData[] = [];
 let favoritesFilterActive = false;
-let activeTagFilters: Set<string> = new Set();
+const activeTagFilters: Set<string> = new Set();
 
 export async function createHistoryPanel(): Promise<void> {
   if (currentPanel) {

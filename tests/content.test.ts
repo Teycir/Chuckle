@@ -29,7 +29,7 @@ describe('Content Script', () => {
       })
     });
 
-    const { analyzeMemeContext } = require('../src/content');
+    const { analyzeMemeContext } = require('../src/geminiService');
     const result = await analyzeMemeContext('test text');
     
     expect(result).toBe('drake');
