@@ -10,6 +10,7 @@ Think of it as your personal meme generator that lives in your browser. No desig
 
 - 🎯 **Instant Memes** - Highlight text, right-click, get a meme in 2-3 seconds
 - 🤖 **AI-Powered** - Gemini 2.5 Flash picks the perfect meme template for your text
+- 🎲 **Regenerate Variants** - Don't like the first meme? Click to try another template instantly
 - 🔒 **Your Privacy is Safe** - Everything stays on your computer, no tracking
 - 🌍 **Speaks Your Language** - Available in English, Spanish, French, and German
 - 🌙 **Dark Mode** - Beautiful animated backgrounds that are easy on your eyes
@@ -86,6 +87,11 @@ Think of it as your personal meme generator that lives in your browser. No desig
 2. Press Enter or select from autocomplete suggestions
 3. Tags help you find memes later
 4. Click the × on any tag to remove it
+
+**🎲 Regenerate Memes**
+- Click the dice button (🎲) on any meme to try a different template
+- Uses the same text but generates a new variant
+- Keep clicking until you find the perfect meme
 
 **⭐ Mark Favorites**
 - Click the star button on any meme to favorite it
@@ -223,7 +229,7 @@ A: Use tags to categorize memes (e.g., "work", "funny", "relatable"). Mark favor
 A: Press H to open History, Ctrl+Z to undo changes, and Esc to close overlays.
 
 **Q: Can I create multiple meme variants?**
-A: Yes! Use the Batch Generate feature to create 1-3 variants per text. Great for finding the perfect meme.
+A: Yes! Click the 🎲 button on any meme to instantly regenerate with a different template. You can also use the Batch Generate feature to create 1-3 variants at once.
 
 ### Tips for Best Memes
 
@@ -231,6 +237,7 @@ A: Yes! Use the Batch Generate feature to create 1-3 variants per text. Great fo
 - Highlight short, punchy text (5-15 words works best)
 - Use text with clear emotions or situations
 - Try different phrases to see what works
+- Click the 🎲 button to try different templates
 - Share your best memes with friends
 
 **❌ Don't:**

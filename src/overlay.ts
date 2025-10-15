@@ -3,6 +3,8 @@ import { simpleHash, updateMeme } from './storage';
 import { CONFIG } from './config';
 import { pushUndo } from './undo';
 import { enableShortcuts, disableShortcuts } from './shortcuts';
+import { analyzeMemeContext, generateMemeImage } from './geminiService';
+import { showLoading, hideLoading } from './loading';
 
 let tagsModule: typeof import('./tags') | null = null;
 
@@ -16,6 +18,7 @@ async function loadTagsModule() {
 let currentOverlay: HTMLElement | null = null;
 let currentMemeKey: string | null = null;
 let currentMemeData: MemeData | null = null;
+let originalText: string | null = null;
 
 function createButton(className: string, text: string, onClick: () => void): HTMLButtonElement {
   const btn = document.createElement('button');
@@ -46,6 +49,38 @@ function createCloseButton(): HTMLButtonElement {
   closeBtn.setAttribute('aria-label', 'Close meme overlay');
   closeBtn.setAttribute('role', 'button');
   return closeBtn;
+}
+
+function createRegenerateButton(): HTMLButtonElement {
+  const regenBtn = createButton('regenerate-btn', '🎲', async () => {
+    if (!originalText) return;
+    try {
+      showLoading('Regenerating meme...');
+      const template = await analyzeMemeContext(originalText, Date.now());
+      const imageUrl = await generateMemeImage(template);
+      
+      if (currentMemeData) {
+        currentMemeData.imageUrl = imageUrl;
+        currentMemeData.template = template;
+        currentMemeData.timestamp = Date.now();
+        
+        const img = currentOverlay?.querySelector('.meme-image') as HTMLImageElement;
+        if (img) img.src = imageUrl;
+        
+        if (currentMemeKey) {
+          await updateMeme(currentMemeKey, { imageUrl, template, timestamp: currentMemeData.timestamp });
+        }
+      }
+      hideLoading();
+    } catch (error) {
+      hideLoading();
+      console.error('Regeneration failed:', error);
+    }
+  });
+  regenBtn.setAttribute('aria-label', 'Try another meme variant');
+  regenBtn.setAttribute('role', 'button');
+  regenBtn.title = 'Try Another';
+  return regenBtn;
 }
 
 function createMemeImage(memeData: MemeData): HTMLImageElement {
@@ -281,7 +316,10 @@ export async function createOverlay(memeData: MemeData): Promise<void> {
   const header = document.createElement('div');
   header.className = 'meme-header';
   header.appendChild(createStarButton(memeData));
+  header.appendChild(createRegenerateButton());
   header.appendChild(createCloseButton());
+
+  originalText = memeData.text;
 
   currentMemeKey = `meme_${simpleHash(memeData.text + memeData.timestamp)}`;
   currentMemeData = memeData;
@@ -319,6 +357,7 @@ export function closeOverlay(): void {
     currentOverlay = null;
     currentMemeKey = null;
     currentMemeData = null;
+    originalText = null;
     document.body.style.overflow = '';
     disableShortcuts();
   }
