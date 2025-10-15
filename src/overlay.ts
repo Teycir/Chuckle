@@ -30,17 +30,21 @@ function createStarButton(memeData: MemeData): HTMLButtonElement {
     const oldValue = memeData.isFavorite;
     memeData.isFavorite = !memeData.isFavorite;
     starBtn.textContent = memeData.isFavorite ? '⭐' : '☆';
+    starBtn.setAttribute('aria-label', memeData.isFavorite ? 'Remove from favorites' : 'Add to favorites');
     if (currentMemeKey) {
       pushUndo({ type: 'favorite', memeKey: currentMemeKey, oldValue, newValue: memeData.isFavorite });
       await updateMeme(currentMemeKey, { isFavorite: memeData.isFavorite });
     }
   });
+  starBtn.setAttribute('aria-label', memeData.isFavorite ? 'Remove from favorites' : 'Add to favorites');
+  starBtn.setAttribute('role', 'button');
   return starBtn;
 }
 
 function createCloseButton(): HTMLButtonElement {
   const closeBtn = createButton('close-btn', '×', closeOverlay);
   closeBtn.setAttribute('aria-label', 'Close meme overlay');
+  closeBtn.setAttribute('role', 'button');
   return closeBtn;
 }
 
@@ -119,12 +123,12 @@ async function updateAutocompleteDropdown(
     return;
   }
 
+  const tags = await loadTagsModule();
+  
   if (allTagsRef.value.length === 0) {
-    const tags = await loadTagsModule();
     allTagsRef.value = await tags.getAllTags();
   }
 
-  const tags = await loadTagsModule();
   const filtered = tags.filterTags(allTagsRef.value, query).filter(tag => !memeData.tags.includes(tag));
   
   if (filtered.length === 0) {
@@ -215,6 +219,7 @@ function createTagsSection(memeData: MemeData): HTMLDivElement {
   tagInput.className = 'tag-input';
   tagInput.type = 'text';
   tagInput.placeholder = 'Add tag...';
+  tagInput.setAttribute('aria-label', 'Add tag to meme');
 
   const dropdown = document.createElement('div');
   dropdown.className = 'tag-autocomplete';
@@ -285,13 +290,14 @@ export async function createOverlay(memeData: MemeData): Promise<void> {
   const closeBtn = header.querySelector('.close-btn') as HTMLButtonElement;
   closeBtn?.focus();
 
-  const handleEscape = (e: KeyboardEvent) => {
+  let escapeHandler: ((e: KeyboardEvent) => void) | null = null;
+  escapeHandler = (e: KeyboardEvent) => {
     if (e.key === 'Escape') {
       closeOverlay();
-      document.removeEventListener('keydown', handleEscape);
+      if (escapeHandler) document.removeEventListener('keydown', escapeHandler);
     }
   };
-  document.addEventListener('keydown', handleEscape);
+  document.addEventListener('keydown', escapeHandler);
 }
 
 export function closeOverlay(): void {

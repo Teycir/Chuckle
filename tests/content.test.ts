@@ -1,4 +1,6 @@
 describe('Content Script', () => {
+  const testApiKey = process.env.GEMINI_API_KEY || 'AIzaSyBlWG7PpQOAah7dkkmy03kWJwPUUq2e40I';
+  
   beforeEach(() => {
     global.chrome = {
       runtime: { onMessage: { addListener: jest.fn() } },
@@ -7,9 +9,9 @@ describe('Content Script', () => {
           set: jest.fn(),
           get: jest.fn((keys, callback) => {
             if (callback) {
-              callback({ geminiApiKey: 'test-key' });
+              callback({ geminiApiKey: testApiKey });
             }
-            return Promise.resolve({ geminiApiKey: 'test-key' });
+            return Promise.resolve({ geminiApiKey: testApiKey });
           })
         } 
       },

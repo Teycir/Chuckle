@@ -1,42 +1,7 @@
 import type { GeminiResponse } from './types';
-import { geminiCache } from './cache';
 import { CONFIG } from './config';
-import { showLoading, hideLoading } from './loading';
+import { geminiCache } from './cache';
 import { logger } from './logger';
-
-function showError(message: string): void {
-  const errorDiv = document.createElement('div');
-  errorDiv.className = 'meme-error';
-  errorDiv.textContent = message;
-  errorDiv.style.cssText = 'position:fixed;top:20px;right:20px;background:#c5221f;color:#fff;padding:15px 20px;border-radius:8px;z-index:10001;box-shadow:0 4px 12px rgba(0,0,0,0.3)';
-  document.body.appendChild(errorDiv);
-  setTimeout(() => errorDiv.remove(), 3000);
-}
-
-chrome.runtime.onMessage.addListener((message) => {
-  if (message.action === "generateMeme") {
-    generateMeme(message.text);
-  }
-});
-
-export async function generateMeme(text: string): Promise<void> {
-  try {
-    showLoading('Generating meme...');
-    const memeData = await analyzeMemeContext(text);
-    const imageUrl = await generateMemeImage(memeData);
-    
-    chrome.storage.local.set({ 
-      currentMeme: { imageUrl, text } 
-    }, () => {
-      hideLoading();
-      chrome.action.openPopup();
-    });
-  } catch (error) {
-    hideLoading();
-    logger.error('Meme generation failed', error);
-    showError('Failed to generate meme. Please try again.');
-  }
-}
 
 export async function analyzeMemeContext(text: string): Promise<string> {
   const cacheKey = `gemini:${text}`;
@@ -45,7 +10,6 @@ export async function analyzeMemeContext(text: string): Promise<string> {
 
   const { geminiApiKey } = await chrome.storage.local.get(['geminiApiKey']);
   if (!geminiApiKey) throw new Error('API key not configured');
-  if (!/^AIza[0-9A-Za-z_-]{35}$/.test(geminiApiKey)) throw new Error('Invalid API key format');
   
   const response = await fetch(
     `${CONFIG.GEMINI_API_URL}?key=${geminiApiKey}`,
@@ -73,7 +37,7 @@ export async function analyzeMemeContext(text: string): Promise<string> {
   return result;
 }
 
-async function generateMemeImage(template: string): Promise<string> {
+export async function generateMemeImage(template: string): Promise<string> {
   try {
     const url = `${CONFIG.MEMEGEN_API_URL}/${template}.png`;
     const response = await fetch(url, { method: 'HEAD' });

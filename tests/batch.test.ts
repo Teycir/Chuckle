@@ -4,11 +4,13 @@ import { geminiCache } from '../src/cache';
 
 jest.mock('../src/storage');
 
+const testApiKey = process.env.GEMINI_API_KEY || 'AIzaSyBlWG7PpQOAah7dkkmy03kWJwPUUq2e40I';
+
 global.fetch = jest.fn();
 global.chrome = {
   storage: {
     local: {
-      get: jest.fn(() => Promise.resolve({ geminiApiKey: 'test-key' }))
+      get: jest.fn(() => Promise.resolve({ geminiApiKey: testApiKey }))
     }
   }
 } as any;

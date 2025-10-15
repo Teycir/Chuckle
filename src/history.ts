@@ -1,4 +1,4 @@
-import { getAllMemes } from './storage';
+import { getAllMemes, simpleHash } from './storage';
 import { createOverlay } from './overlay';
 import type { MemeData } from './types';
 
@@ -78,6 +78,7 @@ export async function createHistoryPanel(): Promise<void> {
   searchInput.className = 'history-search';
   searchInput.type = 'text';
   searchInput.placeholder = 'Search memes...';
+  searchInput.setAttribute('aria-label', 'Search memes by text or template');
   searchInput.oninput = (e) => searchHistory((e.target as HTMLInputElement).value);
   Object.assign(searchInput.style, {
     flex: '1',
@@ -92,6 +93,8 @@ export async function createHistoryPanel(): Promise<void> {
   const filterBtn = document.createElement('button');
   filterBtn.className = 'favorites-filter';
   filterBtn.textContent = '⭐';
+  filterBtn.setAttribute('aria-label', 'Filter favorites');
+  filterBtn.setAttribute('aria-pressed', 'false');
   filterBtn.onclick = async () => await filterFavorites();
   Object.assign(filterBtn.style, {
     padding: '8px 12px',
@@ -141,8 +144,10 @@ export async function createHistoryPanel(): Promise<void> {
     panel.appendChild(empty);
   } else {
     allMemes.forEach(meme => {
+      const memeId = `meme_${simpleHash(meme.text + meme.timestamp)}`;
       const item = document.createElement('div');
       item.className = 'history-item';
+      item.dataset.memeId = memeId;
       item.onclick = () => createOverlay(meme);
       Object.assign(item.style, {
         marginBottom: '10px',
@@ -264,8 +269,9 @@ export async function applyFilters(): Promise<void> {
   
   let visibleCount = 0;
 
-  items.forEach((item, index) => {
-    const meme = allMemes[index];
+  items.forEach((item) => {
+    const memeId = (item as HTMLElement).dataset.memeId;
+    const meme = allMemes.find(m => `meme_${simpleHash(m.text + m.timestamp)}` === memeId);
     if (!meme) return;
 
     const matchesSearch = searchQuery === '' || 
@@ -324,6 +330,7 @@ export async function filterFavorites(): Promise<void> {
   const filterBtn = currentPanel.querySelector('.favorites-filter') as HTMLElement;
   if (filterBtn) {
     filterBtn.style.opacity = favoritesFilterActive ? '1' : '0.5';
+    filterBtn.setAttribute('aria-pressed', favoritesFilterActive ? 'true' : 'false');
   }
 
   await applyFilters();

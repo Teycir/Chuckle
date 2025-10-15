@@ -5,7 +5,10 @@ export async function addTag(memeKey: string, tag: string): Promise<void> {
   if (!trimmedTag) return;
 
   const meme = await getMeme(memeKey);
-  if (!meme) return;
+  if (!meme) {
+    console.warn(`Cannot add tag: meme ${memeKey} not found`);
+    return;
+  }
 
   if (!meme.tags.includes(trimmedTag)) {
     meme.tags.push(trimmedTag);
@@ -15,7 +18,10 @@ export async function addTag(memeKey: string, tag: string): Promise<void> {
 
 export async function removeTag(memeKey: string, tag: string): Promise<void> {
   const meme = await getMeme(memeKey);
-  if (!meme) return;
+  if (!meme) {
+    console.warn(`Cannot remove tag: meme ${memeKey} not found`);
+    return;
+  }
 
   const updatedTags = meme.tags.filter(t => t !== tag);
   await updateMeme(memeKey, { tags: updatedTags });

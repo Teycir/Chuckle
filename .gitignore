@@ -1,7 +1,10 @@
 .env
+.env.*
 node_modules/
 *.log
 .DS_Store
 dist/
 *.js
 !build.js
+!build-prod.js
+.history
