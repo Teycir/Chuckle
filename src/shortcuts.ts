@@ -1,6 +1,7 @@
 import { undo } from './undo';
 
 let shortcutsEnabled = false;
+let shortcutHandlers: Map<string, () => void | Promise<void>> = new Map();
 
 export function enableShortcuts(): void {
   if (shortcutsEnabled) return;
@@ -10,7 +11,12 @@ export function enableShortcuts(): void {
 
 export function disableShortcuts(): void {
   shortcutsEnabled = false;
+  shortcutHandlers.clear();
   document.removeEventListener('keydown', handleShortcut);
+}
+
+export function registerShortcut(key: string, handler: () => void | Promise<void>): void {
+  shortcutHandlers.set(key.toLowerCase(), handler);
 }
 
 async function handleShortcut(e: KeyboardEvent): Promise<void> {
@@ -28,6 +34,12 @@ async function handleShortcut(e: KeyboardEvent): Promise<void> {
     e.preventDefault();
     const { createHistoryPanel } = await import('./history');
     await createHistoryPanel();
+  } else {
+    const handler = shortcutHandlers.get(e.key.toLowerCase());
+    if (handler && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      e.preventDefault();
+      await handler();
+    }
   }
 }
 

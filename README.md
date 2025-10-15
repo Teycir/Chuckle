@@ -19,7 +19,7 @@ Think of it as your personal meme generator that lives in your browser. No desig
 - 🏷️ **Smart Organization** - Tag and favorite your memes for easy access
 - 📚 **History Panel** - Browse all your created memes with search and filters
 - ⚡ **Batch Generation** - Create multiple meme variants at once
-- ⌨️ **Keyboard Shortcuts** - Quick access with Ctrl+Z (undo) and H (history)
+- ⌨️ **Keyboard Shortcuts** - R (regenerate), F (favorite), C (copy), T (tag), H (history), Ctrl+Z (undo)
 - 🔄 **Undo Support** - Easily revert changes to favorites and tags
 
 ### Why Use Chuckle?
@@ -89,9 +89,10 @@ Think of it as your personal meme generator that lives in your browser. No desig
 4. Click the × on any tag to remove it
 
 **🎲 Regenerate Memes**
-- Click the dice button (🎲) on any meme to try a different template
+- Press R or click the dice button (🎲) to try a different template
+- Double-click the meme image to regenerate
 - Uses the same text but generates a new variant
-- Keep clicking until you find the perfect meme
+- Keep regenerating until you find the perfect meme
 
 **⭐ Mark Favorites**
 - Click the star button on any meme to favorite it
@@ -112,8 +113,12 @@ Think of it as your personal meme generator that lives in your browser. No desig
 5. Generate all at once
 
 **⌨️ Keyboard Shortcuts**
-- **Ctrl+Z**: Undo last favorite/tag change
+- **R**: Regenerate meme (when viewing a meme)
+- **F**: Toggle favorite (when viewing a meme)
+- **C**: Copy to clipboard (when viewing a meme)
+- **T**: Focus tag input (when viewing a meme)
 - **H**: Open/close History panel
+- **Ctrl+Z**: Undo last favorite/tag change
 - **Esc**: Close any open overlay
 
 **🌍 Change Language**
@@ -226,7 +231,7 @@ A: Chuckle's AI picks from popular meme templates based on your text's context a
 A: Use tags to categorize memes (e.g., "work", "funny", "relatable"). Mark favorites with the star button. Use History panel to search and filter.
 
 **Q: What are the keyboard shortcuts?**
-A: Press H to open History, Ctrl+Z to undo changes, and Esc to close overlays.
+A: When viewing a meme: R (regenerate), F (favorite), C (copy), T (tag). Global: H (history), Ctrl+Z (undo), Esc (close).
 
 **Q: Can I create multiple meme variants?**
 A: Yes! Click the 🎲 button on any meme to instantly regenerate with a different template. You can also use the Batch Generate feature to create 1-3 variants at once.
@@ -237,7 +242,8 @@ A: Yes! Click the 🎲 button on any meme to instantly regenerate with a differe
 - Highlight short, punchy text (5-15 words works best)
 - Use text with clear emotions or situations
 - Try different phrases to see what works
-- Click the 🎲 button to try different templates
+- Press R or double-click to try different templates
+- Use keyboard shortcuts for faster workflow
 - Share your best memes with friends
 
 **❌ Don't:**

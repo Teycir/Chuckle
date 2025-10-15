@@ -2,7 +2,7 @@ import type { MemeData } from './types';
 import { simpleHash, updateMeme } from './storage';
 import { CONFIG } from './config';
 import { pushUndo } from './undo';
-import { enableShortcuts, disableShortcuts } from './shortcuts';
+import { enableShortcuts, disableShortcuts, registerShortcut } from './shortcuts';
 import { analyzeMemeContext, generateMemeImage } from './geminiService';
 import { showLoading, hideLoading } from './loading';
 
@@ -28,19 +28,25 @@ function createButton(className: string, text: string, onClick: () => void): HTM
   return btn;
 }
 
+async function toggleFavorite(memeData: MemeData, starBtn: HTMLButtonElement): Promise<void> {
+  const oldValue = memeData.isFavorite;
+  memeData.isFavorite = !memeData.isFavorite;
+  starBtn.textContent = memeData.isFavorite ? '⭐' : '☆';
+  starBtn.setAttribute('aria-label', memeData.isFavorite ? 'Remove from favorites' : 'Add to favorites');
+  starBtn.title = memeData.isFavorite ? 'Remove from favorites (F)' : 'Add to favorites (F)';
+  if (currentMemeKey) {
+    pushUndo({ type: 'favorite', memeKey: currentMemeKey, oldValue, newValue: memeData.isFavorite });
+    await updateMeme(currentMemeKey, { isFavorite: memeData.isFavorite });
+  }
+}
+
 function createStarButton(memeData: MemeData): HTMLButtonElement {
   const starBtn = createButton('star-btn', memeData.isFavorite ? '⭐' : '☆', async () => {
-    const oldValue = memeData.isFavorite;
-    memeData.isFavorite = !memeData.isFavorite;
-    starBtn.textContent = memeData.isFavorite ? '⭐' : '☆';
-    starBtn.setAttribute('aria-label', memeData.isFavorite ? 'Remove from favorites' : 'Add to favorites');
-    if (currentMemeKey) {
-      pushUndo({ type: 'favorite', memeKey: currentMemeKey, oldValue, newValue: memeData.isFavorite });
-      await updateMeme(currentMemeKey, { isFavorite: memeData.isFavorite });
-    }
+    await toggleFavorite(memeData, starBtn);
   });
   starBtn.setAttribute('aria-label', memeData.isFavorite ? 'Remove from favorites' : 'Add to favorites');
   starBtn.setAttribute('role', 'button');
+  starBtn.title = memeData.isFavorite ? 'Remove from favorites (F)' : 'Add to favorites (F)';
   return starBtn;
 }
 
@@ -51,35 +57,37 @@ function createCloseButton(): HTMLButtonElement {
   return closeBtn;
 }
 
-function createRegenerateButton(): HTMLButtonElement {
-  const regenBtn = createButton('regenerate-btn', '🎲', async () => {
-    if (!originalText) return;
-    try {
-      showLoading('Regenerating meme...');
-      const template = await analyzeMemeContext(originalText, Date.now());
-      const imageUrl = await generateMemeImage(template);
+async function regenerateMeme(): Promise<void> {
+  if (!originalText) return;
+  try {
+    showLoading('Regenerating meme...');
+    const template = await analyzeMemeContext(originalText, Date.now());
+    const imageUrl = await generateMemeImage(template);
+    
+    if (currentMemeData) {
+      currentMemeData.imageUrl = imageUrl;
+      currentMemeData.template = template;
+      currentMemeData.timestamp = Date.now();
       
-      if (currentMemeData) {
-        currentMemeData.imageUrl = imageUrl;
-        currentMemeData.template = template;
-        currentMemeData.timestamp = Date.now();
-        
-        const img = currentOverlay?.querySelector('.meme-image') as HTMLImageElement;
-        if (img) img.src = imageUrl;
-        
-        if (currentMemeKey) {
-          await updateMeme(currentMemeKey, { imageUrl, template, timestamp: currentMemeData.timestamp });
-        }
+      const img = currentOverlay?.querySelector('.meme-image') as HTMLImageElement;
+      if (img) img.src = imageUrl;
+      
+      if (currentMemeKey) {
+        await updateMeme(currentMemeKey, { imageUrl, template, timestamp: currentMemeData.timestamp });
       }
-      hideLoading();
-    } catch (error) {
-      hideLoading();
-      console.error('Regeneration failed:', error);
     }
-  });
+    hideLoading();
+  } catch (error) {
+    hideLoading();
+    console.error('Regeneration failed:', error);
+  }
+}
+
+function createRegenerateButton(): HTMLButtonElement {
+  const regenBtn = createButton('regenerate-btn', '🎲', regenerateMeme);
   regenBtn.setAttribute('aria-label', 'Try another meme variant');
   regenBtn.setAttribute('role', 'button');
-  regenBtn.title = 'Try Another';
+  regenBtn.title = 'Try Another (R)';
   return regenBtn;
 }
 
@@ -88,6 +96,9 @@ function createMemeImage(memeData: MemeData): HTMLImageElement {
   img.className = 'meme-image';
   img.src = memeData.imageUrl;
   img.alt = `Meme: ${memeData.text}`;
+  img.ondblclick = regenerateMeme;
+  img.style.cursor = 'pointer';
+  img.title = 'Double-click to regenerate';
   return img;
 }
 
@@ -243,9 +254,53 @@ function createTagsSection(memeData: MemeData): HTMLDivElement {
   const tagsContainer = document.createElement('div');
   tagsContainer.className = 'tags-container';
 
-  const renderTags = () => {
+  const renderTags = async () => {
     const existingInput = tagsContainer.querySelector('.tag-input')?.parentElement;
     while (tagsContainer.firstChild) tagsContainer.removeChild(tagsContainer.firstChild);
+    
+    const tags = await loadTagsModule();
+    const allTags = await tags.getAllTags();
+    const recentTags = allTags.slice(0, 3).filter(tag => !memeData.tags.includes(tag));
+    
+    if (recentTags.length > 0) {
+      const quickTags = document.createElement('div');
+      quickTags.className = 'quick-tags';
+      Object.assign(quickTags.style, {
+        display: 'flex',
+        gap: '4px',
+        marginBottom: '8px',
+        flexWrap: 'wrap'
+      });
+      
+      recentTags.forEach(tag => {
+        const chip = document.createElement('button');
+        chip.className = 'quick-tag-chip';
+        chip.textContent = tag;
+        chip.title = 'Click to add tag';
+        chip.onclick = async () => {
+          const key = currentMemeKey;
+          if (key && !memeData.tags.includes(tag)) {
+            const oldTags = [...memeData.tags];
+            await tags.addTag(key, tag);
+            memeData.tags.push(tag);
+            pushUndo({ type: 'tag', memeKey: key, oldValue: oldTags, newValue: memeData.tags });
+            await renderTags();
+          }
+        };
+        Object.assign(chip.style, {
+          padding: '4px 8px',
+          borderRadius: '12px',
+          border: '1px dashed #999',
+          background: 'transparent',
+          cursor: 'pointer',
+          fontSize: '11px',
+          color: '#666'
+        });
+        quickTags.appendChild(chip);
+      });
+      
+      tagsContainer.appendChild(quickTags);
+    }
     
     memeData.tags.forEach(tag => {
       const badge = createTagBadge(tag, memeData, renderTags);
@@ -257,7 +312,7 @@ function createTagsSection(memeData: MemeData): HTMLDivElement {
     }
   };
 
-  renderTags();
+  void renderTags();
 
   const tagInputWrapper = document.createElement('div');
   tagInputWrapper.style.position = 'relative';
@@ -266,7 +321,7 @@ function createTagsSection(memeData: MemeData): HTMLDivElement {
   const tagInput = document.createElement('input');
   tagInput.className = 'tag-input';
   tagInput.type = 'text';
-  tagInput.placeholder = 'Add tag...';
+  tagInput.placeholder = 'Add tag... (Press T)';
   tagInput.setAttribute('aria-label', 'Add tag to meme');
 
   const dropdown = document.createElement('div');
@@ -300,6 +355,26 @@ function createTagsSection(memeData: MemeData): HTMLDivElement {
   return tagsContainer;
 }
 
+async function copyToClipboard(): Promise<void> {
+  if (!currentMemeData) return;
+  try {
+    const response = await fetch(currentMemeData.imageUrl);
+    const blob = await response.blob();
+    await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
+    showToast('Copied to clipboard');
+  } catch {
+    showToast('Copy failed');
+  }
+}
+
+function showToast(message: string): void {
+  const toast = document.createElement('div');
+  toast.className = 'toast-notification';
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 2000);
+}
+
 export async function createOverlay(memeData: MemeData): Promise<void> {
   if (currentOverlay) closeOverlay();
 
@@ -315,7 +390,8 @@ export async function createOverlay(memeData: MemeData): Promise<void> {
 
   const header = document.createElement('div');
   header.className = 'meme-header';
-  header.appendChild(createStarButton(memeData));
+  const starBtn = createStarButton(memeData);
+  header.appendChild(starBtn);
   header.appendChild(createRegenerateButton());
   header.appendChild(createCloseButton());
 
@@ -337,6 +413,14 @@ export async function createOverlay(memeData: MemeData): Promise<void> {
   document.body.appendChild(overlay);
   currentOverlay = overlay;
   enableShortcuts();
+
+  registerShortcut('r', regenerateMeme);
+  registerShortcut('f', () => toggleFavorite(memeData, starBtn));
+  registerShortcut('c', copyToClipboard);
+  registerShortcut('t', () => {
+    const tagInput = overlay.querySelector('.tag-input') as HTMLInputElement;
+    tagInput?.focus();
+  });
 
   const closeBtn = header.querySelector('.close-btn') as HTMLButtonElement;
   closeBtn?.focus();

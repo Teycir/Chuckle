@@ -81,6 +81,7 @@ describe('Tags Input - Integration Tests', () => {
       };
 
       await createOverlay(meme);
+      await new Promise(resolve => setTimeout(resolve, 50));
 
       const tagBadge = document.querySelector('.tag-badge');
       expect(tagBadge).toBeTruthy();
@@ -206,6 +207,7 @@ describe('Tags Input - Integration Tests', () => {
       };
 
       await createOverlay(meme);
+      await new Promise(resolve => setTimeout(resolve, 50));
 
       const badges = document.querySelectorAll('.tag-badge');
       expect(badges.length).toBe(2);
@@ -245,6 +247,7 @@ describe('Tags Input - Integration Tests', () => {
       };
 
       await createOverlay(meme);
+      await new Promise(resolve => setTimeout(resolve, 50));
 
       const badges = document.querySelectorAll('.tag-badge');
       expect(badges.length).toBe(3);
@@ -262,6 +265,7 @@ describe('Tags Input - Integration Tests', () => {
       };
 
       await createOverlay(meme);
+      await new Promise(resolve => setTimeout(resolve, 50));
 
       const removeBtn = document.querySelector('.tag-remove');
       expect(removeBtn).toBeTruthy();
@@ -317,6 +321,7 @@ describe('Tags Input - Integration Tests', () => {
 
       await saveMeme(meme);
       await createOverlay(meme);
+      await new Promise(resolve => setTimeout(resolve, 50));
 
       const badges = document.querySelectorAll('.tag-badge');
       expect(badges.length).toBe(2);
