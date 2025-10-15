@@ -25,5 +25,13 @@
   },
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'; style-src 'self' 'unsafe-inline'"
+  },
+  "commands": {
+    "generate-meme": {
+      "suggested_key": {
+        "default": "Alt+M"
+      },
+      "description": "Generate meme from selected text"
+    }
   }
 }

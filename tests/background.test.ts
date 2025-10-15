@@ -9,7 +9,8 @@ describe('Background Service Worker', () => {
         create: mockCreate,
         onClicked: { addListener: jest.fn() }
       },
-      tabs: { sendMessage: jest.fn() }
+      tabs: { sendMessage: jest.fn(), query: jest.fn() },
+      commands: { onCommand: { addListener: jest.fn() } }
     } as any;
 
     require('../src/background');

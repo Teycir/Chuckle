@@ -5,6 +5,7 @@ import { pushUndo } from './undo';
 import { enableShortcuts, disableShortcuts, registerShortcut } from './shortcuts';
 import { analyzeMemeContext, generateMemeImage } from './geminiService';
 import { showLoading, hideLoading } from './loading';
+import { createShareButton } from './social-share';
 
 let tagsModule: typeof import('./tags') | null = null;
 
@@ -105,7 +106,17 @@ function createMemeImage(memeData: MemeData): HTMLImageElement {
 function createMemeText(memeData: MemeData): HTMLDivElement {
   const text = document.createElement('div');
   text.className = 'meme-text';
+  text.contentEditable = 'true';
   text.textContent = memeData.text;
+  text.title = 'Click to edit text';
+  text.onblur = async () => {
+    const newText = text.textContent?.trim() || memeData.text;
+    if (newText !== memeData.text && currentMemeKey) {
+      memeData.text = newText;
+      originalText = newText;
+      await updateMeme(currentMemeKey, { text: newText });
+    }
+  };
   return text;
 }
 
@@ -393,6 +404,7 @@ export async function createOverlay(memeData: MemeData): Promise<void> {
   const starBtn = createStarButton(memeData);
   header.appendChild(starBtn);
   header.appendChild(createRegenerateButton());
+  header.appendChild(createShareButton(memeData.imageUrl, memeData.text));
   header.appendChild(createCloseButton());
 
   originalText = memeData.text;
@@ -414,10 +426,10 @@ export async function createOverlay(memeData: MemeData): Promise<void> {
   currentOverlay = overlay;
   enableShortcuts();
 
-  registerShortcut('r', regenerateMeme);
-  registerShortcut('f', () => toggleFavorite(memeData, starBtn));
-  registerShortcut('c', copyToClipboard);
-  registerShortcut('t', () => {
+  registerShortcut('regenerate', regenerateMeme);
+  registerShortcut('favorite', () => toggleFavorite(memeData, starBtn));
+  registerShortcut('copy', copyToClipboard);
+  registerShortcut('tag', () => {
     const tagInput = overlay.querySelector('.tag-input') as HTMLInputElement;
     tagInput?.focus();
   });

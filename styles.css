@@ -124,6 +124,41 @@
   color: #fff;
 }
 
+.share-menu {
+  position: absolute;
+  top: 45px;
+  right: 10px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  padding: 8px;
+  display: flex;
+  gap: 8px;
+  z-index: 1000;
+}
+
+.meme-overlay.dark .share-menu {
+  background: #2a2a3e;
+}
+
+.share-menu button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 18px;
+  background: #f5f5f5;
+  transition: transform 0.2s;
+}
+
+.meme-overlay.dark .share-menu button {
+  background: #3a3a4e;
+}
+
+.share-menu button:hover {
+  transform: scale(1.1);
+}
+
 .meme-image {
   width: 100%;
   height: auto;
@@ -135,6 +170,19 @@
   font-size: 16px;
   color: #333;
   text-align: center;
+  padding: 8px;
+  border-radius: 6px;
+  cursor: text;
+  transition: background 0.2s;
+}
+
+.meme-text:hover {
+  background: #f5f5f5;
+}
+
+.meme-text:focus {
+  outline: 2px solid #667eea;
+  background: #fff;
 }
 
 .meme-overlay.dark .meme-text {

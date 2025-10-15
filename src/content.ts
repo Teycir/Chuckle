@@ -14,6 +14,13 @@ function showError(message: string): void {
 chrome.runtime.onMessage.addListener((message) => {
   if (message.action === "generateMeme") {
     generateMeme(message.text);
+  } else if (message.action === "generateMemeFromSelection") {
+    const selectedText = window.getSelection()?.toString().trim();
+    if (selectedText) {
+      generateMeme(selectedText);
+    } else {
+      showError('Please select some text first');
+    }
   }
 });
 
