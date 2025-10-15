@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <!-- Background circle with gradient -->
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="face" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFE66D;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FFD93D;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <circle cx="64" cy="64" r="60" fill="url(#bg)"/>
+  
+  <!-- Face -->
+  <circle cx="64" cy="64" r="45" fill="url(#face)"/>
+  
+  <!-- Left eye (winking) -->
+  <ellipse cx="50" cy="55" rx="3" ry="8" fill="#2C3E50"/>
+  
+  <!-- Right eye (wide open laughing) -->
+  <circle cx="78" cy="55" r="6" fill="#2C3E50"/>
+  <circle cx="80" cy="53" r="2" fill="#fff"/>
+  
+  <!-- Big laughing mouth -->
+  <path d="M 45 70 Q 64 90 83 70" stroke="#2C3E50" stroke-width="4" fill="none" stroke-linecap="round"/>
+  
+  <!-- Teeth -->
+  <rect x="54" y="70" width="6" height="8" fill="#fff" rx="1"/>
+  <rect x="62" y="72" width="6" height="8" fill="#fff" rx="1"/>
+  <rect x="70" y="70" width="6" height="8" fill="#fff" rx="1"/>
+  
+  <!-- Laugh tears -->
+  <ellipse cx="85" cy="60" rx="3" ry="5" fill="#4ECDC4" opacity="0.8"/>
+  <ellipse cx="88" cy="65" rx="2" ry="4" fill="#4ECDC4" opacity="0.6"/>
+  
+  <!-- Comedy mask ribbon -->
+  <path d="M 30 35 Q 64 25 98 35" stroke="#FF6B6B" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <circle cx="30" cy="35" r="4" fill="#FF6B6B"/>
+  <circle cx="98" cy="35" r="4" fill="#FF6B6B"/>
+  
+  <!-- Sparkles for meme magic -->
+  <path d="M 20 50 L 22 52 L 20 54 L 18 52 Z" fill="#FFE66D"/>
+  <path d="M 108 45 L 110 47 L 108 49 L 106 47 Z" fill="#FFE66D"/>
+  <path d="M 25 85 L 27 87 L 25 89 L 23 87 Z" fill="#FFE66D"/>
+  <path d="M 103 80 L 105 82 L 103 84 L 101 82 Z" fill="#FFE66D"/>
+</svg>
