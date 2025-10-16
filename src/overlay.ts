@@ -157,8 +157,8 @@ async function regenerateMeme(specificTemplate?: string): Promise<void> {
       const img = currentOverlay.querySelector('.meme-image') as HTMLImageElement;
       if (img) img.src = watermarkedUrl;
       
-      const textInput = currentOverlay.querySelector('.text-editor-input') as HTMLInputElement;
-      if (textInput) textInput.value = originalText;
+      const textInput = currentOverlay.querySelector('.text-editor-input') as HTMLDivElement;
+      if (textInput) textInput.textContent = originalText;
       
       const actionsContainer = currentOverlay.querySelector('.meme-actions');
       if (actionsContainer) {
@@ -205,17 +205,30 @@ function createTextEditor(): HTMLDivElement {
   label.textContent = 'Edit meme text (press Enter to regenerate):';
   label.style.cssText = 'font-size: 12px; color: #5f6368; font-weight: 600;';
   
-  const input = document.createElement('input');
-  input.type = 'text';
-  input.className = 'text-editor-input';
-  input.value = originalText || '';
-  input.style.cssText = 'padding: 8px 12px; border: 1px solid #dadce0; border-radius: 4px; font-size: 14px; width: 100%; box-sizing: border-box;';
+  const input = document.createElement('div');
+  input.className = 'text-editor-input meme-text';
+  input.contentEditable = 'true';
+  input.textContent = originalText || '';
+  input.style.cssText = 'padding: 8px 12px; border: 1px solid #dadce0; border-radius: 4px; font-size: 14px; width: 100%; box-sizing: border-box; min-height: 40px; background: white; color: black;';
   
-  input.onkeydown = async (e) => {
-    if (e.key === 'Enter' && input.value.trim()) {
-      originalText = input.value.trim();
+  input.onblur = async () => {
+    const newText = input.textContent?.trim() || '';
+    if (newText && newText !== originalText) {
+      originalText = newText;
       isManualEdit = true;
       await regenerateMeme();
+    }
+  };
+  
+  input.onkeydown = async (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const newText = input.textContent?.trim() || '';
+      if (newText) {
+        originalText = newText;
+        isManualEdit = true;
+        await regenerateMeme();
+      }
     }
   };
   
@@ -228,7 +241,7 @@ function createRegenerateButton(): HTMLDivElement {
   const container = document.createElement('div');
   container.style.cssText = 'display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 16px; margin-bottom: 8px;';
   
-  const btn = createButton('star-btn', '🎲', () => regenerateMeme());
+  const btn = createButton('star-btn regenerate-btn', '🎲', () => regenerateMeme());
   btn.setAttribute('aria-label', getTranslation('tryAnother'));
   btn.setAttribute('role', 'button');
   

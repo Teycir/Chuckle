@@ -46,10 +46,10 @@ describe('Regenerate Feature', () => {
       language: 'en',
     };
 
-    (geminiService.analyzeMemeContext as jest.Mock).mockResolvedValue('new-template');
     (geminiService.generateMemeImage as jest.Mock).mockResolvedValue({ 
       watermarkedUrl: 'https://example.com/new-meme.png',
-      originalUrl: 'https://example.com/original.png'
+      originalUrl: 'https://example.com/original.png',
+      formattedText: 'Test meme'
     });
 
     await createOverlay(memeData);
@@ -59,7 +59,7 @@ describe('Regenerate Feature', () => {
     await new Promise(resolve => setTimeout(resolve, 0));
 
     expect(loading.showLoading).toHaveBeenCalledWith('🎲 Regenerating meme...');
-    expect(geminiService.analyzeMemeContext).toHaveBeenCalledWith('Test meme', expect.any(Number));
+    expect(geminiService.generateMemeImage).toHaveBeenCalledWith('drake', 'Test meme', false);
   });
 
   it('should update image when regeneration completes', async () => {
@@ -71,10 +71,10 @@ describe('Regenerate Feature', () => {
       language: 'en',
     };
 
-    (geminiService.analyzeMemeContext as jest.Mock).mockResolvedValue('new-template');
     (geminiService.generateMemeImage as jest.Mock).mockResolvedValue({ 
       watermarkedUrl: 'https://example.com/new-meme.png',
-      originalUrl: 'https://example.com/original.png'
+      originalUrl: 'https://example.com/original.png',
+      formattedText: 'Test meme'
     });
 
     await createOverlay(memeData);

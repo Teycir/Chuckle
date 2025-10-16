@@ -210,10 +210,7 @@
     body.dark select:focus { border-color: #667eea; }
     body.dark .tab-btn { background: #2a2a3e !important; color: #b0b0b0 !important; }
     body.dark .tab-btn.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; color: white !important; }
-    body.dark #statsContent,
-    body.dark #trendingContent { color: #e0e0e0; }
-    body.dark #templatesModal > div { background: #1e1e2e; color: #e0e0e0; }
-    body.dark #templatesModal #closeTemplates { color: #e0e0e0; }
+    body.dark #statsContent { color: #e0e0e0; }
     body.dark .status-msg.success { background: rgba(52, 168, 83, 0.2); color: #81c995; }
     body.dark .status-msg.error { background: rgba(197, 34, 31, 0.2); color: #f28b82; }
     .footer-text {
@@ -244,10 +241,9 @@
 </head>
 <body>
   <div class="container">
-    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 16px; border-bottom: 2px solid #e8eaed; padding-bottom: 8px;">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; border-bottom: 2px solid #e8eaed; padding-bottom: 8px;">
       <button id="settingsTab" class="tab-btn" style="padding: 8px; border: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600;">⚙️ Settings</button>
       <button id="statsTab" class="tab-btn" style="padding: 8px; border: none; background: #f5f5f5; color: #666; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600;">📊 Stats</button>
-      <button id="trendingTab" class="tab-btn" style="padding: 8px; border: none; background: #f5f5f5; color: #666; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600;">🔥 Trending</button>
     </div>
     <div id="settingsPanel">
     <h2>🎭 Chuckle Settings</h2>
@@ -280,23 +276,9 @@
       <h2>📊 Your Meme Stats</h2>
       <div id="statsContent" style="font-size: 12px; color: #333;"></div>
       <button id="exportBtn" style="margin-top: 12px;">📥 Export Data</button>
-      <button id="templatesBtn" style="margin-top: 8px; background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);">🎨 Browse Templates</button>
     </div>
+  </div>
 
-    <div id="trendingPanel" style="display: none;">
-      <h2>🔥 Your Trending</h2>
-      <div id="trendingContent" style="font-size: 12px; color: #333;"></div>
-    </div>
-  </div>
-  <div id="templatesModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center;">
-    <div style="background: white; border-radius: 12px; padding: 20px; max-width: 400px; max-height: 80vh; overflow: auto;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-        <h3 style="margin: 0; font-size: 14px;">🎨 Available Templates</h3>
-        <button id="closeTemplates" style="background: #f8f9fa; border: 1px solid #e8eaed; width: 32px; height: 32px; border-radius: 50%; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #5f6368; transition: all 0.2s;">×</button>
-      </div>
-      <div id="templatesList" style="display: grid; gap: 8px;"></div>
-    </div>
-  </div>
   <script src="popup.js"></script>
 </body>
 </html>

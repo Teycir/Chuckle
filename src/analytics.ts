@@ -43,13 +43,18 @@ export async function exportData(): Promise<void> {
   const data = await chrome.storage.local.get(null);
   const memes = Object.entries(data)
     .filter(([k]) => k.startsWith('meme_'))
-    .reduce((acc, [k, v]) => ({ ...acc, [k]: v }), {});
+    .map(([k, v]) => ({ key: k, ...(v as MemeData) }));
 
-  const blob = new Blob([JSON.stringify(memes, null, 2)], { type: 'application/json' });
+  const csv = [
+    'Key,Template,Text,Image URL,Timestamp,Language',
+    ...memes.map(m => `${m.key},"${m.template}","${m.text.replace(/"/g, '""')}",${m.imageUrl},${m.timestamp},${m.language}`)
+  ].join('\n');
+
+  const blob = new Blob([csv], { type: 'text/csv' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `chuckle-memes-${Date.now()}.json`;
+  a.download = `chuckle-memes-${Date.now()}.csv`;
   a.click();
   URL.revokeObjectURL(url);
 }

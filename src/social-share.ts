@@ -117,7 +117,7 @@ function createShareModal(imageUrl: string, text: string, lang: string): HTMLDiv
   title.style.cssText = 'font-size: 24px; font-weight: 700; color: #333; margin-bottom: 16px; text-align: center;';
   
   const statusText = document.createElement('div');
-  statusText.style.cssText = 'font-size: 14px; color: #666; text-align: center; margin-bottom: 32px; min-height: 20px;';
+  statusText.style.cssText = 'font-size: 16px; font-weight: 700; color: #333; text-align: center; margin-bottom: 32px; min-height: 24px;';
   
   const buttonsContainer = document.createElement('div');
   buttonsContainer.style.cssText = 'display: flex; justify-content: center; gap: 48px;';
@@ -139,11 +139,11 @@ function createShareModal(imageUrl: string, text: string, lang: string): HTMLDiv
       const shareText = `${getTranslation('checkThisMeme', lang)} ${text}`;
       statusText.textContent = getTranslation('textCopied', lang);
       await navigator.clipboard.writeText(shareText);
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
       statusText.textContent = getTranslation('imageDownloaded', lang);
       await downloadMeme(imageUrl);
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await new Promise(resolve => setTimeout(resolve, 2000));
       
       window.open(platform.getUrl(imageUrl, text), '_blank');
       trackShare(platform.name);

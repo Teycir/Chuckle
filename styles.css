@@ -318,6 +318,17 @@ body.dark .share-menu {
   font-weight: bold;
 }
 
+.text-editor-input {
+  background: white;
+  color: black;
+}
+
+.meme-overlay.dark .text-editor-input {
+  background: #2a2a3e;
+  color: white;
+  border-color: #3a3a4e;
+}
+
 
 
 /* History Panel Styles */

@@ -1,7 +1,5 @@
 import { getShortcuts, saveShortcuts, validateShortcut, hasConflict } from './shortcutConfig';
 import { getAnalytics, exportData } from './analytics';
-import { MEME_TEMPLATES } from './templates';
-import { getTrendingData } from './trending';
 
 const translations = {
   English: {
@@ -16,21 +14,11 @@ const translations = {
     madeBy: 'Meme generator, made by',
     settingsTab: '⚙️ Settings',
     statsTab: '📊 Stats',
-    trendingTab: '🔥 Trending',
-    trendingTitle: '🔥 Your Trending',
-    topTemplates7Days: '🔥 Your Top Templates (7 days)',
-    mostShared: '📤 Your Most Shared',
-    risingStars: '📈 Your Rising Stars',
-    templatesToTry: '✨ Templates to Try',
-    uses: 'uses',
-    shares: 'shares',
     statsTitle: '📊 Your Meme Stats',
     totalMemes: 'Total Memes',
     topTemplates: '🏆 Top Templates',
     sharesLabel: '📤 Shares',
-    exportData: '📥 Export Data',
-    browseTemplates: '🎨 Browse Templates',
-    availableTemplates: '🎨 Available Templates'
+    exportData: '📥 Export Data'
   },
   Spanish: {
     title: '🎭 Configuración de Chuckle',
@@ -44,21 +32,11 @@ const translations = {
     madeBy: 'Generador de memes, hecho por',
     settingsTab: '⚙️ Configuración',
     statsTab: '📊 Estadísticas',
-    trendingTab: '🔥 Tendencias',
-    trendingTitle: '🔥 Tus Tendencias',
-    topTemplates7Days: '🔥 Tus Plantillas Más Usadas (7 días)',
-    mostShared: '📤 Más Compartidos',
-    risingStars: '📈 Estrellas Emergentes',
-    templatesToTry: '✨ Plantillas para Probar',
-    uses: 'usos',
-    shares: 'compartidos',
     statsTitle: '📊 Tus Estadísticas',
     totalMemes: 'Memes Totales',
     topTemplates: '🏆 Mejores Plantillas',
     sharesLabel: '📤 Compartidos',
-    exportData: '📥 Exportar Datos',
-    browseTemplates: '🎨 Ver Plantillas',
-    availableTemplates: '🎨 Plantillas Disponibles'
+    exportData: '📥 Exportar Datos'
   },
   French: {
     title: '🎭 Paramètres Chuckle',
@@ -72,21 +50,11 @@ const translations = {
     madeBy: 'Générateur de mèmes, créé par',
     settingsTab: '⚙️ Paramètres',
     statsTab: '📊 Statistiques',
-    trendingTab: '🔥 Tendances',
-    trendingTitle: '🔥 Vos Tendances',
-    topTemplates7Days: '🔥 Vos Meilleurs Modèles (7 jours)',
-    mostShared: '📤 Les Plus Partagés',
-    risingStars: '📈 Étoiles Montantes',
-    templatesToTry: '✨ Modèles à Essayer',
-    uses: 'utilisations',
-    shares: 'partages',
     statsTitle: '📊 Vos Statistiques',
     totalMemes: 'Memes Totaux',
     topTemplates: '🏆 Meilleurs Modèles',
     sharesLabel: '📤 Partages',
-    exportData: '📥 Exporter les Données',
-    browseTemplates: '🎨 Parcourir les Modèles',
-    availableTemplates: '🎨 Modèles Disponibles'
+    exportData: '📥 Exporter les Données'
   },
   German: {
     title: '🎭 Chuckle Einstellungen',
@@ -100,21 +68,11 @@ const translations = {
     madeBy: 'Meme-Generator, erstellt von',
     settingsTab: '⚙️ Einstellungen',
     statsTab: '📊 Statistiken',
-    trendingTab: '🔥 Trends',
-    trendingTitle: '🔥 Ihre Trends',
-    topTemplates7Days: '🔥 Ihre Top-Vorlagen (7 Tage)',
-    mostShared: '📤 Am Meisten Geteilt',
-    risingStars: '📈 Aufstrebende Stars',
-    templatesToTry: '✨ Vorlagen zum Ausprobieren',
-    uses: 'Verwendungen',
-    shares: 'Teilungen',
     statsTitle: '📊 Ihre Statistiken',
     totalMemes: 'Memes Gesamt',
     topTemplates: '🏆 Top-Vorlagen',
     sharesLabel: '📤 Teilungen',
-    exportData: '📥 Daten Exportieren',
-    browseTemplates: '🎨 Vorlagen Durchsuchen',
-    availableTemplates: '🎨 Verfügbare Vorlagen'
+    exportData: '📥 Daten Exportieren'
   }
 };
 
@@ -142,23 +100,11 @@ function updateUILanguage(lang: string) {
   const statsTab = document.getElementById('statsTab');
   if (statsTab) statsTab.textContent = t.statsTab;
   
-  const trendingTab = document.getElementById('trendingTab');
-  if (trendingTab) trendingTab.textContent = t.trendingTab;
-  
-  const trendingTitle = document.querySelector('#trendingPanel h2');
-  if (trendingTitle) trendingTitle.textContent = t.trendingTitle;
-  
   const statsTitle = document.querySelector('#statsPanel h2');
   if (statsTitle) statsTitle.textContent = t.statsTitle;
   
   const exportBtn = document.getElementById('exportBtn');
   if (exportBtn) exportBtn.textContent = t.exportData;
-  
-  const templatesBtn = document.getElementById('templatesBtn');
-  if (templatesBtn) templatesBtn.textContent = t.browseTemplates;
-  
-  const templatesTitle = document.querySelector('#templatesModal h3');
-  if (templatesTitle) templatesTitle.textContent = t.availableTemplates;
   
   const infoTexts = document.querySelectorAll('.info');
   if (infoTexts[0]) {
@@ -199,7 +145,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   document.getElementById('settingsTab')?.addEventListener('click', () => switchTab('settings'));
   document.getElementById('statsTab')?.addEventListener('click', () => switchTab('stats'));
-  document.getElementById('trendingTab')?.addEventListener('click', () => switchTab('trending'));
   
   langSelect?.addEventListener('change', (e) => {
     const lang = (e.target as HTMLSelectElement).value;
@@ -207,7 +152,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   async function switchTab(tab: string) {
-    ['settings', 'stats', 'trending'].forEach(t => {
+    ['settings', 'stats'].forEach(t => {
       const panel = document.getElementById(`${t}Panel`);
       const btn = document.getElementById(`${t}Tab`);
       if (panel) panel.style.display = t === tab ? 'block' : 'none';
@@ -217,62 +162,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     });
     if (tab === 'stats') await loadStats();
-    if (tab === 'trending') await loadTrending();
   }
 
   document.getElementById('exportBtn')?.addEventListener('click', exportData);
-  
-  document.getElementById('templatesBtn')?.addEventListener('click', () => {
-    const modal = document.getElementById('templatesModal')!;
-    modal.style.display = 'flex';
-    const list = document.getElementById('templatesList')!;
-    list.innerHTML = '';
-    MEME_TEMPLATES.forEach(template => {
-      const item = document.createElement('div');
-      item.textContent = template;
-      item.style.cssText = 'padding: 8px; background: #f5f5f5; border-radius: 6px; font-size: 11px;';
-      list.appendChild(item);
-    });
-  });
-
-  document.getElementById('closeTemplates')?.addEventListener('click', () => {
-    document.getElementById('templatesModal')!.style.display = 'none';
-  });
 
 });
-
-async function loadTrending() {
-  const { selectedLanguage } = await chrome.storage.local.get(['selectedLanguage']);
-  const lang = selectedLanguage || 'English';
-  const t = translations[lang as keyof typeof translations] || translations.English;
-  
-  const trending = await getTrendingData();
-  const content = document.getElementById('trendingContent')!;
-  content.innerHTML = `
-    <div style="display: grid; gap: 12px;">
-      ${trending.last7Days.length ? `
-      <div style="padding: 12px; background: #f5f5f5; border-radius: 8px;">
-        <div style="font-size: 11px; font-weight: 600; margin-bottom: 6px;">${t.topTemplates7Days}</div>
-        ${trending.last7Days.map(item => `<div style="font-size: 10px; color: #666;">${item.template}: ${item.count} ${t.uses}</div>`).join('')}
-      </div>` : ''}
-      ${trending.mostShared.length ? `
-      <div style="padding: 12px; background: #f5f5f5; border-radius: 8px;">
-        <div style="font-size: 11px; font-weight: 600; margin-bottom: 6px;">${t.mostShared}</div>
-        ${trending.mostShared.map(item => `<div style="font-size: 10px; color: #666;">${item.template}: ~${item.shares} ${t.shares}</div>`).join('')}
-      </div>` : ''}
-      ${trending.risingStars.length ? `
-      <div style="padding: 12px; background: #f5f5f5; border-radius: 8px;">
-        <div style="font-size: 11px; font-weight: 600; margin-bottom: 6px;">${t.risingStars}</div>
-        ${trending.risingStars.map(item => `<div style="font-size: 10px; color: #666;">${item.trend} ${item.template}</div>`).join('')}
-      </div>` : ''}
-      ${trending.untried.length ? `
-      <div style="padding: 12px; background: #f5f5f5; border-radius: 8px;">
-        <div style="font-size: 11px; font-weight: 600; margin-bottom: 6px;">${t.templatesToTry}</div>
-        ${trending.untried.map(item => `<div style="font-size: 10px; color: #666;">${item}</div>`).join('')}
-      </div>` : ''}
-    </div>
-  `;
-}
 
 async function loadStats() {
   const { selectedLanguage } = await chrome.storage.local.get(['selectedLanguage']);
@@ -368,8 +262,5 @@ darkStyle.textContent = `
   body.dark .tab-btn { background: #2a2a3e !important; color: #e0e0e0 !important; }
   body.dark .tab-btn.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; color: white !important; }
   body.dark #statsContent > div > div { background: #2a2a3e !important; color: #e0e0e0 !important; }
-  body.dark #trendingContent > div > div { background: #2a2a3e !important; color: #e0e0e0 !important; }
-  body.dark #templatesModal > div { background: #1a1a2e !important; color: #e0e0e0 !important; }
-  body.dark #templatesList > div { background: #2a2a3e !important; color: #e0e0e0 !important; }
 `;
 document.head.appendChild(darkStyle);

@@ -5,7 +5,6 @@ describe('Popup UI', () => {
       <div class="container">
         <button id="settingsTab"></button>
         <button id="statsTab"></button>
-        <button id="trendingTab"></button>
         <div id="settingsPanel">
           <input id="geminiApiKey" />
           <select id="languageSelect"></select>
@@ -16,14 +15,6 @@ describe('Popup UI', () => {
         <div id="statsPanel" style="display: none;">
           <div id="statsContent"></div>
           <button id="exportBtn"></button>
-          <button id="templatesBtn"></button>
-        </div>
-        <div id="trendingPanel" style="display: none;">
-          <div id="trendingContent"></div>
-        </div>
-        <div id="templatesModal" style="display: none;">
-          <button id="closeTemplates"></button>
-          <div id="templatesList"></div>
         </div>
       </div>
     `;
