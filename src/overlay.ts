@@ -4,6 +4,7 @@ import { enableShortcuts, disableShortcuts, registerShortcut } from './shortcuts
 import { analyzeMemeContext, generateMemeImage } from './geminiService';
 import { showLoading, hideLoading } from './loading';
 import { createShareButton } from './social-share';
+import { MEME_TEMPLATES } from './constants';
 
 const overlayTranslations = {
   English: {
@@ -126,7 +127,7 @@ function createCloseButton(): HTMLDivElement {
   return container;
 }
 
-async function regenerateMeme(): Promise<void> {
+async function regenerateMeme(specificTemplate?: string): Promise<void> {
   if (!originalText || isRegenerating) return;
   isRegenerating = true;
   
@@ -134,11 +135,12 @@ async function regenerateMeme(): Promise<void> {
   
   try {
     const truncatedText = originalText.slice(0, 100);
-    const template = await analyzeMemeContext(truncatedText, Date.now());
-    const { watermarkedUrl, originalUrl } = await generateMemeImage(template, truncatedText);
+    const template = specificTemplate || await analyzeMemeContext(truncatedText, Date.now());
+    const { watermarkedUrl, originalUrl, formattedText } = await generateMemeImage(template, truncatedText);
     
     if (currentMemeData && currentOverlay) {
       currentMemeData.imageUrl = watermarkedUrl;
+      currentMemeData.text = formattedText;
       currentMemeData.template = template;
       currentMemeData.timestamp = Date.now();
       originalImageUrl = originalUrl;
@@ -148,13 +150,20 @@ async function regenerateMeme(): Promise<void> {
       
       const actionsContainer = currentOverlay.querySelector('.meme-actions');
       if (actionsContainer) {
-        const oldShareBtn = actionsContainer.children[2];
-        const newShareBtn = createShareButton(originalUrl, truncatedText, currentLanguage);
+        const oldShareBtn = actionsContainer.children[1];
+        const newShareBtn = createShareButton(originalUrl, formattedText, currentLanguage);
         actionsContainer.replaceChild(newShareBtn, oldShareBtn);
       }
       
+      const templateButtons = currentOverlay.querySelectorAll('.template-btn');
+      templateButtons.forEach(btn => btn.classList.remove('active'));
+      if (specificTemplate) {
+        const activeBtn = currentOverlay.querySelector(`[data-template="${specificTemplate}"]`);
+        activeBtn?.classList.add('active');
+      }
+      
       if (currentMemeKey) {
-        await updateMeme(currentMemeKey, { imageUrl: watermarkedUrl, originalUrl, template, timestamp: currentMemeData.timestamp });
+        await updateMeme(currentMemeKey, { imageUrl: originalUrl, originalUrl, template, timestamp: currentMemeData.timestamp });
       }
     }
   } catch (error) {
@@ -166,48 +175,44 @@ async function regenerateMeme(): Promise<void> {
   }
 }
 
-function createRegenerateButton(): HTMLDivElement {
-  const container = document.createElement('div');
-  container.style.cssText = 'display: flex; flex-direction: column; align-items: center; gap: 4px;';
-  
-  const regenBtn = createButton('regenerate-btn', '🎲', regenerateMeme);
-  regenBtn.setAttribute('aria-label', getTranslation('tryAnother'));
-  regenBtn.setAttribute('role', 'button');
-  
-  const label = document.createElement('div');
-  label.textContent = getTranslation('tryAnother');
-  label.style.cssText = 'font-size: 10px; color: #5f6368; font-weight: 500;';
-  
-  container.appendChild(regenBtn);
-  container.appendChild(label);
-  return container;
-}
+
 
 function createMemeImage(memeData: MemeData): HTMLImageElement {
   const img = document.createElement('img');
   img.className = 'meme-image';
   img.src = memeData.imageUrl;
   img.alt = `Meme: ${memeData.text}`;
-  img.ondblclick = regenerateMeme;
+  img.ondblclick = () => regenerateMeme();
   img.style.cursor = 'pointer';
   return img;
 }
 
-function createMemeText(memeData: MemeData): HTMLDivElement {
-  const text = document.createElement('div');
-  text.className = 'meme-text';
-  text.contentEditable = 'true';
-  text.textContent = memeData.text;
-  text.onblur = async () => {
-    const newText = text.textContent?.trim() || memeData.text;
-    if (newText !== memeData.text && currentMemeKey) {
-      memeData.text = newText;
-      originalText = newText;
-      await updateMeme(currentMemeKey, { text: newText });
-    }
-  };
-  return text;
+function createTemplateSelector(): HTMLDivElement {
+  const wrapper = document.createElement('div');
+  wrapper.style.cssText = 'display: flex; flex-direction: column; align-items: center; gap: 8px; padding-bottom: 16px; border-bottom: 1px solid #e8eaed; width: 100%;';
+  
+  const heading = document.createElement('div');
+  heading.textContent = 'Choose template for meme';
+  heading.style.cssText = 'font-size: 12px; color: #5f6368; font-weight: 600; margin-bottom: 4px;';
+  wrapper.appendChild(heading);
+  
+  const templatesRow = document.createElement('div');
+  templatesRow.style.cssText = 'display: flex; flex-wrap: wrap; gap: 2px; justify-content: center; max-width: 800px;';
+  
+  MEME_TEMPLATES.forEach((template) => {
+    const btn = document.createElement('button');
+    btn.className = 'template-btn';
+    btn.textContent = template.name;
+    btn.setAttribute('data-template', template.id);
+    btn.onclick = () => regenerateMeme(template.id);
+    templatesRow.appendChild(btn);
+  });
+  
+  wrapper.appendChild(templatesRow);
+  return wrapper;
 }
+
+
 
 
 
@@ -236,7 +241,6 @@ export async function createOverlay(memeData: MemeData): Promise<void> {
   const actionsContainer = document.createElement('div');
   actionsContainer.className = 'meme-actions';
   actionsContainer.appendChild(createDownloadButton());
-  actionsContainer.appendChild(createRegenerateButton());
   actionsContainer.appendChild(createShareButton(memeData.originalUrl || memeData.imageUrl, memeData.text, currentLanguage));
   actionsContainer.appendChild(createCloseButton());
 
@@ -247,9 +251,18 @@ export async function createOverlay(memeData: MemeData): Promise<void> {
   currentMemeData = memeData;
 
   content.appendChild(actionsContainer);
-  content.appendChild(createMemeImage(memeData));
-  content.appendChild(createMemeText(memeData));
+  content.appendChild(createTemplateSelector());
+  
+  const imgWrapper = document.createElement('div');
+  imgWrapper.style.cssText = 'margin-top: 20px; display: flex; justify-content: center; width: 100%;';
+  imgWrapper.appendChild(createMemeImage(memeData));
+  content.appendChild(imgWrapper);
   overlay.appendChild(content);
+  
+  const currentTemplateBtn = overlay.querySelector(`[data-template="${memeData.template}"]`);
+  if (currentTemplateBtn) {
+    currentTemplateBtn.classList.add('active');
+  }
 
   overlay.onclick = (e) => e.target === overlay && closeOverlay();
   content.onclick = (e) => e.stopPropagation();
@@ -259,7 +272,6 @@ export async function createOverlay(memeData: MemeData): Promise<void> {
   currentOverlay = overlay;
   enableShortcuts();
 
-  registerShortcut('regenerate', regenerateMeme);
   registerShortcut('download', downloadPng);
 
   const closeButton = overlay.querySelector('.close-btn') as HTMLButtonElement;

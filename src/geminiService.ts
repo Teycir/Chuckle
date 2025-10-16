@@ -4,6 +4,7 @@ import { geminiCache } from './cache';
 import { logger } from './logger';
 import { API_KEY_REGEX, GEMINI_PROMPT_TEMPLATE, ERROR_MESSAGES } from './constants';
 import { addWatermark } from './watermark';
+import { formatTextForTemplate } from './templateFormatter';
 
 export function validateApiKey(key: string): boolean {
   return API_KEY_REGEX.test(key);
@@ -37,10 +38,7 @@ export async function analyzeMemeContext(text: string, variant: number = 0): Pro
   if (!geminiApiKey) throw new Error(ERROR_MESSAGES.NO_API_KEY);
   if (!validateApiKey(geminiApiKey)) throw new Error(ERROR_MESSAGES.INVALID_API_KEY);
   
-  let lastError: Error | null = null;
-  for (let attempt = 1; attempt <= 3; attempt++) {
-    try {
-      console.log(`[Chuckle] API attempt ${attempt}/3`);
+  try {
       const response = await fetchWithTimeout(
         `${CONFIG.GEMINI_API_URL}?key=${geminiApiKey}`,
         {
@@ -55,10 +53,14 @@ export async function analyzeMemeContext(text: string, variant: number = 0): Pro
               }]
             }],
             generationConfig: isRegenerate ? {
-              temperature: 1.2,
+              temperature: 1.3,
+              topP: 0.98,
+              topK: 64
+            } : {
+              temperature: 1.0,
               topP: 0.95,
               topK: 40
-            } : undefined
+            }
           })
         },
         10000
@@ -76,20 +78,17 @@ export async function analyzeMemeContext(text: string, variant: number = 0): Pro
         throw new Error(`${ERROR_MESSAGES.INVALID_RESPONSE} for text: "${text.slice(0, 50)}..."`);
       }
       
-      const result = data.candidates[0].content.parts[0].text;
+      const result = data.candidates[0].content.parts[0].text.trim().replace(/\s+/g, ' ');
       console.log('[Chuckle] Template from API:', result);
       if (!isRegenerate) {
         geminiCache.set(cacheKey, result);
       }
       return result;
-    } catch (error) {
-      lastError = error instanceof Error ? error : new Error(String(error));
-      console.error(`[Chuckle] Attempt ${attempt} failed:`, lastError.message);
-      if (attempt < 3) await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
-    }
+  } catch (error) {
+    const lastError = error instanceof Error ? error : new Error(String(error));
+    console.error('[Chuckle] API call failed:', lastError.message);
+    throw new Error(`Network error: ${lastError.message || 'Connection failed'}. Check your internet connection and API key.`);
   }
-  
-  throw new Error(`Network error: ${lastError?.message || 'Connection failed'}. Check your internet connection and API key.`);
 }
 
 // Normalize text for URL compatibility across French, Spanish, German, Italian
@@ -103,22 +102,33 @@ function normalizeText(text: string): string {
     .replace(/\s+/g, '_');
 }
 
-export async function generateMemeImage(template: string, text: string): Promise<{ watermarkedUrl: string; originalUrl: string }> {
+export async function generateMemeImage(template: string, text: string): Promise<{ watermarkedUrl: string; originalUrl: string; formattedText: string }> {
   try {
     const formattedTemplate = template.trim().toLowerCase().replace(/\s+/g, '_');
-    const cleanText = text.replace(/['']/g, "'").replace(/…/g, '...');
-    const words = cleanText.split(/\s+/);
-    const mid = Math.ceil(words.length / 2);
-    const topText = normalizeText(words.slice(0, mid).join(' '));
-    const bottomText = normalizeText(words.slice(mid).join(' '));
+    const formattedText = await formatTextForTemplate(text, formattedTemplate);
+    const cleanText = formattedText.replace(/['']/g, "'").replace(/…/g, '...');
+    
+    const parts = cleanText.split(' / ').map(p => p.trim()).filter(p => p.length > 0);
+    let topText: string, bottomText: string;
+    
+    if (parts.length >= 2) {
+      topText = normalizeText(parts[0]);
+      bottomText = normalizeText(parts.slice(1).join(' '));
+    } else {
+      const words = cleanText.split(/\s+/);
+      const mid = Math.ceil(words.length / 2);
+      topText = normalizeText(words.slice(0, mid).join(' '));
+      bottomText = normalizeText(words.slice(mid).join(' ') || 'yes');
+    }
+    
     const url = `${CONFIG.MEMEGEN_API_URL}/${formattedTemplate}/${topText}/${bottomText}.png`;
     console.log('[Chuckle] Trying meme URL:', url);
     const response = await fetch(url, { method: 'HEAD' });
     if (!response.ok) throw new Error(ERROR_MESSAGES.TEMPLATE_UNAVAILABLE);
     const watermarkedUrl = await addWatermark(url);
-    return { watermarkedUrl, originalUrl: url };
+    return { watermarkedUrl, originalUrl: url, formattedText: cleanText };
   } catch (error) {
     logger.error('Meme image generation failed', error);
-    return { watermarkedUrl: CONFIG.FALLBACK_IMAGE_URL, originalUrl: CONFIG.FALLBACK_IMAGE_URL };
+    return { watermarkedUrl: CONFIG.FALLBACK_IMAGE_URL, originalUrl: CONFIG.FALLBACK_IMAGE_URL, formattedText: text };
   }
 }

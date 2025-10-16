@@ -1,4 +1,5 @@
 import type { MemeData } from './types';
+import { MEME_TEMPLATES } from './constants';
 
 export interface Analytics {
   totalMemes: number;
@@ -21,7 +22,10 @@ export async function getAnalytics(): Promise<Analytics> {
   const topTemplates = Object.entries(templates)
     .sort(([, a], [, b]) => b - a)
     .slice(0, 5)
-    .map(([name, count]) => ({ name, count }));
+    .map(([id, count]) => {
+      const template = MEME_TEMPLATES.find(t => t.id === id);
+      return { name: template?.name || id, count };
+    });
 
   return {
     totalMemes: memes.length,
