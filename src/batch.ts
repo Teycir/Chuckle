@@ -17,6 +17,7 @@ export interface BatchResult {
 export async function generateBatch(texts: string[], variantsCount: 1 | 2 | 3 = 1): Promise<BatchResult[]> {
   return Promise.all(texts.map(async (text) => {
     try {
+      console.log(`[Chuckle] Generating ${variantsCount} variant(s) for:`, text.slice(0, 30));
       const variantPromises = Array.from({ length: variantsCount }, (_, i) => 
         analyzeMemeContext(text, i).then(template => ({
           imageUrl: `${CONFIG.MEMEGEN_API_URL}/${template}.png`,
@@ -38,12 +39,15 @@ export async function generateBatch(texts: string[], variantsCount: 1 | 2 | 3 = 
         })
       ));
       
+      console.log(`[Chuckle] Successfully generated ${variants.length} variant(s)`);
       return { text, success: true, variants };
     } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+      console.error('[Chuckle] Batch generation failed:', errorMsg);
       return { 
         text, 
         success: false, 
-        error: error instanceof Error ? error.message : 'Unknown error' 
+        error: errorMsg
       };
     }
   }));

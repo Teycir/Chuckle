@@ -1,4 +1,5 @@
 chrome.runtime.onInstalled.addListener(() => {
+  console.log('[Chuckle] Extension installed, creating context menu');
   chrome.contextMenus.create({
     id: "remixAsMeme",
     title: "Remix as a Meme",
@@ -8,6 +9,7 @@ chrome.runtime.onInstalled.addListener(() => {
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {
   if (info.menuItemId === "remixAsMeme" && info.selectionText && tab?.id) {
+    console.log('[Chuckle] Context menu clicked, text:', info.selectionText.slice(0, 50));
     chrome.tabs.sendMessage(tab.id, {
       action: "generateMeme",
       text: info.selectionText
@@ -16,11 +18,18 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 });
 
 chrome.commands.onCommand.addListener((command) => {
+  console.log('[Chuckle] Keyboard shortcut triggered:', command);
   if (command === "generate-meme") {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       if (tabs[0]?.id) {
         chrome.tabs.sendMessage(tabs[0].id, { action: "generateMemeFromSelection" });
       }
     });
+  }
+});
+
+chrome.runtime.onMessage.addListener((message) => {
+  if (message.action === 'openPopup') {
+    chrome.action.openPopup();
   }
 });

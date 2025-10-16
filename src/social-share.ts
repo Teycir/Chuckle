@@ -67,13 +67,8 @@ function createShareMenu(imageUrl: string, text: string): HTMLDivElement {
     });
     btn.onmouseenter = () => btn.style.transform = 'scale(1.1)';
     btn.onmouseleave = () => btn.style.transform = 'scale(1)';
-    btn.onclick = async () => {
-      try {
-        const watermarkedUrl = await addWatermark(imageUrl);
-        window.open(platform.getUrl(watermarkedUrl, text), '_blank');
-      } catch {
-        window.open(platform.getUrl(imageUrl, text), '_blank');
-      }
+    btn.onclick = () => {
+      window.open(platform.getUrl(imageUrl, text), '_blank');
       trackShare(platform.name);
       menu.remove();
     };

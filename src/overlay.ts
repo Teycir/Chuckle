@@ -63,8 +63,9 @@ async function regenerateMeme(): Promise<void> {
   if (!originalText) return;
   try {
     showLoading('Regenerating meme...');
-    const template = await analyzeMemeContext(originalText, Date.now());
-    const imageUrl = await generateMemeImage(template);
+    const truncatedText = originalText.slice(0, 100);
+    const template = await analyzeMemeContext(truncatedText, Date.now());
+    const imageUrl = await generateMemeImage(template, truncatedText);
     
     if (currentMemeData) {
       currentMemeData.imageUrl = imageUrl;

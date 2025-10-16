@@ -1,5 +1,5 @@
 export const GEMINI_PROMPT_TEMPLATE = (text: string) => 
-  `Analyze this text and suggest a meme template: "${text}". Return only the template name.`;
+  `Analyze this text and suggest ONE meme template from this list: db (distracted boyfriend), drake, ds (daily struggle), cmm (change my mind), gb (galaxy brain), pigeon, woman-cat, fine (this is fine), stonks, astronaut (always has been), success, blb (bad luck brian), mordor (one does not simply), aag (ancient aliens), fry (futurama fry), fwp (first world problems), doge, iw (insanity wolf), philosoraptor, grumpycat. Text: "${text}". Return ONLY the template ID (e.g., "db", "drake", "gb"). No explanation.`;
 
 export const API_KEY_REGEX = /^AIza[0-9A-Za-z_-]{35}$/;
 
