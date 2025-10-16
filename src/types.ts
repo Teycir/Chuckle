@@ -23,6 +23,7 @@ export interface GeminiResponse {
 export interface MemeData {
   text: string;
   imageUrl: string;
+  originalUrl?: string;
   template: string;
   timestamp: number;
   language: string;

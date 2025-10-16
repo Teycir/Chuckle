@@ -20,13 +20,18 @@ async function fetchWithTimeout(url: string, options: RequestInit, timeoutMs: nu
 }
 
 export async function analyzeMemeContext(text: string, variant: number = 0): Promise<string> {
-  const cacheKey = `gemini:${text}${variant > 0 ? `:v${variant}` : ''}`;
-  const cached = geminiCache.get(cacheKey);
-  if (cached) {
-    console.log('[Chuckle] Using cached template:', cached);
-    return cached;
+  const isRegenerate = variant > 0;
+  const cacheKey = `gemini:${text}${isRegenerate ? `:v${variant}` : ''}`;
+  
+  if (!isRegenerate) {
+    const cached = geminiCache.get(cacheKey);
+    if (cached) {
+      console.log('[Chuckle] Using cached template:', cached);
+      return cached;
+    }
   }
-  console.log('[Chuckle] Calling Gemini API for text:', text.slice(0, 50));
+  
+  console.log('[Chuckle] Calling Gemini API for text:', text.slice(0, 50), isRegenerate ? '(regenerate)' : '');
 
   const { geminiApiKey } = await chrome.storage.local.get(['geminiApiKey']);
   if (!geminiApiKey) throw new Error(ERROR_MESSAGES.NO_API_KEY);
@@ -44,9 +49,16 @@ export async function analyzeMemeContext(text: string, variant: number = 0): Pro
           body: JSON.stringify({
             contents: [{
               parts: [{
-                text: GEMINI_PROMPT_TEMPLATE(text)
+                text: isRegenerate 
+                  ? `${GEMINI_PROMPT_TEMPLATE(text)}\n\nIMPORTANT: Provide a DIFFERENT template than you might have suggested before for this text. Choose an alternative that fits the context.`
+                  : GEMINI_PROMPT_TEMPLATE(text)
               }]
-            }]
+            }],
+            generationConfig: isRegenerate ? {
+              temperature: 1.2,
+              topP: 0.95,
+              topK: 40
+            } : undefined
           })
         },
         10000
@@ -66,7 +78,9 @@ export async function analyzeMemeContext(text: string, variant: number = 0): Pro
       
       const result = data.candidates[0].content.parts[0].text;
       console.log('[Chuckle] Template from API:', result);
-      geminiCache.set(cacheKey, result);
+      if (!isRegenerate) {
+        geminiCache.set(cacheKey, result);
+      }
       return result;
     } catch (error) {
       lastError = error instanceof Error ? error : new Error(String(error));
@@ -89,7 +103,7 @@ function normalizeText(text: string): string {
     .replace(/\s+/g, '_');
 }
 
-export async function generateMemeImage(template: string, text: string): Promise<string> {
+export async function generateMemeImage(template: string, text: string): Promise<{ watermarkedUrl: string; originalUrl: string }> {
   try {
     const formattedTemplate = template.trim().toLowerCase().replace(/\s+/g, '_');
     const cleanText = text.replace(/['']/g, "'").replace(/…/g, '...');
@@ -102,9 +116,9 @@ export async function generateMemeImage(template: string, text: string): Promise
     const response = await fetch(url, { method: 'HEAD' });
     if (!response.ok) throw new Error(ERROR_MESSAGES.TEMPLATE_UNAVAILABLE);
     const watermarkedUrl = await addWatermark(url);
-    return watermarkedUrl;
+    return { watermarkedUrl, originalUrl: url };
   } catch (error) {
     logger.error('Meme image generation failed', error);
-    return CONFIG.FALLBACK_IMAGE_URL;
+    return { watermarkedUrl: CONFIG.FALLBACK_IMAGE_URL, originalUrl: CONFIG.FALLBACK_IMAGE_URL };
   }
 }

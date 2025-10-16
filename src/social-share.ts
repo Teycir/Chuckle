@@ -13,7 +13,9 @@ const shareTranslations = {
     emailSubject: 'Check out this meme!',
     download: 'Download',
     regenerate: 'Regenerate',
-    close: 'Close'
+    close: 'Close',
+    textCopied: 'Text copied!',
+    imageDownloaded: 'Image downloaded!'
   },
   Spanish: {
     shareMeme: 'Compartir Meme',
@@ -21,7 +23,9 @@ const shareTranslations = {
     emailSubject: '¡Mira este meme!',
     download: 'Descargar',
     regenerate: 'Regenerar',
-    close: 'Cerrar'
+    close: 'Cerrar',
+    textCopied: '¡Texto copiado!',
+    imageDownloaded: '¡Imagen descargada!'
   },
   French: {
     shareMeme: 'Partager Meme',
@@ -29,7 +33,9 @@ const shareTranslations = {
     emailSubject: 'Regardez ce meme!',
     download: 'Télécharger',
     regenerate: 'Regénérer',
-    close: 'Fermer'
+    close: 'Fermer',
+    textCopied: 'Texte copié!',
+    imageDownloaded: 'Image téléchargée!'
   },
   German: {
     shareMeme: 'Meme Teilen',
@@ -37,7 +43,9 @@ const shareTranslations = {
     emailSubject: 'Schau dir dieses Meme an!',
     download: 'Herunterladen',
     regenerate: 'Regenerieren',
-    close: 'Schließen'
+    close: 'Schließen',
+    textCopied: 'Text kopiert!',
+    imageDownloaded: 'Bild heruntergeladen!'
   }
 };
 
@@ -46,22 +54,35 @@ function getTranslation(key: keyof typeof shareTranslations.English, lang: strin
   return shareTranslations[language]?.[key] || shareTranslations.English[key];
 }
 
+async function downloadMeme(imageUrl: string): Promise<void> {
+  const response = await fetch(imageUrl);
+  const blob = await response.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `meme-${Date.now()}.png`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
 function getPlatforms(lang: string): SharePlatform[] {
   return [
     {
       name: 'Twitter',
       icon: '𝕏',
-      getUrl: (img, txt) => `https://twitter.com/intent/tweet?text=${encodeURIComponent(txt + '\n\n' + img)}`
+      getUrl: () => 'https://twitter.com/compose/tweet'
     },
     {
       name: 'LinkedIn',
       icon: 'in',
-      getUrl: (img) => `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(img)}`
+      getUrl: () => 'https://www.linkedin.com/feed/'
     },
     {
       name: 'Email',
       icon: '✉️',
-      getUrl: (img, txt) => `mailto:?subject=${encodeURIComponent(getTranslation('emailSubject', lang))}&body=${encodeURIComponent(txt + '\n\n' + img)}`
+      getUrl: () => 'mailto:'
     }
   ];
 }
@@ -89,7 +110,10 @@ function createShareModal(imageUrl: string, text: string, lang: string): HTMLDiv
   
   const title = document.createElement('div');
   title.textContent = getTranslation('shareMeme', lang);
-  title.style.cssText = 'font-size: 24px; font-weight: 700; color: #333; margin-bottom: 48px; text-align: center;';
+  title.style.cssText = 'font-size: 24px; font-weight: 700; color: #333; margin-bottom: 16px; text-align: center;';
+  
+  const statusText = document.createElement('div');
+  statusText.style.cssText = 'font-size: 14px; color: #666; text-align: center; margin-bottom: 32px; min-height: 20px;';
   
   const buttonsContainer = document.createElement('div');
   buttonsContainer.style.cssText = 'display: flex; justify-content: center; gap: 48px;';
@@ -107,7 +131,15 @@ function createShareModal(imageUrl: string, text: string, lang: string): HTMLDiv
     btn.style.cssText = 'background: transparent; border: none; cursor: pointer; padding: 20px; border-radius: 20px; transition: all 0.2s; display: flex; align-items: center; justify-content: center; min-width: 120px; min-height: 120px; flex-shrink: 0;';
     btn.onmouseover = () => { btn.style.transform = 'scale(1.1)'; btn.style.background = '#f5f5f5'; };
     btn.onmouseout = () => { btn.style.transform = 'scale(1)'; btn.style.background = 'transparent'; };
-    btn.onclick = () => {
+    btn.onclick = async () => {
+      statusText.textContent = getTranslation('textCopied', lang);
+      await navigator.clipboard.writeText(text);
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      statusText.textContent = getTranslation('imageDownloaded', lang);
+      await downloadMeme(imageUrl);
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
       window.open(platform.getUrl(imageUrl, text), '_blank');
       trackShare(platform.name);
       modal.remove();
@@ -117,6 +149,7 @@ function createShareModal(imageUrl: string, text: string, lang: string): HTMLDiv
   
   content.appendChild(closeBtn);
   content.appendChild(title);
+  content.appendChild(statusText);
   content.appendChild(buttonsContainer);
   modal.appendChild(content);
   modal.onclick = (e) => { if (e.target === modal) modal.remove(); };

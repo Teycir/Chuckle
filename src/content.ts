@@ -34,11 +34,12 @@ export async function generateMeme(text: string): Promise<void> {
     const truncatedText = text.slice(0, 100);
     const template = await analyzeMemeContext(truncatedText);
     console.log('[Chuckle] Template selected:', template);
-    const imageUrl = await generateMemeImage(template, truncatedText);
+    const { watermarkedUrl, originalUrl } = await generateMemeImage(template, truncatedText);
     
     const memeData = {
       text: truncatedText,
-      imageUrl,
+      imageUrl: watermarkedUrl,
+      originalUrl,
       template,
       timestamp: Date.now(),
       language: 'English'

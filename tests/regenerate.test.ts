@@ -47,7 +47,10 @@ describe('Regenerate Feature', () => {
     };
 
     (geminiService.analyzeMemeContext as jest.Mock).mockResolvedValue('new-template');
-    (geminiService.generateMemeImage as jest.Mock).mockResolvedValue('https://example.com/new-meme.png');
+    (geminiService.generateMemeImage as jest.Mock).mockResolvedValue({ 
+      watermarkedUrl: 'https://example.com/new-meme.png',
+      originalUrl: 'https://example.com/original.png'
+    });
 
     await createOverlay(memeData);
     const regenBtn = document.querySelector('.regenerate-btn') as HTMLButtonElement;
@@ -69,7 +72,10 @@ describe('Regenerate Feature', () => {
     };
 
     (geminiService.analyzeMemeContext as jest.Mock).mockResolvedValue('new-template');
-    (geminiService.generateMemeImage as jest.Mock).mockResolvedValue('https://example.com/new-meme.png');
+    (geminiService.generateMemeImage as jest.Mock).mockResolvedValue({ 
+      watermarkedUrl: 'https://example.com/new-meme.png',
+      originalUrl: 'https://example.com/original.png'
+    });
 
     await createOverlay(memeData);
     const regenBtn = document.querySelector('.regenerate-btn') as HTMLButtonElement;

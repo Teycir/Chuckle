@@ -62,6 +62,7 @@ let currentOverlay: HTMLElement | null = null;
 let currentMemeKey: string | null = null;
 let currentMemeData: MemeData | null = null;
 let originalText: string | null = null;
+let originalImageUrl: string | null = null;
 let isRegenerating = false;
 
 function createButton(className: string, text: string, onClick: () => void): HTMLButtonElement {
@@ -134,18 +135,26 @@ async function regenerateMeme(): Promise<void> {
   try {
     const truncatedText = originalText.slice(0, 100);
     const template = await analyzeMemeContext(truncatedText, Date.now());
-    const imageUrl = await generateMemeImage(template, truncatedText);
+    const { watermarkedUrl, originalUrl } = await generateMemeImage(template, truncatedText);
     
-    if (currentMemeData) {
-      currentMemeData.imageUrl = imageUrl;
+    if (currentMemeData && currentOverlay) {
+      currentMemeData.imageUrl = watermarkedUrl;
       currentMemeData.template = template;
       currentMemeData.timestamp = Date.now();
+      originalImageUrl = originalUrl;
       
-      const img = currentOverlay?.querySelector('.meme-image') as HTMLImageElement;
-      if (img) img.src = imageUrl;
+      const img = currentOverlay.querySelector('.meme-image') as HTMLImageElement;
+      if (img) img.src = watermarkedUrl;
+      
+      const actionsContainer = currentOverlay.querySelector('.meme-actions');
+      if (actionsContainer) {
+        const oldShareBtn = actionsContainer.children[2];
+        const newShareBtn = createShareButton(originalUrl, truncatedText, currentLanguage);
+        actionsContainer.replaceChild(newShareBtn, oldShareBtn);
+      }
       
       if (currentMemeKey) {
-        await updateMeme(currentMemeKey, { imageUrl, template, timestamp: currentMemeData.timestamp });
+        await updateMeme(currentMemeKey, { imageUrl: watermarkedUrl, originalUrl, template, timestamp: currentMemeData.timestamp });
       }
     }
   } catch (error) {
@@ -228,10 +237,11 @@ export async function createOverlay(memeData: MemeData): Promise<void> {
   actionsContainer.className = 'meme-actions';
   actionsContainer.appendChild(createDownloadButton());
   actionsContainer.appendChild(createRegenerateButton());
-  actionsContainer.appendChild(createShareButton(memeData.imageUrl, memeData.text, currentLanguage));
+  actionsContainer.appendChild(createShareButton(memeData.originalUrl || memeData.imageUrl, memeData.text, currentLanguage));
   actionsContainer.appendChild(createCloseButton());
 
   originalText = memeData.text;
+  originalImageUrl = memeData.originalUrl || memeData.imageUrl;
 
   currentMemeKey = `meme_${simpleHash(memeData.text + memeData.timestamp)}`;
   currentMemeData = memeData;
@@ -272,6 +282,7 @@ export function closeOverlay(): void {
     currentMemeKey = null;
     currentMemeData = null;
     originalText = null;
+    originalImageUrl = null;
     document.body.style.overflow = '';
     disableShortcuts();
   }
