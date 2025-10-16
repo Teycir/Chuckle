@@ -23,6 +23,18 @@ const TEMPLATE_PROMPTS: Record<string, string> = {
   grumpycat: 'Grumpy Cat: TOP = suggestion/request, BOTTOM = grumpy "No" response. Format: "request / No" (max 35 chars each)'
 };
 
+function cleanText(text: string): string {
+  return text
+    .replace(/[\u{1F300}-\u{1F9FF}]/gu, '')
+    .replace(/[\u{2600}-\u{26FF}]/gu, '')
+    .replace(/[\u{2700}-\u{27BF}]/gu, '')
+    .replace(/&#\d+;/g, '')
+    .replace(/&[a-z]+;/gi, '')
+    .replace(/[*#@]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 function smartSplit(text: string): string {
   const words = text.split(/\s+/);
   if (words.length <= 3) return `${words[0] || text} / ${words.slice(1).join(' ') || 'yes'}`;
@@ -38,7 +50,7 @@ export async function formatTextForTemplate(text: string, template: string): Pro
   const { geminiApiKey } = await chrome.storage.local.get(['geminiApiKey']);
   if (!geminiApiKey) return smartSplit(text);
   
-  const prompt = `${templatePrompt}\n\nAdapt this text to match the template format. Make it EXTREMELY HILARIOUS with wit, irony, or exaggeration. MUST use " / " separator.\n\nText: "${text}"\n\nReturn ONLY ONE formatted text with " / " separator. No alternatives, no explanations, just the single formatted text.`;
+  const prompt = `${templatePrompt}\n\nAdapt this text to match the template format. Make it EXTREMELY HILARIOUS with wit, irony, or exaggeration. MUST use " / " separator.\n\nSTRICT RULES:\n- NO emojis or special characters (only letters, numbers, spaces, basic punctuation)\n- Each part MAX 35 characters\n- Keep it simple and clean\n- NO hashtags, NO asterisks, NO HTML entities\n\nText: "${text}"\n\nReturn ONLY ONE formatted text with " / " separator. No alternatives, no explanations, just the single formatted text.`;
 
   try {
     const response = await fetch(`${CONFIG.GEMINI_API_URL}?key=${geminiApiKey}`, {
@@ -66,11 +78,17 @@ export async function formatTextForTemplate(text: string, template: string): Pro
     
     if (formatted) {
       formatted = formatted.replace(/^["']|["']$/g, '').trim();
+      formatted = cleanText(formatted);
       const lines = formatted.split('\n').filter(l => l.trim().length > 0);
       const firstLine = lines[0] || formatted;
-      if (firstLine.length <= 200 && firstLine.includes(' / ')) {
-        console.log('[Chuckle] Text formatted for template:', firstLine);
-        return firstLine;
+      
+      if (firstLine.includes(' / ')) {
+        const parts = firstLine.split(' / ').map(p => p.trim());
+        if (parts.length >= 2 && parts[0].length <= 35 && parts[1].length <= 35) {
+          const cleanedLine = `${parts[0]} / ${parts[1]}`;
+          console.log('[Chuckle] Text formatted for template:', cleanedLine);
+          return cleanedLine;
+        }
       }
     }
     

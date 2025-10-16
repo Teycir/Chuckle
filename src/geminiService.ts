@@ -111,16 +111,22 @@ export async function generateMemeImage(template: string, text: string): Promise
     const parts = cleanText.split(' / ').map(p => p.trim()).filter(p => p.length > 0);
     let topText: string, bottomText: string;
     
+    console.log('[Chuckle] Split parts:', parts);
+    
     if (parts.length >= 2) {
       topText = normalizeText(parts[0]);
       bottomText = normalizeText(parts.slice(1).join(' '));
-    } else {
-      const words = cleanText.split(/\s+/);
+    } else if (parts.length === 1 && parts[0]) {
+      const words = parts[0].split(/\s+/);
       const mid = Math.ceil(words.length / 2);
       topText = normalizeText(words.slice(0, mid).join(' '));
       bottomText = normalizeText(words.slice(mid).join(' ') || 'yes');
+    } else {
+      topText = normalizeText(cleanText);
+      bottomText = 'yes';
     }
     
+    console.log('[Chuckle] Top text:', topText, '| Bottom text:', bottomText);
     const url = `${CONFIG.MEMEGEN_API_URL}/${formattedTemplate}/${topText}/${bottomText}.png`;
     console.log('[Chuckle] Trying meme URL:', url);
     const response = await fetch(url, { method: 'HEAD' });

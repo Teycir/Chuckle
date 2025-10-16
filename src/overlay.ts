@@ -187,6 +187,32 @@ function createMemeImage(memeData: MemeData): HTMLImageElement {
   return img;
 }
 
+function createTextEditor(): HTMLDivElement {
+  const wrapper = document.createElement('div');
+  wrapper.style.cssText = 'display: flex; flex-direction: column; gap: 8px; padding: 16px 0; border-bottom: 1px solid #e8eaed; width: 100%;';
+  
+  const label = document.createElement('div');
+  label.textContent = 'Edit meme text (press Enter to regenerate):';
+  label.style.cssText = 'font-size: 12px; color: #5f6368; font-weight: 600;';
+  
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.className = 'text-editor-input';
+  input.value = originalText || '';
+  input.style.cssText = 'padding: 8px 12px; border: 1px solid #dadce0; border-radius: 4px; font-size: 14px; width: 100%; box-sizing: border-box;';
+  
+  input.onkeydown = async (e) => {
+    if (e.key === 'Enter' && input.value.trim()) {
+      originalText = input.value.trim();
+      await regenerateMeme();
+    }
+  };
+  
+  wrapper.appendChild(label);
+  wrapper.appendChild(input);
+  return wrapper;
+}
+
 function createTemplateSelector(): HTMLDivElement {
   const wrapper = document.createElement('div');
   wrapper.style.cssText = 'display: flex; flex-direction: column; align-items: center; gap: 8px; padding-bottom: 16px; border-bottom: 1px solid #e8eaed; width: 100%;';
@@ -251,6 +277,7 @@ export async function createOverlay(memeData: MemeData): Promise<void> {
   currentMemeData = memeData;
 
   content.appendChild(actionsContainer);
+  content.appendChild(createTextEditor());
   content.appendChild(createTemplateSelector());
   
   const imgWrapper = document.createElement('div');
