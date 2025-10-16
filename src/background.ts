@@ -28,8 +28,12 @@ chrome.commands.onCommand.addListener((command) => {
   }
 });
 
+chrome.action.onClicked.addListener(() => {
+  chrome.tabs.create({ url: chrome.runtime.getURL('popup.html') });
+});
+
 chrome.runtime.onMessage.addListener((message) => {
   if (message.action === 'openPopup') {
-    chrome.action.openPopup();
+    chrome.tabs.create({ url: chrome.runtime.getURL('popup.html') });
   }
 });

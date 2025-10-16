@@ -5,18 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chuckle Settings</title>
   <style>
-    html { height: 100%; }
+    html {
+      width: 100%;
+      height: 100%;
+    }
     body {
-      min-height: 100vh;
+      width: 100%;
+      height: 100%;
       margin: 0;
-      padding: 16px;
+      padding: 0;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       display: flex;
       align-items: center;
       justify-content: center;
       position: relative;
-      overflow-x: hidden;
+      overflow: auto;
     }
     body::before {
       content: '';
@@ -27,13 +31,31 @@
       height: 200%;
       background: 
         radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.25) 20%, transparent 50%),
-        radial-gradient(circle at 80% 70%, rgba(255, 60, 120, 0.5) 0%, rgba(255, 60, 120, 0.2) 20%, transparent 50%);
+        radial-gradient(circle at 80% 70%, rgba(255, 60, 120, 0.5) 0%, rgba(255, 60, 120, 0.2) 20%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(60, 160, 255, 0.5) 0%, rgba(60, 160, 255, 0.2) 20%, transparent 50%);
       animation: shader 8s ease-in-out infinite;
       z-index: 0;
     }
+    body::after {
+      content: '';
+      position: fixed;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: 
+        radial-gradient(circle at 70% 20%, rgba(255, 160, 0, 0.45) 0%, rgba(255, 160, 0, 0.18) 20%, transparent 50%),
+        radial-gradient(circle at 30% 80%, rgba(160, 60, 255, 0.5) 0%, rgba(160, 60, 255, 0.2) 20%, transparent 50%);
+      animation: shader2 10s ease-in-out infinite;
+      z-index: 0;
+    }
     @keyframes shader {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      50% { transform: translate(15%, 15%) scale(1.1); }
+      0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); }
+      50% { transform: translate(15%, 15%) scale(1.1) rotate(10deg); }
+    }
+    @keyframes shader2 {
+      0%, 100% { transform: translate(10%, 5%) rotate(0deg) scale(1); }
+      50% { transform: translate(-5%, -10%) rotate(-10deg) scale(1.08); }
     }
     .container {
       width: 100%;
@@ -42,18 +64,33 @@
       backdrop-filter: blur(10px);
       border-radius: 16px;
       padding: 20px;
+      margin: 20px;
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
       position: relative;
       z-index: 1;
       border: 1px solid rgba(255, 255, 255, 0.3);
+      box-sizing: border-box;
+    }
+    @media (max-width: 420px) {
+      body { padding: 12px; align-items: flex-start; }
+      .container { width: 100%; padding: 20px 16px; margin: 10px auto; border-radius: 12px; }
+      h2 { font-size: 16px; }
+      input, select { font-size: 14px; }
+      button { font-size: 14px; }
+    }
+    @media (max-height: 700px) {
+      body { align-items: flex-start; padding-top: 20px; padding-bottom: 20px; }
+      .container { margin: 10px auto; }
     }
     h2 {
-      margin: 0 0 12px 0;
+      margin: 0;
       font-size: 16px;
       font-weight: 700;
       color: #202124;
+      letter-spacing: -0.5px;
     }
     .form-group { margin-bottom: 10px; }
+    .form-group:first-of-type { margin-top: 12px; }
     label {
       display: block;
       font-size: 10px;
@@ -63,7 +100,7 @@
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
-    input {
+    input, select {
       width: 100%;
       padding: 8px;
       border: 2px solid #e8eaed;
@@ -73,10 +110,14 @@
       transition: all 0.2s ease;
       background: white;
     }
-    input:focus {
+    input:focus, select:focus {
       outline: none;
       border-color: #667eea;
       box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    button:focus, input:focus, select:focus {
+      outline: 2px solid #667eea;
+      outline-offset: 2px;
     }
     input.valid { border-color: #34a853; }
     button {
@@ -97,6 +138,9 @@
       transform: translateY(-1px);
       box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
     }
+    button:active:not(:disabled) {
+      transform: translateY(0);
+    }
     button:disabled {
       opacity: 0.6;
       cursor: not-allowed;
@@ -108,6 +152,7 @@
       font-weight: 500;
       min-height: 14px;
       text-align: center;
+      margin-top: -6px;
       margin-bottom: 6px;
     }
     .status-msg.success {
@@ -130,23 +175,12 @@
       color: #667eea;
       text-decoration: none;
       font-weight: 600;
+      font-size: 10px;
     }
-    .form-group.checkbox {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      margin-bottom: 12px;
+    .info a:hover {
+      text-decoration: underline;
     }
-    .form-group.checkbox input {
-      width: auto;
-      margin: 0;
-    }
-    .form-group.checkbox label {
-      margin: 0;
-      text-transform: none;
-      font-size: 12px;
-      font-weight: 500;
-    }
+
     body.dark {
       background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
     }
@@ -169,12 +203,46 @@
       border-color: #3a3a4e;
       color: #e0e0e0;
     }
+    body.dark select:focus { border-color: #667eea; }
+    body.dark .tab-btn { background: #2a2a3e !important; color: #b0b0b0 !important; }
+    body.dark .tab-btn.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; color: white !important; }
+    body.dark #statsContent,
+    body.dark #collectionsContent,
+    body.dark #trendingContent { color: #e0e0e0; }
+    body.dark #templatesModal > div { background: #1e1e2e; color: #e0e0e0; }
+    body.dark #templatesModal #closeTemplates { color: #e0e0e0; }
+    body.dark .status-msg.success { background: rgba(52, 168, 83, 0.2); color: #81c995; }
+    body.dark .status-msg.error { background: rgba(197, 34, 31, 0.2); color: #f28b82; }
+    .footer-text {
+      text-align: center;
+      margin-top: 4px;
+      margin-bottom: 2px;
+      font-size: 9px;
+      color: #80868b;
+      animation: fadeInUp 0.6s ease-out;
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .footer-text a {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #667eea 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-decoration: none;
+      font-weight: 700;
+      transition: background-position 0.3s ease;
+    }
+    .footer-text a:hover { background-position: right center; }
+    body.dark .footer-text { color: #b0b0b0; }
   </style>
 </head>
 <body>
   <div class="container">
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 16px; border-bottom: 2px solid #e8eaed; padding-bottom: 8px;">
-      <button id="settingsTab" class="tab-btn active" style="padding: 8px; border: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600;">⚙️ Settings</button>
+      <button id="settingsTab" class="tab-btn" style="padding: 8px; border: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600;">⚙️ Settings</button>
       <button id="statsTab" class="tab-btn" style="padding: 8px; border: none; background: #f5f5f5; color: #666; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600;">📊 Stats</button>
       <button id="collectionsTab" class="tab-btn" style="padding: 8px; border: none; background: #f5f5f5; color: #666; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600;">📁 Collections</button>
       <button id="trendingTab" class="tab-btn" style="padding: 8px; border: none; background: #f5f5f5; color: #666; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600;">🔥 Trending</button>
@@ -194,40 +262,16 @@
         <option value="German">🇩🇪 Deutsch</option>
       </select>
     </div>
-    <div class="form-group checkbox">
-      <input type="checkbox" id="darkMode" />
-      <label for="darkMode">🌙 Dark Mode</label>
+    <div class="form-group" style="display: flex; align-items: center; gap: 6px; margin-bottom: 12px;">
+      <input type="checkbox" id="darkMode" style="width: auto; margin: 0;" />
+      <label for="darkMode" style="margin: 0; text-transform: none; font-size: 12px; font-weight: 500;">🌙 Dark Mode</label>
     </div>
-    <details style="margin-bottom: 12px;">
-      <summary style="cursor: pointer; font-size: 12px; font-weight: 600; color: #5f6368; margin-bottom: 8px;">⌨️ Keyboard Shortcuts</summary>
-      <div style="display: grid; gap: 6px; margin-top: 8px;">
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <label for="shortcut-regenerate" style="flex: 1; margin: 0; font-size: 11px;">Regenerate:</label>
-          <input type="text" id="shortcut-regenerate" maxlength="1" style="width: 40px; text-align: center; padding: 4px;" />
-        </div>
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <label for="shortcut-favorite" style="flex: 1; margin: 0; font-size: 11px;">Favorite:</label>
-          <input type="text" id="shortcut-favorite" maxlength="1" style="width: 40px; text-align: center; padding: 4px;" />
-        </div>
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <label for="shortcut-copy" style="flex: 1; margin: 0; font-size: 11px;">Copy:</label>
-          <input type="text" id="shortcut-copy" maxlength="1" style="width: 40px; text-align: center; padding: 4px;" />
-        </div>
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <label for="shortcut-tag" style="flex: 1; margin: 0; font-size: 11px;">Tag:</label>
-          <input type="text" id="shortcut-tag" maxlength="1" style="width: 40px; text-align: center; padding: 4px;" />
-        </div>
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <label for="shortcut-history" style="flex: 1; margin: 0; font-size: 11px;">History:</label>
-          <input type="text" id="shortcut-history" maxlength="1" style="width: 40px; text-align: center; padding: 4px;" />
-        </div>
-      </div>
-    </details>
     <div id="statusMsg" class="status-msg"></div>
     <button id="saveKey">💾 Save Settings</button>
-    <div class="info">Get key from <a href="https://aistudio.google.com/api-keys" target="_blank">Google AI Studio</a></div>
-    <div style="text-align: center; margin-top: 4px; margin-bottom: 2px; font-size: 9px; color: #80868b;">
-      <span>Meme generator, made by</span> <a href="https://teycirbensoltane.tn/" target="_blank" rel="noopener noreferrer" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #667eea 100%); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-decoration: none; font-weight: 700;">Teycir</a>
+    <div class="info">Get key from <a href="https://aistudio.google.com/api-keys" target="_blank" rel="noopener noreferrer">Google AI Studio</a></div>
+    <div class="info" style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #e8eaed;">How to use: Highlight text → Right-click → Remix as a Meme</div>
+    <div class="footer-text">
+      <span>Meme generator, made by</span> <a href="https://teycirbensoltane.tn/" target="_blank" rel="noopener noreferrer">Teycir</a>
     </div>
     </div>
     <div id="statsPanel" style="display: none;">

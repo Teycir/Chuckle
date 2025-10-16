@@ -13,18 +13,13 @@ const PLATFORMS: SharePlatform[] = [
     getUrl: (img, txt) => `https://twitter.com/intent/tweet?text=${encodeURIComponent(txt + '\n\n' + img)}`
   },
   {
-    name: 'Reddit',
-    icon: '🔴',
-    getUrl: (img, txt) => `https://reddit.com/submit?url=${encodeURIComponent(img)}&title=${encodeURIComponent(txt)}`
-  },
-  {
     name: 'LinkedIn',
-    icon: '💼',
+    icon: 'in',
     getUrl: (img) => `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(img)}`
   },
   {
     name: 'Email',
-    icon: '📧',
+    icon: '✉️',
     getUrl: (img, txt) => `mailto:?subject=${encodeURIComponent('Check out this meme!')}&body=${encodeURIComponent(txt + '\n\n' + img)}`
   }
 ];
@@ -38,35 +33,11 @@ async function trackShare(platform: string): Promise<void> {
 function createShareMenu(imageUrl: string, text: string): HTMLDivElement {
   const menu = document.createElement('div');
   menu.className = 'share-menu';
-  Object.assign(menu.style, {
-    position: 'absolute',
-    top: '45px',
-    right: '10px',
-    background: '#fff',
-    borderRadius: '8px',
-    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-    padding: '8px',
-    display: 'grid',
-    gridTemplateColumns: 'repeat(2, 1fr)',
-    gap: '8px',
-    zIndex: '1000'
-  });
 
   PLATFORMS.forEach(platform => {
     const btn = document.createElement('button');
-    btn.textContent = platform.icon;
-    btn.title = `Share on ${platform.name}`;
-    Object.assign(btn.style, {
-      padding: '8px 12px',
-      border: 'none',
-      borderRadius: '6px',
-      cursor: 'pointer',
-      fontSize: '18px',
-      background: '#f5f5f5',
-      transition: 'transform 0.2s'
-    });
-    btn.onmouseenter = () => btn.style.transform = 'scale(1.1)';
-    btn.onmouseleave = () => btn.style.transform = 'scale(1)';
+    btn.className = 'share-option';
+    btn.innerHTML = `${platform.icon} Share on ${platform.name}`;
     btn.onclick = () => {
       window.open(platform.getUrl(imageUrl, text), '_blank');
       trackShare(platform.name);
@@ -81,40 +52,11 @@ function createShareMenu(imageUrl: string, text: string): HTMLDivElement {
 export function createShareButton(imageUrl: string, text: string): HTMLButtonElement {
   const btn = document.createElement('button');
   btn.className = 'share-btn';
-  btn.textContent = '🚀';
-  btn.title = 'Share meme';
-  Object.assign(btn.style, {
-    position: 'absolute',
-    top: '10px',
-    right: '50px',
-    background: 'none',
-    border: 'none',
-    fontSize: '24px',
-    cursor: 'pointer',
-    zIndex: '1',
-    opacity: '0.8',
-    transition: 'opacity 0.2s'
-  });
-  btn.onmouseenter = () => btn.style.opacity = '1';
-  btn.onmouseleave = () => btn.style.opacity = '0.8';
+  btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="display: block;"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M15.5 6.5L8.5 10.5M8.5 13.5L15.5 17.5" stroke="currentColor" stroke-width="2" fill="none"/></svg>';
+  btn.setAttribute('data-tooltip', 'Share meme');
   
-  btn.onclick = () => {
-    const existing = document.querySelector('.share-menu');
-    if (existing) {
-      existing.remove();
-      return;
-    }
-    const menu = createShareMenu(imageUrl, text);
-    btn.parentElement?.appendChild(menu);
-    
-    const closeMenu = (e: MouseEvent) => {
-      if (!menu.contains(e.target as Node) && e.target !== btn) {
-        menu.remove();
-        document.removeEventListener('click', closeMenu);
-      }
-    };
-    setTimeout(() => document.addEventListener('click', closeMenu), 0);
-  };
+  const menu = createShareMenu(imageUrl, text);
+  btn.appendChild(menu);
   
   return btn;
 }

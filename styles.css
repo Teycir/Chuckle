@@ -10,7 +10,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  z-index: 10001;
+  z-index: 2147483648;
 }
 
 .loading-spinner {
@@ -69,7 +69,7 @@
 .meme-content {
   background-color: #fff;
   border-radius: 12px;
-  padding: 20px;
+  padding: 120px 20px 20px 20px;
   max-width: 600px;
   max-height: 90vh;
   overflow: auto;
@@ -80,50 +80,105 @@
   background-color: #1a1a2e;
 }
 
-.star-btn {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  z-index: 1;
+.meme-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+  margin-top: -70px;
+  position: relative;
 }
 
-.regenerate-btn {
-  position: absolute;
-  top: 10px;
-  left: 50px;
-  background: none;
-  border: none;
-  font-size: 24px;
+.star-btn,
+.regenerate-btn,
+.collection-btn,
+.share-btn {
+  background: #f8f9fa;
+  border: 1px solid #e8eaed;
+  font-size: 20px;
+  color: #5f6368;
   cursor: pointer;
-  z-index: 1;
-  opacity: 0.8;
-  transition: opacity 0.2s;
+  padding: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
 }
 
-.regenerate-btn:hover {
+.star-btn:hover,
+.regenerate-btn:hover,
+.collection-btn:hover,
+.share-btn:hover {
+  background: #e8eaed;
+  transform: scale(1.1);
+}
+
+.meme-overlay.dark .star-btn,
+.meme-overlay.dark .regenerate-btn,
+.meme-overlay.dark .collection-btn,
+.meme-overlay.dark .share-btn {
+  background: #2a2a3e;
+  border-color: #3a3a4e;
+  color: #e0e0e0;
+}
+
+.meme-overlay.dark .star-btn:hover,
+.meme-overlay.dark .regenerate-btn:hover,
+.meme-overlay.dark .collection-btn:hover,
+.meme-overlay.dark .share-btn:hover {
+  background: #3a3a4e;
+}
+
+.star-btn[data-tooltip]::after,
+.regenerate-btn[data-tooltip]::after,
+.collection-btn[data-tooltip]::after,
+.share-btn[data-tooltip]::after,
+.close-btn[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 6px 10px;
+  background: white;
+  color: #202124;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e8eaed;
+  z-index: 10001;
+}
+
+.meme-overlay.dark .star-btn[data-tooltip]::after,
+.meme-overlay.dark .regenerate-btn[data-tooltip]::after,
+.meme-overlay.dark .collection-btn[data-tooltip]::after,
+.meme-overlay.dark .share-btn[data-tooltip]::after,
+.meme-overlay.dark .close-btn[data-tooltip]::after {
+  background: #2a2a3e;
+  color: #e0e0e0;
+  border-color: #3a3a4e;
+}
+
+.star-btn:hover[data-tooltip]::after,
+.regenerate-btn:hover[data-tooltip]::after,
+.collection-btn:hover[data-tooltip]::after,
+.share-btn:hover[data-tooltip]::after,
+.close-btn:hover[data-tooltip]::after {
   opacity: 1;
 }
 
-.collection-btn {
-  position: absolute;
-  top: 10px;
-  left: 90px;
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  z-index: 1;
-  opacity: 0.8;
-  transition: opacity 0.2s;
-}
 
-.collection-btn:hover {
-  opacity: 1;
-}
 
 .collection-dropdown {
   position: absolute;
@@ -136,6 +191,12 @@
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
   max-height: 200px;
   overflow-y: auto;
+  display: none;
+}
+
+.collection-btn:hover .collection-dropdown,
+.collection-dropdown:hover {
+  display: block;
 }
 
 .meme-overlay.dark .collection-dropdown {
@@ -162,51 +223,94 @@
   position: absolute;
   top: 10px;
   right: 10px;
-  background: none;
-  border: none;
-  font-size: 32px;
+  background: #f8f9fa;
+  border: 1px solid #e8eaed;
+  font-size: 24px;
+  color: #5f6368;
   cursor: pointer;
-  color: #333;
+  padding: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
   z-index: 1;
 }
 
+.close-btn:hover {
+  background: #e8eaed;
+  transform: scale(1.1);
+}
+
 .meme-overlay.dark .close-btn {
-  color: #fff;
+  background: #2a2a3e;
+  border-color: #3a3a4e;
+  color: #e0e0e0;
+}
+
+.meme-overlay.dark .close-btn:hover {
+  background: #3a3a4e;
 }
 
 .share-menu {
   position: absolute;
-  top: 45px;
-  right: 10px;
-  background: #fff;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
   padding: 8px;
+  display: none;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 180px;
+  z-index: 10002;
+  animation: fadeIn 0.2s ease;
+}
+
+.share-btn:hover .share-menu,
+.share-menu:hover {
   display: flex;
-  gap: 8px;
-  z-index: 1000;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 
 .meme-overlay.dark .share-menu {
   background: #2a2a3e;
+  border: 1px solid #3a3a4e;
 }
 
-.share-menu button {
-  padding: 8px 12px;
+.share-option {
+  background: transparent;
   border: none;
-  border-radius: 6px;
+  padding: 10px 14px;
+  text-align: left;
   cursor: pointer;
-  font-size: 18px;
-  background: #f5f5f5;
-  transition: transform 0.2s;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #3c4043;
+  transition: background 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.meme-overlay.dark .share-menu button {
+.share-option:hover {
+  background: #f1f3f4;
+}
+
+.meme-overlay.dark .share-option {
+  color: #e0e0e0;
+}
+
+.meme-overlay.dark .share-option:hover {
   background: #3a3a4e;
-}
-
-.share-menu button:hover {
-  transform: scale(1.1);
 }
 
 .meme-image {

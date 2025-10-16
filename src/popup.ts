@@ -31,13 +31,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (data.darkMode) document.body.classList.add('dark');
   }
 
-  const shortcuts = await getShortcuts();
-  (document.getElementById('shortcut-regenerate') as HTMLInputElement).value = shortcuts.regenerate;
-  (document.getElementById('shortcut-favorite') as HTMLInputElement).value = shortcuts.favorite;
-  (document.getElementById('shortcut-copy') as HTMLInputElement).value = shortcuts.copy;
-  (document.getElementById('shortcut-tag') as HTMLInputElement).value = shortcuts.tag;
-  (document.getElementById('shortcut-history') as HTMLInputElement).value = shortcuts.history;
-
   document.getElementById('settingsTab')?.addEventListener('click', () => switchTab('settings'));
   document.getElementById('statsTab')?.addEventListener('click', () => switchTab('stats'));
   document.getElementById('collectionsTab')?.addEventListener('click', () => switchTab('collections'));
@@ -166,7 +159,6 @@ async function loadStats() {
       <div style="padding: 12px; background: #f5f5f5; border-radius: 8px;">
         <div style="font-size: 11px; font-weight: 600; margin-bottom: 6px;">📤 Shares</div>
         <div style="font-size: 10px; color: #666;">𝕏 Twitter: ${stats.shareStats.twitter}</div>
-        <div style="font-size: 10px; color: #666;">🔴 Reddit: ${stats.shareStats.reddit}</div>
         <div style="font-size: 10px; color: #666;">💼 LinkedIn: ${stats.shareStats.linkedin}</div>
         <div style="font-size: 10px; color: #666;">📧 Email: ${stats.shareStats.email}</div>
       </div>
@@ -206,29 +198,6 @@ document.getElementById('saveKey')?.addEventListener('click', async () => {
     return;
   }
 
-  const shortcuts = {
-    regenerate: (document.getElementById('shortcut-regenerate') as HTMLInputElement).value.toLowerCase(),
-    favorite: (document.getElementById('shortcut-favorite') as HTMLInputElement).value.toLowerCase(),
-    copy: (document.getElementById('shortcut-copy') as HTMLInputElement).value.toLowerCase(),
-    tag: (document.getElementById('shortcut-tag') as HTMLInputElement).value.toLowerCase(),
-    history: (document.getElementById('shortcut-history') as HTMLInputElement).value.toLowerCase()
-  };
-
-  for (const [action, shortcut] of Object.entries(shortcuts)) {
-    if (!validateShortcut(shortcut)) {
-      statusMsg.textContent = `⚠️ Invalid shortcut for ${action}`;
-      statusMsg.className = 'status-msg error';
-      setTimeout(() => { statusMsg.textContent = ''; statusMsg.className = 'status-msg'; }, 3000);
-      return;
-    }
-    if (hasConflict(shortcuts, shortcut, action as keyof typeof shortcuts)) {
-      statusMsg.textContent = `⚠️ Duplicate shortcut: ${shortcut}`;
-      statusMsg.className = 'status-msg error';
-      setTimeout(() => { statusMsg.textContent = ''; statusMsg.className = 'status-msg'; }, 3000);
-      return;
-    }
-  }
-  
   try {
     saveBtn.disabled = true;
     statusMsg.textContent = 'Saving...';
@@ -238,7 +207,6 @@ document.getElementById('saveKey')?.addEventListener('click', async () => {
       geminiApiKey: key,
       selectedLanguage: lang
     });
-    await saveShortcuts(shortcuts);
     
     const t = translations[lang as keyof typeof translations] || translations.English;
     statusMsg.textContent = `✓ ${t.saved}`;

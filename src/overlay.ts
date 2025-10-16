@@ -21,6 +21,7 @@ let currentOverlay: HTMLElement | null = null;
 let currentMemeKey: string | null = null;
 let currentMemeData: MemeData | null = null;
 let originalText: string | null = null;
+let isRegenerating = false;
 
 function createButton(className: string, text: string, onClick: () => void): HTMLButtonElement {
   const btn = document.createElement('button');
@@ -35,7 +36,7 @@ async function toggleFavorite(memeData: MemeData, starBtn: HTMLButtonElement): P
   memeData.isFavorite = !memeData.isFavorite;
   starBtn.textContent = memeData.isFavorite ? '⭐' : '☆';
   starBtn.setAttribute('aria-label', memeData.isFavorite ? 'Remove from favorites' : 'Add to favorites');
-  starBtn.title = memeData.isFavorite ? 'Remove from favorites (F)' : 'Add to favorites (F)';
+  starBtn.setAttribute('data-tooltip', memeData.isFavorite ? 'Remove from favorites (F)' : 'Add to favorites (F)');
   if (currentMemeKey) {
     pushUndo({ type: 'favorite', memeKey: currentMemeKey, oldValue, newValue: memeData.isFavorite });
     await updateMeme(currentMemeKey, { isFavorite: memeData.isFavorite });
@@ -48,7 +49,7 @@ function createStarButton(memeData: MemeData): HTMLButtonElement {
   });
   starBtn.setAttribute('aria-label', memeData.isFavorite ? 'Remove from favorites' : 'Add to favorites');
   starBtn.setAttribute('role', 'button');
-  starBtn.title = memeData.isFavorite ? 'Remove from favorites (F)' : 'Add to favorites (F)';
+  starBtn.setAttribute('data-tooltip', memeData.isFavorite ? 'Remove from favorites (F)' : 'Add to favorites (F)');
   return starBtn;
 }
 
@@ -60,9 +61,12 @@ function createCloseButton(): HTMLButtonElement {
 }
 
 async function regenerateMeme(): Promise<void> {
-  if (!originalText) return;
+  if (!originalText || isRegenerating) return;
+  isRegenerating = true;
+  
+  showLoading('🎲 Regenerating meme...');
+  
   try {
-    showLoading('Regenerating meme...');
     const truncatedText = originalText.slice(0, 100);
     const template = await analyzeMemeContext(truncatedText, Date.now());
     const imageUrl = await generateMemeImage(template, truncatedText);
@@ -79,10 +83,12 @@ async function regenerateMeme(): Promise<void> {
         await updateMeme(currentMemeKey, { imageUrl, template, timestamp: currentMemeData.timestamp });
       }
     }
-    hideLoading();
   } catch (error) {
-    hideLoading();
     console.error('Regeneration failed:', error);
+    showToast('❌ Regeneration failed');
+  } finally {
+    hideLoading();
+    isRegenerating = false;
   }
 }
 
@@ -90,51 +96,63 @@ function createRegenerateButton(): HTMLButtonElement {
   const regenBtn = createButton('regenerate-btn', '🎲', regenerateMeme);
   regenBtn.setAttribute('aria-label', 'Try another meme variant');
   regenBtn.setAttribute('role', 'button');
-  regenBtn.title = 'Try Another (R)';
+  regenBtn.setAttribute('data-tooltip', 'Try Another (R)');
   return regenBtn;
 }
 
 function createCollectionButton(): HTMLButtonElement {
-  const btn = createButton('collection-btn', '📁', async () => {
-    const collections = await getCollections();
-    const dropdown = document.createElement('div');
-    dropdown.className = 'collection-dropdown';
-    Object.assign(dropdown.style, {
-      position: 'absolute',
-      background: '#fff',
-      border: '1px solid #ddd',
-      borderRadius: '8px',
-      padding: '8px',
-      zIndex: '10000',
-      minWidth: '150px',
-      boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
-    });
-
-    collections.forEach(col => {
-      const item = document.createElement('div');
-      item.textContent = col.name;
-      item.style.padding = '6px';
-      item.style.cursor = 'pointer';
-      item.onclick = async () => {
-        if (currentMemeKey) {
-          if (col.memeIds.includes(currentMemeKey)) {
-            await removeMemeFromCollection(col.id, currentMemeKey);
-            showToast(`Removed from ${col.name}`);
-          } else {
-            await addMemeToCollection(col.id, currentMemeKey);
-            showToast(`Added to ${col.name}`);
-          }
-        }
-        dropdown.remove();
-      };
-      dropdown.appendChild(item);
-    });
-
-    btn.appendChild(dropdown);
-    setTimeout(() => dropdown.onclick = (e) => e.stopPropagation(), 0);
-    setTimeout(() => document.addEventListener('click', () => dropdown.remove(), { once: true }), 0);
+  const btn = createButton('collection-btn', '📁', () => {});
+  btn.setAttribute('data-tooltip', 'Add to Collection');
+  
+  const dropdown = document.createElement('div');
+  dropdown.className = 'collection-dropdown';
+  Object.assign(dropdown.style, {
+    position: 'absolute',
+    top: 'calc(100% + 8px)',
+    left: '50%',
+    transform: 'translateX(-50%)'
   });
-  btn.title = 'Add to Collection';
+
+  const loadCollections = async () => {
+    const collections = await getCollections();
+    dropdown.innerHTML = '';
+    
+    if (collections.length === 0) {
+      const msg = document.createElement('div');
+      msg.textContent = 'No collections yet';
+      msg.style.padding = '6px';
+      msg.style.color = '#999';
+      msg.style.fontSize = '12px';
+      dropdown.appendChild(msg);
+    } else {
+      collections.forEach(col => {
+        const item = document.createElement('div');
+        item.textContent = col.name;
+        item.style.padding = '6px';
+        item.style.cursor = 'pointer';
+        item.style.borderRadius = '4px';
+        item.style.transition = 'background 0.2s';
+        item.onmouseenter = () => item.style.background = '#f5f5f5';
+        item.onmouseleave = () => item.style.background = 'transparent';
+        item.onclick = async () => {
+          if (currentMemeKey) {
+            if (col.memeIds.includes(currentMemeKey)) {
+              await removeMemeFromCollection(col.id, currentMemeKey);
+              showToast(`Removed from ${col.name}`);
+            } else {
+              await addMemeToCollection(col.id, currentMemeKey);
+              showToast(`Added to ${col.name}`);
+            }
+          }
+        };
+        dropdown.appendChild(item);
+      });
+    }
+  };
+
+  btn.onmouseenter = () => loadCollections();
+  btn.appendChild(dropdown);
+  
   return btn;
 }
 
@@ -145,7 +163,7 @@ function createMemeImage(memeData: MemeData): HTMLImageElement {
   img.alt = `Meme: ${memeData.text}`;
   img.ondblclick = regenerateMeme;
   img.style.cursor = 'pointer';
-  img.title = 'Double-click to regenerate';
+  img.setAttribute('data-tooltip', 'Double-click to regenerate');
   return img;
 }
 
@@ -154,7 +172,7 @@ function createMemeText(memeData: MemeData): HTMLDivElement {
   text.className = 'meme-text';
   text.contentEditable = 'true';
   text.textContent = memeData.text;
-  text.title = 'Click to edit text';
+  text.setAttribute('data-tooltip', 'Click to edit text');
   text.onblur = async () => {
     const newText = text.textContent?.trim() || memeData.text;
     if (newText !== memeData.text && currentMemeKey) {
@@ -445,21 +463,23 @@ export async function createOverlay(memeData: MemeData): Promise<void> {
   const content = document.createElement('div');
   content.className = 'meme-content';
 
-  const header = document.createElement('div');
-  header.className = 'meme-header';
+  const closeBtn = createCloseButton();
+  content.appendChild(closeBtn);
+
+  const actionsContainer = document.createElement('div');
+  actionsContainer.className = 'meme-actions';
   const starBtn = createStarButton(memeData);
-  header.appendChild(starBtn);
-  header.appendChild(createRegenerateButton());
-  header.appendChild(createCollectionButton());
-  header.appendChild(createShareButton(memeData.imageUrl, memeData.text));
-  header.appendChild(createCloseButton());
+  actionsContainer.appendChild(starBtn);
+  actionsContainer.appendChild(createRegenerateButton());
+  actionsContainer.appendChild(createCollectionButton());
+  actionsContainer.appendChild(createShareButton(memeData.imageUrl, memeData.text));
 
   originalText = memeData.text;
 
   currentMemeKey = `meme_${simpleHash(memeData.text + memeData.timestamp)}`;
   currentMemeData = memeData;
 
-  content.appendChild(header);
+  content.appendChild(actionsContainer);
   content.appendChild(createMemeImage(memeData));
   content.appendChild(createMemeText(memeData));
   content.appendChild(createTagsSection(memeData));
@@ -481,7 +501,6 @@ export async function createOverlay(memeData: MemeData): Promise<void> {
     tagInput?.focus();
   });
 
-  const closeBtn = header.querySelector('.close-btn') as HTMLButtonElement;
   closeBtn?.focus();
 
   let escapeHandler: ((e: KeyboardEvent) => void) | null = null;
