@@ -273,7 +273,7 @@ function showToast(message: string): void {
   toast.className = 'toast-notification';
   toast.textContent = message;
   document.body.appendChild(toast);
-  setTimeout(() => toast.remove(), 2000);
+  setTimeout(() => toast.remove(), 4000);
 }
 
 export async function createOverlay(memeData: MemeData): Promise<void> {

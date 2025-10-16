@@ -151,12 +151,11 @@ async function summarizeText(text: string): Promise<string> {
 // Normalize text for URL compatibility across French, Spanish, German, Italian
 // Handles: é→e, ñ→n, ü→u, à→a, ö→o, ç→c, €→removed, etc.
 function normalizeText(text: string): string {
-  const normalized = text
+  return text
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-zA-Z0-9\s$€£¥!?.,;:'-]/g, '');
-  console.log('[Chuckle] Normalizing:', text, '→', normalized);
-  return normalized.replace(/\s+/g, '_');
+    .replace(/[^a-zA-Z0-9\s$€£¥!?.,;:'-]/g, '')
+    .replace(/\s+/g, '_');
 }
 
 export async function generateMemeImage(template: string, text: string, skipFormatting: boolean = false): Promise<{ watermarkedUrl: string; originalUrl: string; formattedText: string }> {
@@ -177,17 +176,19 @@ export async function generateMemeImage(template: string, text: string, skipForm
     let topText: string, bottomText: string;
     
     console.log('[Chuckle] Split parts:', parts);
+    console.log('[Chuckle] Parts count:', parts.length);
     
     if (formattedTemplate === 'cmm') {
       topText = '~';
       bottomText = normalizeText(parts.join(', '));
-    } else if (formattedTemplate === 'grumpycat' && parts.length >= 2) {
-      topText = normalizeText(parts[0]);
-      bottomText = normalizeText(parts.slice(1).join(' '));
-      console.log('[Chuckle] Grumpy Cat - Parts:', parts, 'Bottom joined:', parts.slice(1).join(' '));
     } else if (parts.length >= 2) {
+      const bottomParts = parts.slice(1);
+      const bottomJoined = bottomParts.join(' ');
       topText = normalizeText(parts[0]);
-      bottomText = normalizeText(parts.slice(1).join(' '));
+      bottomText = normalizeText(bottomJoined);
+      console.log('[Chuckle] Bottom parts:', bottomParts);
+      console.log('[Chuckle] Bottom joined BEFORE normalize:', bottomJoined);
+      console.log('[Chuckle] Bottom text AFTER normalize:', bottomText);
     } else if (parts.length === 1 && parts[0]) {
       const words = parts[0].split(/\s+/);
       const mid = Math.ceil(words.length / 2);
@@ -198,12 +199,13 @@ export async function generateMemeImage(template: string, text: string, skipForm
       bottomText = 'yes';
     }
     
-    console.log('[Chuckle] Top text:', topText, '| Bottom text:', bottomText);
+    console.log('[Chuckle] FINAL Top text:', topText);
+    console.log('[Chuckle] FINAL Bottom text:', bottomText);
     console.log('[Chuckle] Template:', formattedTemplate);
     const url = formattedTemplate === 'cmm'
       ? `${CONFIG.MEMEGEN_API_URL}/${formattedTemplate}/${bottomText}.png`
       : `${CONFIG.MEMEGEN_API_URL}/${formattedTemplate}/${topText}/${bottomText}.png`;
-    console.log('[Chuckle] Trying meme URL:', url);
+    console.log('[Chuckle] FULL meme URL:', url);
     console.log('[Chuckle] Formatted text for display:', cleanText);
     const response = await fetch(url, { method: 'HEAD' });
     if (!response.ok) throw new Error(ERROR_MESSAGES.TEMPLATE_UNAVAILABLE);

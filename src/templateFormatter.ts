@@ -76,6 +76,9 @@ export async function formatTextForTemplate(text: string, template: string): Pro
     });
     
     if (!response.ok) {
+      if (response.status === 429) {
+        throw new Error('Too many requests. Please wait a moment and try again.');
+      }
       console.error('[Chuckle] Template formatting failed:', response.status);
       return smartSplit(text);
     }
