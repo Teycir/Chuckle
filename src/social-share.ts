@@ -15,7 +15,8 @@ const shareTranslations = {
     regenerate: 'Regenerate',
     close: 'Close',
     textCopied: 'Text copied!',
-    imageDownloaded: 'Image downloaded!'
+    imageDownloaded: 'Image downloaded!',
+    checkThisMeme: 'Check this meme:'
   },
   Spanish: {
     shareMeme: 'Compartir Meme',
@@ -25,7 +26,8 @@ const shareTranslations = {
     regenerate: 'Regenerar',
     close: 'Cerrar',
     textCopied: '¡Texto copiado!',
-    imageDownloaded: '¡Imagen descargada!'
+    imageDownloaded: '¡Imagen descargada!',
+    checkThisMeme: 'Mira este meme:'
   },
   French: {
     shareMeme: 'Partager Meme',
@@ -35,7 +37,8 @@ const shareTranslations = {
     regenerate: 'Regénérer',
     close: 'Fermer',
     textCopied: 'Texte copié!',
-    imageDownloaded: 'Image téléchargée!'
+    imageDownloaded: 'Image téléchargée!',
+    checkThisMeme: 'Regardez ce meme:'
   },
   German: {
     shareMeme: 'Meme Teilen',
@@ -45,7 +48,8 @@ const shareTranslations = {
     regenerate: 'Regenerieren',
     close: 'Schließen',
     textCopied: 'Text kopiert!',
-    imageDownloaded: 'Bild heruntergeladen!'
+    imageDownloaded: 'Bild heruntergeladen!',
+    checkThisMeme: 'Schau dir dieses Meme an:'
   }
 };
 
@@ -132,8 +136,9 @@ function createShareModal(imageUrl: string, text: string, lang: string): HTMLDiv
     btn.onmouseover = () => { btn.style.transform = 'scale(1.1)'; btn.style.background = '#f5f5f5'; };
     btn.onmouseout = () => { btn.style.transform = 'scale(1)'; btn.style.background = 'transparent'; };
     btn.onclick = async () => {
+      const shareText = `${getTranslation('checkThisMeme', lang)} ${text}`;
       statusText.textContent = getTranslation('textCopied', lang);
-      await navigator.clipboard.writeText(text);
+      await navigator.clipboard.writeText(shareText);
       await new Promise(resolve => setTimeout(resolve, 500));
       
       statusText.textContent = getTranslation('imageDownloaded', lang);

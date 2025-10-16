@@ -23,13 +23,20 @@ const TEMPLATE_PROMPTS: Record<string, string> = {
   grumpycat: 'Grumpy Cat: TOP = suggestion/request, BOTTOM = grumpy "No" response. Format: "request / No" (max 35 chars each)'
 };
 
+function decodeHtmlEntities(text: string): string {
+  const entities: Record<string, string> = {
+    '&quot;': '"', '&#34;': '"', '&apos;': "'", '&#39;': "'",
+    '&amp;': '&', '&#38;': '&', '&lt;': '<', '&#60;': '<',
+    '&gt;': '>', '&#62;': '>', '&nbsp;': ' ', '&#160;': ' '
+  };
+  return text.replace(/&[#a-z0-9]+;/gi, match => entities[match.toLowerCase()] || '');
+}
+
 function cleanText(text: string): string {
   return text
     .replace(/[\u{1F300}-\u{1F9FF}]/gu, '')
     .replace(/[\u{2600}-\u{26FF}]/gu, '')
     .replace(/[\u{2700}-\u{27BF}]/gu, '')
-    .replace(/&#\d+;/g, '')
-    .replace(/&[a-z]+;/gi, '')
     .replace(/[*#@]/g, '')
     .replace(/\s+/g, ' ')
     .trim();
@@ -50,7 +57,7 @@ export async function formatTextForTemplate(text: string, template: string): Pro
   const { geminiApiKey } = await chrome.storage.local.get(['geminiApiKey']);
   if (!geminiApiKey) return smartSplit(text);
   
-  const prompt = `${templatePrompt}\n\nAdapt this text to match the template format. Make it EXTREMELY HILARIOUS with wit, irony, or exaggeration. MUST use " / " separator.\n\nSTRICT RULES:\n- NO emojis or special characters (only letters, numbers, spaces, basic punctuation)\n- Each part MAX 35 characters\n- Keep it simple and clean\n- NO hashtags, NO asterisks, NO HTML entities\n\nText: "${text}"\n\nReturn ONLY ONE formatted text with " / " separator. No alternatives, no explanations, just the single formatted text.`;
+  const prompt = `${templatePrompt}\n\nAdapt this text to match the template format. Make it EXTREMELY HILARIOUS and relatable with wit, irony, or exaggeration.\n\nSTRICT RULES:\n- MUST use " / " separator between top and bottom text\n- Each part MAX 35 characters\n- Use simple, clear language\n- NO emojis, NO special characters, NO HTML entities\n- NO hashtags, NO asterisks\n- Make it easy to understand\n\nText: "${text}"\n\nReturn ONLY the formatted text with " / " separator. Nothing else.`;
 
   try {
     const response = await fetch(`${CONFIG.GEMINI_API_URL}?key=${geminiApiKey}`, {
@@ -78,6 +85,7 @@ export async function formatTextForTemplate(text: string, template: string): Pro
     
     if (formatted) {
       formatted = formatted.replace(/^["']|["']$/g, '').trim();
+      formatted = decodeHtmlEntities(formatted);
       formatted = cleanText(formatted);
       const lines = formatted.split('\n').filter(l => l.trim().length > 0);
       const firstLine = lines[0] || formatted;

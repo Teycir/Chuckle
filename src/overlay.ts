@@ -224,9 +224,26 @@ function createTextEditor(): HTMLDivElement {
   return wrapper;
 }
 
+function createRegenerateButton(): HTMLDivElement {
+  const container = document.createElement('div');
+  container.style.cssText = 'display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 16px; margin-bottom: 8px;';
+  
+  const btn = createButton('star-btn', '🎲', () => regenerateMeme());
+  btn.setAttribute('aria-label', getTranslation('tryAnother'));
+  btn.setAttribute('role', 'button');
+  
+  const label = document.createElement('div');
+  label.textContent = getTranslation('tryAnother');
+  label.style.cssText = 'font-size: 12px; color: #5f6368; font-weight: 600;';
+  
+  container.appendChild(btn);
+  container.appendChild(label);
+  return container;
+}
+
 function createTemplateSelector(): HTMLDivElement {
   const wrapper = document.createElement('div');
-  wrapper.style.cssText = 'display: flex; flex-direction: column; align-items: center; gap: 8px; padding-bottom: 16px; border-bottom: 1px solid #e8eaed; width: 100%;';
+  wrapper.style.cssText = 'display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 16px 0; border-bottom: 1px solid #e8eaed; width: 100%;';
   
   const heading = document.createElement('div');
   heading.textContent = 'Choose template for meme';
@@ -291,9 +308,10 @@ export async function createOverlay(memeData: MemeData): Promise<void> {
   content.appendChild(actionsContainer);
   content.appendChild(createTextEditor());
   content.appendChild(createTemplateSelector());
+  content.appendChild(createRegenerateButton());
   
   const imgWrapper = document.createElement('div');
-  imgWrapper.style.cssText = 'margin-top: 20px; display: flex; justify-content: center; width: 100%;';
+  imgWrapper.style.cssText = 'display: flex; justify-content: center; width: 100%;';
   imgWrapper.appendChild(createMemeImage(memeData));
   content.appendChild(imgWrapper);
   overlay.appendChild(content);
