@@ -5,6 +5,7 @@ import { analyzeMemeContext, generateMemeImage } from './geminiService';
 import { showLoading, hideLoading } from './loading';
 import { createShareButton } from './social-share';
 import { MEME_TEMPLATES } from './constants';
+import { getErrorMessage } from './errorMessages';
 
 const overlayTranslations = {
   English: {
@@ -186,7 +187,8 @@ async function regenerateMeme(specificTemplate?: string): Promise<void> {
     }
   } catch (error) {
     console.error('Regeneration failed:', error);
-    showToast(getTranslation('regenerationFailed'));
+    const errorMessage = error instanceof Error ? error.message : await getErrorMessage('generationFailed');
+    showToast(errorMessage);
   } finally {
     hideLoading();
     isRegenerating = false;

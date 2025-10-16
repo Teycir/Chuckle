@@ -1,5 +1,6 @@
 import { CONFIG } from './config';
 import type { GeminiResponse } from './types';
+import { getErrorMessage } from './errorMessages';
 
 const TEMPLATE_PROMPTS: Record<string, string> = {
   drake: 'Drake meme: TOP = bad/rejected option, BOTTOM = good/approved option. Make it savage and brutally honest about preferences. Format: "bad thing / good thing" (max 35 chars each)',
@@ -77,7 +78,8 @@ export async function formatTextForTemplate(text: string, template: string): Pro
     
     if (!response.ok) {
       if (response.status === 429) {
-        throw new Error('Too many requests. Please wait a moment and try again.');
+        const errorMsg = await getErrorMessage('tooManyRequests');
+        throw new Error(errorMsg);
       }
       console.error('[Chuckle] Template formatting failed:', response.status);
       return smartSplit(text);
@@ -107,6 +109,12 @@ export async function formatTextForTemplate(text: string, template: string): Pro
     return smartSplit(text);
   } catch (error) {
     console.error('[Chuckle] Template formatting error:', error);
+    if (error instanceof Error) {
+      const tooManyMsg = await getErrorMessage('tooManyRequests');
+      if (error.message.includes(tooManyMsg) || error.message.includes('Too many requests')) {
+        throw error;
+      }
+    }
     return smartSplit(text);
   }
 }
