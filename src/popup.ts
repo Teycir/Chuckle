@@ -27,7 +27,10 @@ const translations = {
     statsTitle: '📊 Your Meme Stats',
     totalMemes: 'Total Memes',
     topTemplates: '🏆 Top Templates',
-    sharesLabel: '📤 Shares'
+    sharesLabel: '📤 Shares',
+    exportData: '📥 Export Data',
+    browseTemplates: '🎨 Browse Templates',
+    availableTemplates: '🎨 Available Templates'
   },
   Spanish: {
     title: '🎭 Configuración de Chuckle',
@@ -52,7 +55,10 @@ const translations = {
     statsTitle: '📊 Tus Estadísticas',
     totalMemes: 'Memes Totales',
     topTemplates: '🏆 Mejores Plantillas',
-    sharesLabel: '📤 Compartidos'
+    sharesLabel: '📤 Compartidos',
+    exportData: '📥 Exportar Datos',
+    browseTemplates: '🎨 Ver Plantillas',
+    availableTemplates: '🎨 Plantillas Disponibles'
   },
   French: {
     title: '🎭 Paramètres Chuckle',
@@ -77,7 +83,10 @@ const translations = {
     statsTitle: '📊 Vos Statistiques',
     totalMemes: 'Memes Totaux',
     topTemplates: '🏆 Meilleurs Modèles',
-    sharesLabel: '📤 Partages'
+    sharesLabel: '📤 Partages',
+    exportData: '📥 Exporter les Données',
+    browseTemplates: '🎨 Parcourir les Modèles',
+    availableTemplates: '🎨 Modèles Disponibles'
   },
   German: {
     title: '🎭 Chuckle Einstellungen',
@@ -102,7 +111,10 @@ const translations = {
     statsTitle: '📊 Ihre Statistiken',
     totalMemes: 'Memes Gesamt',
     topTemplates: '🏆 Top-Vorlagen',
-    sharesLabel: '📤 Teilungen'
+    sharesLabel: '📤 Teilungen',
+    exportData: '📥 Daten Exportieren',
+    browseTemplates: '🎨 Vorlagen Durchsuchen',
+    availableTemplates: '🎨 Verfügbare Vorlagen'
   }
 };
 
@@ -138,6 +150,15 @@ function updateUILanguage(lang: string) {
   
   const statsTitle = document.querySelector('#statsPanel h2');
   if (statsTitle) statsTitle.textContent = t.statsTitle;
+  
+  const exportBtn = document.getElementById('exportBtn');
+  if (exportBtn) exportBtn.textContent = t.exportData;
+  
+  const templatesBtn = document.getElementById('templatesBtn');
+  if (templatesBtn) templatesBtn.textContent = t.browseTemplates;
+  
+  const templatesTitle = document.querySelector('#templatesModal h3');
+  if (templatesTitle) templatesTitle.textContent = t.availableTemplates;
   
   const infoTexts = document.querySelectorAll('.info');
   if (infoTexts[0]) {

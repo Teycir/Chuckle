@@ -3,6 +3,7 @@ import { CONFIG } from './config';
 import { geminiCache } from './cache';
 import { logger } from './logger';
 import { API_KEY_REGEX, GEMINI_PROMPT_TEMPLATE, ERROR_MESSAGES } from './constants';
+import { addWatermark } from './watermark';
 
 export function validateApiKey(key: string): boolean {
   return API_KEY_REGEX.test(key);
@@ -100,7 +101,8 @@ export async function generateMemeImage(template: string, text: string): Promise
     console.log('[Chuckle] Trying meme URL:', url);
     const response = await fetch(url, { method: 'HEAD' });
     if (!response.ok) throw new Error(ERROR_MESSAGES.TEMPLATE_UNAVAILABLE);
-    return url;
+    const watermarkedUrl = await addWatermark(url);
+    return watermarkedUrl;
   } catch (error) {
     logger.error('Meme image generation failed', error);
     return CONFIG.FALLBACK_IMAGE_URL;

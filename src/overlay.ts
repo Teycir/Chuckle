@@ -7,44 +7,36 @@ import { createShareButton } from './social-share';
 
 const overlayTranslations = {
   English: {
-    downloadPng: 'Download PNG (D)',
-    tryAnother: 'Try Another (R)',
-    doubleClickRegenerate: 'Double-click to regenerate',
-    clickToEdit: 'Click to edit text',
-    closeMeme: 'Close meme overlay',
+    downloadPng: 'Download',
+    tryAnother: 'Regenerate',
+    closeMeme: 'Close',
     regenerating: '🎲 Regenerating meme...',
     regenerationFailed: '❌ Regeneration failed',
     downloaded: 'Downloaded!',
     downloadFailed: 'Download failed'
   },
   Spanish: {
-    downloadPng: 'Descargar PNG (D)',
-    tryAnother: 'Probar Otro (R)',
-    doubleClickRegenerate: 'Doble clic para regenerar',
-    clickToEdit: 'Clic para editar texto',
-    closeMeme: 'Cerrar meme',
+    downloadPng: 'Descargar',
+    tryAnother: 'Regenerar',
+    closeMeme: 'Cerrar',
     regenerating: '🎲 Regenerando meme...',
     regenerationFailed: '❌ Regeneración fallida',
     downloaded: '¡Descargado!',
     downloadFailed: 'Descarga fallida'
   },
   French: {
-    downloadPng: 'Télécharger PNG (D)',
-    tryAnother: 'Essayer un Autre (R)',
-    doubleClickRegenerate: 'Double-clic pour regénérer',
-    clickToEdit: 'Cliquer pour éditer le texte',
-    closeMeme: 'Fermer le meme',
+    downloadPng: 'Télécharger',
+    tryAnother: 'Regénérer',
+    closeMeme: 'Fermer',
     regenerating: '🎲 Regénération du meme...',
     regenerationFailed: '❌ Échec de la regénération',
     downloaded: 'Téléchargé!',
     downloadFailed: 'Échec du téléchargement'
   },
   German: {
-    downloadPng: 'PNG Herunterladen (D)',
-    tryAnother: 'Anderen Versuchen (R)',
-    doubleClickRegenerate: 'Doppelklick zum Regenerieren',
-    clickToEdit: 'Klicken zum Bearbeiten',
-    closeMeme: 'Meme schließen',
+    downloadPng: 'Herunterladen',
+    tryAnother: 'Regenerieren',
+    closeMeme: 'Schließen',
     regenerating: '🎲 Meme wird regeneriert...',
     regenerationFailed: '❌ Regenerierung fehlgeschlagen',
     downloaded: 'Heruntergeladen!',
@@ -99,22 +91,38 @@ async function downloadPng(): Promise<void> {
   }
 }
 
-function createDownloadButton(): HTMLButtonElement {
+function createDownloadButton(): HTMLDivElement {
+  const container = document.createElement('div');
+  container.style.cssText = 'display: flex; flex-direction: column; align-items: center; gap: 4px;';
+  
   const downloadBtn = createButton('star-btn', '⬇️', downloadPng);
-  const tooltip = getTranslation('downloadPng');
-  downloadBtn.setAttribute('aria-label', tooltip);
+  downloadBtn.setAttribute('aria-label', getTranslation('downloadPng'));
   downloadBtn.setAttribute('role', 'button');
-  downloadBtn.setAttribute('data-tooltip', tooltip);
-  return downloadBtn;
+  
+  const label = document.createElement('div');
+  label.textContent = getTranslation('downloadPng');
+  label.style.cssText = 'font-size: 10px; color: #5f6368; font-weight: 500;';
+  
+  container.appendChild(downloadBtn);
+  container.appendChild(label);
+  return container;
 }
 
-function createCloseButton(): HTMLButtonElement {
+function createCloseButton(): HTMLDivElement {
+  const container = document.createElement('div');
+  container.style.cssText = 'display: flex; flex-direction: column; align-items: center; gap: 4px;';
+  
   const closeBtn = createButton('close-btn', '×', closeOverlay);
-  const tooltip = getTranslation('closeMeme');
-  closeBtn.setAttribute('aria-label', tooltip);
+  closeBtn.setAttribute('aria-label', getTranslation('closeMeme'));
   closeBtn.setAttribute('role', 'button');
-  closeBtn.setAttribute('data-tooltip', tooltip);
-  return closeBtn;
+  
+  const label = document.createElement('div');
+  label.textContent = getTranslation('closeMeme');
+  label.style.cssText = 'font-size: 10px; color: #5f6368; font-weight: 500;';
+  
+  container.appendChild(closeBtn);
+  container.appendChild(label);
+  return container;
 }
 
 async function regenerateMeme(): Promise<void> {
@@ -149,13 +157,21 @@ async function regenerateMeme(): Promise<void> {
   }
 }
 
-function createRegenerateButton(): HTMLButtonElement {
+function createRegenerateButton(): HTMLDivElement {
+  const container = document.createElement('div');
+  container.style.cssText = 'display: flex; flex-direction: column; align-items: center; gap: 4px;';
+  
   const regenBtn = createButton('regenerate-btn', '🎲', regenerateMeme);
-  const tooltip = getTranslation('tryAnother');
-  regenBtn.setAttribute('aria-label', tooltip);
+  regenBtn.setAttribute('aria-label', getTranslation('tryAnother'));
   regenBtn.setAttribute('role', 'button');
-  regenBtn.setAttribute('data-tooltip', tooltip);
-  return regenBtn;
+  
+  const label = document.createElement('div');
+  label.textContent = getTranslation('tryAnother');
+  label.style.cssText = 'font-size: 10px; color: #5f6368; font-weight: 500;';
+  
+  container.appendChild(regenBtn);
+  container.appendChild(label);
+  return container;
 }
 
 function createMemeImage(memeData: MemeData): HTMLImageElement {
@@ -165,7 +181,6 @@ function createMemeImage(memeData: MemeData): HTMLImageElement {
   img.alt = `Meme: ${memeData.text}`;
   img.ondblclick = regenerateMeme;
   img.style.cursor = 'pointer';
-  img.setAttribute('data-tooltip', getTranslation('doubleClickRegenerate'));
   return img;
 }
 
@@ -174,7 +189,6 @@ function createMemeText(memeData: MemeData): HTMLDivElement {
   text.className = 'meme-text';
   text.contentEditable = 'true';
   text.textContent = memeData.text;
-  text.setAttribute('data-tooltip', getTranslation('clickToEdit'));
   text.onblur = async () => {
     const newText = text.textContent?.trim() || memeData.text;
     if (newText !== memeData.text && currentMemeKey) {
