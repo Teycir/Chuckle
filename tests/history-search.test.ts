@@ -1,4 +1,4 @@
-import { createHistoryPanel, searchHistory, clearTagFilters } from '../src/history';
+import { createHistoryPanel, searchHistory } from '../src/history';
 import { saveMeme } from '../src/storage';
 import type { MemeData } from '../src/types';
 
@@ -6,7 +6,6 @@ describe('History Search - Integration Tests', () => {
   beforeEach(async () => {
     document.body.innerHTML = '';
     await chrome.storage.local.clear();
-    clearTagFilters();
   });
 
   afterEach(() => {
@@ -29,8 +28,6 @@ describe('History Search - Integration Tests', () => {
         template: 'drake',
         timestamp: 1000,
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
 
       const meme2: MemeData = {
@@ -39,8 +36,6 @@ describe('History Search - Integration Tests', () => {
         template: 'distracted',
         timestamp: 2000,
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
 
       await saveMeme(meme1);
@@ -60,8 +55,6 @@ describe('History Search - Integration Tests', () => {
         template: 'drake',
         timestamp: 1000,
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
 
       const meme2: MemeData = {
@@ -70,8 +63,6 @@ describe('History Search - Integration Tests', () => {
         template: 'distracted',
         timestamp: 2000,
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
 
       await saveMeme(meme1);
@@ -91,8 +82,6 @@ describe('History Search - Integration Tests', () => {
         template: 'drake',
         timestamp: Date.now(),
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
 
       await saveMeme(meme);
@@ -111,8 +100,6 @@ describe('History Search - Integration Tests', () => {
         template: 'drake',
         timestamp: 1000,
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
 
       const meme2: MemeData = {
@@ -121,8 +108,6 @@ describe('History Search - Integration Tests', () => {
         template: 'distracted',
         timestamp: 2000,
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
 
       await saveMeme(meme1);
@@ -142,8 +127,6 @@ describe('History Search - Integration Tests', () => {
         template: 'drake',
         timestamp: Date.now(),
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
 
       await saveMeme(meme);
@@ -165,8 +148,6 @@ describe('History Search - Integration Tests', () => {
         template: 'drake',
         timestamp: 1000,
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
 
       const meme2: MemeData = {
@@ -175,8 +156,6 @@ describe('History Search - Integration Tests', () => {
         template: 'distracted',
         timestamp: 2000,
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
 
       await saveMeme(meme1);
@@ -201,8 +180,6 @@ describe('History Search - Integration Tests', () => {
         template: 'drake',
         timestamp: Date.now(),
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
 
       await saveMeme(meme);
@@ -221,8 +198,6 @@ describe('History Search - Integration Tests', () => {
         template: 'drake',
         timestamp: Date.now(),
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
 
       await saveMeme(meme);
@@ -245,8 +220,6 @@ describe('History Search - Integration Tests', () => {
           template: 'drake',
           timestamp: i,
           language: 'English',
-          isFavorite: false,
-          tags: []
         });
       }
 
@@ -264,8 +237,6 @@ describe('History Search - Integration Tests', () => {
         template: 'drake',
         timestamp: Date.now(),
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
 
       await saveMeme(meme);
@@ -289,8 +260,6 @@ describe('History Search - Integration Tests', () => {
         template: 'drake',
         timestamp: Date.now(),
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
 
       await saveMeme(meme);
@@ -309,8 +278,6 @@ describe('History Search - Integration Tests', () => {
         template: 'drake',
         timestamp: Date.now(),
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
 
       await saveMeme(meme);
@@ -329,8 +296,6 @@ describe('History Search - Integration Tests', () => {
         template: 'drake',
         timestamp: Date.now(),
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
 
       await saveMeme(meme);

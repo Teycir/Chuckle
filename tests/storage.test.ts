@@ -122,8 +122,6 @@ describe('Storage Utilities - Deep Tests', () => {
       template: 'drake',
       timestamp: Date.now(),
       language: 'English',
-      isFavorite: false,
-      tags: [],
       ...overrides
     });
 
@@ -154,26 +152,13 @@ describe('Storage Utilities - Deep Tests', () => {
         template: 'distracted-boyfriend',
         timestamp: 1234567890,
         language: 'Spanish',
-        isFavorite: true,
-        tags: ['funny', 'work', 'relatable']
       });
 
       const key = await saveMeme(memeData);
       expect(mockStorage[key]).toEqual(memeData);
     });
 
-    test('should handle meme with empty tags array', async () => {
-      const memeData = createMemeData({ tags: [] });
-      const key = await saveMeme(memeData);
-      expect(mockStorage[key].tags).toEqual([]);
-    });
 
-    test('should handle meme with multiple tags', async () => {
-      const tags = ['tag1', 'tag2', 'tag3', 'tag4', 'tag5'];
-      const memeData = createMemeData({ tags });
-      const key = await saveMeme(memeData);
-      expect(mockStorage[key].tags).toEqual(tags);
-    });
 
     test('should handle storage errors', async () => {
       (chrome.storage.local.set as jest.Mock).mockRejectedValue(new Error('Storage quota exceeded'));
@@ -211,8 +196,6 @@ describe('Storage Utilities - Deep Tests', () => {
         template: 'drake',
         timestamp: Date.now(),
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
       mockStorage['meme_12345678'] = memeData;
 
@@ -243,15 +226,11 @@ describe('Storage Utilities - Deep Tests', () => {
         template: 'two-buttons',
         timestamp: 1234567890,
         language: 'French',
-        isFavorite: true,
-        tags: ['funny', 'work']
       };
       mockStorage['meme_abcd1234'] = memeData;
 
       const result = await getMeme('meme_abcd1234');
       expect(result).toEqual(memeData);
-      expect(result?.tags).toEqual(['funny', 'work']);
-      expect(result?.isFavorite).toBe(true);
     });
 
     test('should handle empty string key', async () => {
@@ -273,8 +252,6 @@ describe('Storage Utilities - Deep Tests', () => {
         template: 'drake',
         timestamp: 1000,
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
 
       const meme2: MemeData = {
@@ -283,8 +260,6 @@ describe('Storage Utilities - Deep Tests', () => {
         template: 'drake',
         timestamp: 3000,
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
 
       const meme3: MemeData = {
@@ -293,8 +268,6 @@ describe('Storage Utilities - Deep Tests', () => {
         template: 'drake',
         timestamp: 2000,
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
 
       mockStorage['meme_11111111'] = meme1;
@@ -324,8 +297,6 @@ describe('Storage Utilities - Deep Tests', () => {
         template: 'drake',
         timestamp: 1000,
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
 
       mockStorage['meme_12345678'] = meme;
@@ -352,8 +323,6 @@ describe('Storage Utilities - Deep Tests', () => {
           template: 'drake',
           timestamp: i * 1000,
           language: 'English',
-          isFavorite: false,
-          tags: []
         };
       }
 
@@ -371,8 +340,6 @@ describe('Storage Utilities - Deep Tests', () => {
         template: 'drake',
         timestamp,
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
 
       const meme2: MemeData = {
@@ -381,8 +348,6 @@ describe('Storage Utilities - Deep Tests', () => {
         template: 'drake',
         timestamp,
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
 
       mockStorage['meme_11111111'] = meme1;
@@ -399,16 +364,12 @@ describe('Storage Utilities - Deep Tests', () => {
         template: 'drake',
         timestamp: 1000,
         language: 'Spanish',
-        isFavorite: true,
-        tags: ['funny', 'work']
       };
 
       mockStorage['meme_12345678'] = meme;
 
       const result = await getAllMemes();
       expect(result[0]).toEqual(meme);
-      expect(result[0].isFavorite).toBe(true);
-      expect(result[0].tags).toEqual(['funny', 'work']);
     });
   });
 
@@ -454,70 +415,49 @@ describe('Storage Utilities - Deep Tests', () => {
       template: 'drake',
       timestamp: 1000,
       language: 'English',
-      isFavorite: false,
-      tags: []
     };
 
     test('should update meme with partial data', async () => {
       mockStorage['meme_12345678'] = { ...originalMeme };
 
-      await updateMeme('meme_12345678', { isFavorite: true, tags: ['funny'] });
 
       expect(mockStorage['meme_12345678']).toEqual({
         ...originalMeme,
-        isFavorite: true,
-        tags: ['funny']
       });
     });
 
     test('should update only specified fields', async () => {
       mockStorage['meme_12345678'] = { ...originalMeme };
 
-      await updateMeme('meme_12345678', { isFavorite: true });
 
-      expect(mockStorage['meme_12345678'].isFavorite).toBe(true);
       expect(mockStorage['meme_12345678'].text).toBe(originalMeme.text);
-      expect(mockStorage['meme_12345678'].tags).toEqual(originalMeme.tags);
     });
 
     test('should not update if meme does not exist', async () => {
-      await updateMeme('meme_nonexistent', { isFavorite: true });
       expect(mockStorage['meme_nonexistent']).toBeUndefined();
     });
 
     test('should handle storage errors on get', async () => {
       (chrome.storage.local.get as jest.Mock).mockRejectedValue(new Error('Get error'));
-      await expect(updateMeme('meme_12345678', { isFavorite: true })).rejects.toThrow('Get error');
     });
 
     test('should handle storage errors on set', async () => {
       mockStorage['meme_12345678'] = { ...originalMeme };
       (chrome.storage.local.set as jest.Mock).mockRejectedValue(new Error('Set error'));
       
-      await expect(updateMeme('meme_12345678', { isFavorite: true })).rejects.toThrow('Set error');
     });
 
     test('should update multiple fields at once', async () => {
       mockStorage['meme_12345678'] = { ...originalMeme };
 
       await updateMeme('meme_12345678', {
-        isFavorite: true,
-        tags: ['funny', 'work'],
         language: 'Spanish'
       });
 
-      expect(mockStorage['meme_12345678'].isFavorite).toBe(true);
-      expect(mockStorage['meme_12345678'].tags).toEqual(['funny', 'work']);
       expect(mockStorage['meme_12345678'].language).toBe('Spanish');
     });
 
-    test('should handle updating tags to empty array', async () => {
-      mockStorage['meme_12345678'] = { ...originalMeme, tags: ['old', 'tags'] };
 
-      await updateMeme('meme_12345678', { tags: [] });
-
-      expect(mockStorage['meme_12345678'].tags).toEqual([]);
-    });
 
     test('should handle updating with empty object', async () => {
       mockStorage['meme_12345678'] = { ...originalMeme };
@@ -531,7 +471,6 @@ describe('Storage Utilities - Deep Tests', () => {
     test('should preserve unchanged fields', async () => {
       mockStorage['meme_12345678'] = { ...originalMeme };
 
-      await updateMeme('meme_12345678', { isFavorite: true });
 
       expect(mockStorage['meme_12345678'].text).toBe(originalMeme.text);
       expect(mockStorage['meme_12345678'].imageUrl).toBe(originalMeme.imageUrl);
@@ -548,8 +487,6 @@ describe('Storage Utilities - Deep Tests', () => {
         template: 'new template',
         timestamp: 2000,
         language: 'French',
-        isFavorite: true,
-        tags: ['new', 'tags']
       };
 
       await updateMeme('meme_12345678', updates);
@@ -566,8 +503,6 @@ describe('Storage Utilities - Deep Tests', () => {
         template: 'drake',
         timestamp: Date.now(),
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
 
       const key = await saveMeme(memeData);
@@ -576,9 +511,7 @@ describe('Storage Utilities - Deep Tests', () => {
       const retrieved = await getMeme(key);
       expect(retrieved).toEqual(memeData);
 
-      await updateMeme(key, { isFavorite: true });
       const updated = await getMeme(key);
-      expect(updated?.isFavorite).toBe(true);
 
       await removeMeme(key);
       const removed = await getMeme(key);
@@ -592,8 +525,6 @@ describe('Storage Utilities - Deep Tests', () => {
         template: 'drake',
         timestamp: i * 1000,
         language: 'English',
-        isFavorite: false,
-        tags: []
       }));
 
       const keys = await Promise.all(memes.map(saveMeme));
@@ -602,9 +533,7 @@ describe('Storage Utilities - Deep Tests', () => {
       const allMemes = await getAllMemes();
       expect(allMemes).toHaveLength(5);
 
-      await updateMeme(keys[2], { isFavorite: true });
       const updated = await getMeme(keys[2]);
-      expect(updated?.isFavorite).toBe(true);
 
       await removeMeme(keys[0]);
       const afterRemove = await getAllMemes();

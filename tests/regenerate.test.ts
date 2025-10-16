@@ -29,8 +29,6 @@ describe('Regenerate Feature', () => {
       template: 'drake',
       timestamp: Date.now(),
       language: 'en',
-      isFavorite: false,
-      tags: [],
     };
 
     await createOverlay(memeData);
@@ -46,8 +44,6 @@ describe('Regenerate Feature', () => {
       template: 'drake',
       timestamp: Date.now(),
       language: 'en',
-      isFavorite: false,
-      tags: [],
     };
 
     (geminiService.analyzeMemeContext as jest.Mock).mockResolvedValue('new-template');
@@ -70,8 +66,6 @@ describe('Regenerate Feature', () => {
       template: 'drake',
       timestamp: Date.now(),
       language: 'en',
-      isFavorite: false,
-      tags: [],
     };
 
     (geminiService.analyzeMemeContext as jest.Mock).mockResolvedValue('new-template');

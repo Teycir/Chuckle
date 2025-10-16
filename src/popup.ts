@@ -26,9 +26,7 @@ const translations = {
     shares: 'shares',
     statsTitle: '📊 Your Meme Stats',
     totalMemes: 'Total Memes',
-    favorites: 'Favorites',
     topTemplates: '🏆 Top Templates',
-    topTags: '🏷️ Top Tags',
     sharesLabel: '📤 Shares'
   },
   Spanish: {
@@ -53,9 +51,7 @@ const translations = {
     shares: 'compartidos',
     statsTitle: '📊 Tus Estadísticas',
     totalMemes: 'Memes Totales',
-    favorites: 'Favoritos',
     topTemplates: '🏆 Mejores Plantillas',
-    topTags: '🏷️ Mejores Etiquetas',
     sharesLabel: '📤 Compartidos'
   },
   French: {
@@ -80,9 +76,7 @@ const translations = {
     shares: 'partages',
     statsTitle: '📊 Vos Statistiques',
     totalMemes: 'Memes Totaux',
-    favorites: 'Favoris',
     topTemplates: '🏆 Meilleurs Modèles',
-    topTags: '🏷️ Meilleures Étiquettes',
     sharesLabel: '📤 Partages'
   },
   German: {
@@ -107,9 +101,7 @@ const translations = {
     shares: 'Teilungen',
     statsTitle: '📊 Ihre Statistiken',
     totalMemes: 'Memes Gesamt',
-    favorites: 'Favoriten',
     topTemplates: '🏆 Top-Vorlagen',
-    topTags: '🏷️ Top-Tags',
     sharesLabel: '📤 Teilungen'
   }
 };
@@ -274,19 +266,10 @@ async function loadStats() {
         <div style="font-size: 24px; font-weight: 700; color: #667eea;">${stats.totalMemes}</div>
         <div style="font-size: 10px; color: #666; text-transform: uppercase;">${t.totalMemes}</div>
       </div>
-      <div style="padding: 12px; background: #f5f5f5; border-radius: 8px;">
-        <div style="font-size: 24px; font-weight: 700; color: #764ba2;">${stats.favoritesCount} (${stats.favoritesPercent}%)</div>
-        <div style="font-size: 10px; color: #666; text-transform: uppercase;">${t.favorites}</div>
-      </div>
       ${stats.topTemplates.length ? `
       <div style="padding: 12px; background: #f5f5f5; border-radius: 8px;">
         <div style="font-size: 11px; font-weight: 600; margin-bottom: 6px;">${t.topTemplates}</div>
         ${stats.topTemplates.map(item => `<div style="font-size: 10px; color: #666;">${item.name}: ${item.count}</div>`).join('')}
-      </div>` : ''}
-      ${stats.topTags.length ? `
-      <div style="padding: 12px; background: #f5f5f5; border-radius: 8px;">
-        <div style="font-size: 11px; font-weight: 600; margin-bottom: 6px;">${t.topTags}</div>
-        ${stats.topTags.map(item => `<div style="font-size: 10px; color: #666;">${item.name}: ${item.count}</div>`).join('')}
       </div>` : ''}
       <div style="padding: 12px; background: #f5f5f5; border-radius: 8px;">
         <div style="font-size: 11px; font-weight: 600; margin-bottom: 6px;">${t.sharesLabel}</div>

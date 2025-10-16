@@ -39,8 +39,6 @@ describe('Overlay - Deep Tests', () => {
       template: 'drake',
       timestamp: Date.now(),
       language: 'English',
-      isFavorite: false,
-      tags: [],
       ...overrides
     });
 
@@ -193,8 +191,6 @@ describe('Overlay - Deep Tests', () => {
         template: 'drake',
         timestamp: Date.now(),
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
       
       await createOverlay(memeData);
@@ -211,8 +207,6 @@ describe('Overlay - Deep Tests', () => {
         template: 'drake',
         timestamp: Date.now(),
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
       
       await createOverlay(memeData);
@@ -233,8 +227,6 @@ describe('Overlay - Deep Tests', () => {
         template: 'drake',
         timestamp: Date.now(),
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
       
       await createOverlay(memeData);
@@ -258,8 +250,6 @@ describe('Overlay - Deep Tests', () => {
         template: 'drake',
         timestamp: Date.now(),
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
       
       await createOverlay(memeData);
@@ -273,8 +263,6 @@ describe('Overlay - Deep Tests', () => {
         template: 'drake',
         timestamp: Date.now(),
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
       
       await createOverlay(memeData);
@@ -293,8 +281,6 @@ describe('Overlay - Deep Tests', () => {
         template: 'drake',
         timestamp: Date.now(),
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
       
       await createOverlay(memeData);
@@ -312,8 +298,6 @@ describe('Overlay - Deep Tests', () => {
         template: 'drake',
         timestamp: Date.now(),
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
       
       await createOverlay(memeData);
@@ -331,8 +315,6 @@ describe('Overlay - Deep Tests', () => {
         template: 'drake',
         timestamp: Date.now(),
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
       
       await createOverlay(memeData);
@@ -350,8 +332,6 @@ describe('Overlay - Deep Tests', () => {
         template: 'drake',
         timestamp: Date.now(),
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
       
       await createOverlay(memeData);
@@ -369,8 +349,6 @@ describe('Overlay - Deep Tests', () => {
         template: 'drake',
         timestamp: Date.now(),
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
       
       await createOverlay(memeData);
@@ -390,8 +368,6 @@ describe('Overlay - Deep Tests', () => {
         template: 'drake',
         timestamp: Date.now(),
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
       
       await createOverlay(memeData);
@@ -408,8 +384,6 @@ describe('Overlay - Deep Tests', () => {
         template: 'drake',
         timestamp: Date.now(),
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
       
       await createOverlay(memeData);
@@ -425,8 +399,6 @@ describe('Overlay - Deep Tests', () => {
         template: 'drake',
         timestamp: Date.now(),
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
       
       await createOverlay(memeData);
@@ -442,8 +414,6 @@ describe('Overlay - Deep Tests', () => {
         template: 'drake',
         timestamp: Date.now(),
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
       
       await createOverlay(memeData);
@@ -461,8 +431,6 @@ describe('Overlay - Deep Tests', () => {
         template: 'drake',
         timestamp: Date.now(),
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
       
       const start = performance.now();
@@ -479,8 +447,6 @@ describe('Overlay - Deep Tests', () => {
         template: 'drake',
         timestamp: Date.now(),
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
       
       await createOverlay(memeData);

@@ -26,8 +26,6 @@ export interface MemeData {
   template: string;
   timestamp: number;
   language: string;
-  isFavorite: boolean;
-  tags: string[];
 }
 
 export interface StorageResult {

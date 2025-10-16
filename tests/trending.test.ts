@@ -15,9 +15,9 @@ describe('Trending', () => {
 
   it('calculates trending templates from last 7 days', async () => {
     const now = Date.now();
-    await saveMeme({ text: 'test1', imageUrl: 'url1', template: 'Drake', timestamp: now - 1000, language: 'English', isFavorite: false, tags: [] });
-    await saveMeme({ text: 'test2', imageUrl: 'url2', template: 'Drake', timestamp: now - 2000, language: 'English', isFavorite: false, tags: [] });
-    await saveMeme({ text: 'test3', imageUrl: 'url3', template: 'Surprised Pikachu', timestamp: now - 3000, language: 'English', isFavorite: false, tags: [] });
+    await saveMeme({ text: 'test1', imageUrl: 'url1', template: 'Drake', timestamp: now - 1000, language: 'English' });
+    await saveMeme({ text: 'test2', imageUrl: 'url2', template: 'Drake', timestamp: now - 2000, language: 'English' });
+    await saveMeme({ text: 'test3', imageUrl: 'url3', template: 'Surprised Pikachu', timestamp: now - 3000, language: 'English' });
 
     const trending = await getTrendingData();
     expect(trending.last7Days).toHaveLength(2);
@@ -26,7 +26,7 @@ describe('Trending', () => {
   });
 
   it('identifies untried templates', async () => {
-    await saveMeme({ text: 'test', imageUrl: 'url', template: 'Drake', timestamp: Date.now(), language: 'English', isFavorite: false, tags: [] });
+    await saveMeme({ text: 'test', imageUrl: 'url', template: 'Drake', timestamp: Date.now(), language: 'English' });
 
     const trending = await getTrendingData();
     expect(trending.untried).not.toContain('Drake');
@@ -36,10 +36,10 @@ describe('Trending', () => {
   it('calculates rising stars', async () => {
     const now = Date.now();
     const dayMs = 24 * 60 * 60 * 1000;
-    await saveMeme({ text: 'test1', imageUrl: 'url1', template: 'Drake', timestamp: now - dayMs, language: 'English', isFavorite: false, tags: [] });
-    await saveMeme({ text: 'test2', imageUrl: 'url2', template: 'Drake', timestamp: now - 2 * dayMs, language: 'English', isFavorite: false, tags: [] });
-    await saveMeme({ text: 'test3', imageUrl: 'url3', template: 'Drake', timestamp: now - 3 * dayMs, language: 'English', isFavorite: false, tags: [] });
-    await saveMeme({ text: 'test4', imageUrl: 'url4', template: 'Surprised Pikachu', timestamp: now - 10 * dayMs, language: 'English', isFavorite: false, tags: [] });
+    await saveMeme({ text: 'test1', imageUrl: 'url1', template: 'Drake', timestamp: now - dayMs, language: 'English' });
+    await saveMeme({ text: 'test2', imageUrl: 'url2', template: 'Drake', timestamp: now - 2 * dayMs, language: 'English' });
+    await saveMeme({ text: 'test3', imageUrl: 'url3', template: 'Drake', timestamp: now - 3 * dayMs, language: 'English' });
+    await saveMeme({ text: 'test4', imageUrl: 'url4', template: 'Surprised Pikachu', timestamp: now - 10 * dayMs, language: 'English' });
 
     const trending = await getTrendingData();
     expect(trending.risingStars.length).toBeGreaterThanOrEqual(0);

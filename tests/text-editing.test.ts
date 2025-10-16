@@ -21,8 +21,6 @@ describe('Text Editing', () => {
       template: 'Drake',
       timestamp: Date.now(),
       language: 'English',
-      isFavorite: false,
-      tags: []
     };
 
     await createOverlay(memeData);
@@ -40,8 +38,6 @@ describe('Text Editing', () => {
       template: 'Drake',
       timestamp: Date.now(),
       language: 'English',
-      isFavorite: false,
-      tags: []
     };
 
     await createOverlay(memeData);

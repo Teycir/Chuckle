@@ -35,8 +35,6 @@ describe('History Panel - Integration Tests', () => {
         template: 'drake',
         timestamp: 1000,
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
 
       const meme2: MemeData = {
@@ -45,8 +43,6 @@ describe('History Panel - Integration Tests', () => {
         template: 'distracted',
         timestamp: 2000,
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
 
       await saveMeme(meme1);
@@ -64,8 +60,6 @@ describe('History Panel - Integration Tests', () => {
         template: 'drake',
         timestamp: 1000,
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
 
       const meme2: MemeData = {
@@ -74,8 +68,6 @@ describe('History Panel - Integration Tests', () => {
         template: 'distracted',
         timestamp: 2000,
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
 
       await saveMeme(meme1);
@@ -127,8 +119,6 @@ describe('History Panel - Integration Tests', () => {
         template: 'drake',
         timestamp: Date.now(),
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
 
       await saveMeme(meme);
@@ -145,8 +135,6 @@ describe('History Panel - Integration Tests', () => {
         template: 'drake',
         timestamp: Date.now(),
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
 
       await saveMeme(meme);
@@ -163,8 +151,6 @@ describe('History Panel - Integration Tests', () => {
         template: 'drake',
         timestamp: Date.now(),
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
 
       await saveMeme(meme);
@@ -219,8 +205,6 @@ describe('History Panel - Integration Tests', () => {
         template: 'drake',
         timestamp: Date.now(),
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
 
       await saveMeme(meme);
@@ -237,8 +221,6 @@ describe('History Panel - Integration Tests', () => {
         template: 'drake',
         timestamp: Date.now(),
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
 
       await saveMeme(meme);

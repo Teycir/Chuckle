@@ -70,10 +70,13 @@
   background-color: #fff;
   border-radius: 12px;
   padding: 20px;
-  max-width: 600px;
+  max-width: 90vw;
   max-height: 90vh;
-  overflow: visible;
+  overflow: auto;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .meme-overlay.dark .meme-content {
@@ -90,6 +93,7 @@
 }
 
 .star-btn,
+.download-btn,
 .regenerate-btn,
 .share-btn {
   background: #f8f9fa;
@@ -117,6 +121,7 @@
 }
 
 .meme-overlay.dark .star-btn,
+.meme-overlay.dark .download-btn,
 .meme-overlay.dark .regenerate-btn,
 .meme-overlay.dark .share-btn {
   background: #2a2a3e;
@@ -125,12 +130,14 @@
 }
 
 .meme-overlay.dark .star-btn:hover,
+.meme-overlay.dark .download-btn:hover,
 .meme-overlay.dark .regenerate-btn:hover,
 .meme-overlay.dark .share-btn:hover {
   background: #3a3a4e;
 }
 
 .star-btn[data-tooltip]::before,
+.download-btn[data-tooltip]::before,
 .regenerate-btn[data-tooltip]::before,
 .share-btn[data-tooltip]::before,
 .close-btn[data-tooltip]::before {
@@ -155,6 +162,7 @@
 }
 
 .meme-overlay.dark .star-btn[data-tooltip]::before,
+.meme-overlay.dark .download-btn[data-tooltip]::before,
 .meme-overlay.dark .regenerate-btn[data-tooltip]::before,
 .meme-overlay.dark .share-btn[data-tooltip]::before,
 .meme-overlay.dark .close-btn[data-tooltip]::before {
@@ -163,6 +171,7 @@
 }
 
 .star-btn:hover[data-tooltip]::before,
+.download-btn:hover[data-tooltip]::before,
 .regenerate-btn:hover[data-tooltip]::before,
 .share-btn:hover[data-tooltip]::before,
 .close-btn:hover[data-tooltip]::before {
@@ -205,20 +214,23 @@
   background: #3a3a4e;
 }
 
+.share-btn {
+  position: relative;
+}
+
 .share-menu {
   position: absolute;
-  top: 100%;
+  top: 45px;
   right: 0;
-  margin-top: 8px;
   background: white;
   border-radius: 8px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
   padding: 8px;
+  min-width: 180px;
+  z-index: 10003;
   display: none;
   flex-direction: column;
   gap: 4px;
-  min-width: 180px;
-  z-index: 10002;
 }
 
 .share-menu.visible {
@@ -263,9 +275,12 @@ body.dark .share-menu {
 }
 
 .meme-image {
-  width: 100%;
+  max-width: 100%;
+  max-height: 70vh;
+  width: auto;
   height: auto;
   border-radius: 8px;
+  object-fit: contain;
 }
 
 .meme-text {
@@ -292,80 +307,7 @@ body.dark .share-menu {
   color: #fff;
 }
 
-.tags-container {
-  margin-top: 15px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-}
 
-.tag-badge {
-  background-color: #e0e0e0;
-  color: #333;
-  padding: 4px 8px;
-  border-radius: 12px;
-  font-size: 12px;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.meme-overlay.dark .tag-badge {
-  background-color: #2a2a3e;
-  color: #fff;
-}
-
-.tag-remove {
-  cursor: pointer !important;
-  font-weight: bold;
-}
-
-.tag-input {
-  width: 100%;
-  padding: 8px;
-  border-radius: 6px;
-  border: 1px solid #ddd;
-  background-color: #fff;
-  color: #333;
-  font-size: 14px;
-}
-
-.meme-overlay.dark .tag-input {
-  border-color: #444;
-  background-color: #2a2a3e;
-  color: #fff;
-}
-
-.tag-autocomplete {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  background-color: #fff;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  margin-top: 4px;
-  max-height: 150px;
-  overflow-y: auto;
-  display: none;
-  z-index: 1000;
-}
-
-.meme-overlay.dark .tag-autocomplete {
-  background-color: #2a2a3e;
-  border-color: #444;
-}
-
-.tag-suggestion {
-  padding: 8px;
-  cursor: pointer !important;
-  font-size: 14px;
-  color: #333;
-}
-
-.meme-overlay.dark .tag-suggestion {
-  color: #fff;
-}
 
 /* History Panel Styles */
 .history-panel {
@@ -450,28 +392,7 @@ body.dark .share-menu {
   gap: 4px;
 }
 
-.tag-filter-badge {
-  background-color: #e0e0e0;
-  color: #333;
-  padding: 2px 6px;
-  border-radius: 8px;
-  font-size: 10px;
-  cursor: pointer !important;
-}
 
-.history-panel.dark .tag-filter-badge {
-  background-color: #3a3a4e;
-  color: #fff;
-}
-
-.tag-filter-badge.active {
-  background-color: #d0d0ff;
-  border: 1px solid #6060ff;
-}
-
-.history-panel.dark .tag-filter-badge.active {
-  background-color: #4a4a6e;
-}
 
 .empty-history,
 .no-results,

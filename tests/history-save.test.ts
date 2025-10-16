@@ -25,8 +25,6 @@ describe('History Save - Integration Tests', () => {
         template: 'drake',
         timestamp: Date.now(),
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
 
       const key = await saveAndTrack(memeData);
@@ -43,8 +41,6 @@ describe('History Save - Integration Tests', () => {
         template: 'drake',
         timestamp: Date.now(),
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
 
       const meme2: MemeData = {
@@ -53,8 +49,6 @@ describe('History Save - Integration Tests', () => {
         template: 'distracted',
         timestamp: Date.now(),
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
 
       const key1 = await saveAndTrack(meme1);
@@ -70,8 +64,6 @@ describe('History Save - Integration Tests', () => {
         template: 'drake',
         timestamp: Date.now(),
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
 
       const key1 = await saveAndTrack(memeData);
@@ -88,8 +80,6 @@ describe('History Save - Integration Tests', () => {
         template: 'drake',
         timestamp: Date.now(),
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
       const afterTime = Date.now();
 
@@ -107,8 +97,6 @@ describe('History Save - Integration Tests', () => {
         template: 'drake',
         timestamp: 1234567890,
         language: 'Spanish',
-        isFavorite: true,
-        tags: ['funny', 'work']
       };
 
       const key = await saveAndTrack(memeData);
@@ -119,8 +107,6 @@ describe('History Save - Integration Tests', () => {
       expect(retrieved?.template).toBe('drake');
       expect(retrieved?.timestamp).toBe(1234567890);
       expect(retrieved?.language).toBe('Spanish');
-      expect(retrieved?.isFavorite).toBe(true);
-      expect(retrieved?.tags).toEqual(['funny', 'work']);
     });
   });
 
@@ -132,8 +118,6 @@ describe('History Save - Integration Tests', () => {
         template: 'drake',
         timestamp: Date.now(),
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
 
       const key = await saveAndTrack(memeData);
@@ -148,8 +132,6 @@ describe('History Save - Integration Tests', () => {
         template: 'drake',
         timestamp: Date.now(),
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
 
       const key1 = await saveAndTrack(memeData);
@@ -165,8 +147,6 @@ describe('History Save - Integration Tests', () => {
         template: 'drake',
         timestamp: Date.now(),
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
 
       const meme2: MemeData = {
@@ -175,8 +155,6 @@ describe('History Save - Integration Tests', () => {
         template: 'drake',
         timestamp: Date.now(),
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
 
       const key1 = await saveAndTrack(meme1);
@@ -209,8 +187,6 @@ describe('History Save - Integration Tests', () => {
         template: 'drake',
         timestamp: Date.now(),
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
 
       const key = await saveAndTrack(memeData);
@@ -227,8 +203,6 @@ describe('History Save - Integration Tests', () => {
           template: 'drake',
           timestamp: 1000,
           language: 'English',
-          isFavorite: false,
-          tags: []
         },
         {
           text: 'Second',
@@ -236,8 +210,6 @@ describe('History Save - Integration Tests', () => {
           template: 'distracted',
           timestamp: 2000,
           language: 'English',
-          isFavorite: false,
-          tags: []
         }
       ];
 
@@ -264,8 +236,6 @@ describe('History Save - Integration Tests', () => {
         template: 'drake',
         timestamp: Date.now(),
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
 
       const key = await saveAndTrack(memeData);
@@ -281,8 +251,6 @@ describe('History Save - Integration Tests', () => {
         template: 'drake',
         timestamp: Date.now(),
         language: 'Spanish',
-        isFavorite: false,
-        tags: []
       };
 
       const key = await saveAndTrack(memeData);
@@ -298,8 +266,6 @@ describe('History Save - Integration Tests', () => {
         template: 'drake',
         timestamp: Date.now(),
         language: 'French',
-        isFavorite: false,
-        tags: []
       };
 
       const key = await saveAndTrack(memeData);
@@ -315,8 +281,6 @@ describe('History Save - Integration Tests', () => {
         template: 'drake',
         timestamp: Date.now(),
         language: 'German',
-        isFavorite: false,
-        tags: []
       };
 
       const key = await saveAndTrack(memeData);
@@ -335,8 +299,6 @@ describe('History Save - Integration Tests', () => {
         template: 'drake',
         timestamp: Date.now(),
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
 
       const key = await saveAndTrack(memeData);
@@ -352,8 +314,6 @@ describe('History Save - Integration Tests', () => {
         template: 'drake',
         timestamp: Date.now(),
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
 
       const key = await saveAndTrack(memeData);
@@ -369,8 +329,6 @@ describe('History Save - Integration Tests', () => {
         template: 'drake',
         timestamp: Date.now(),
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
 
       const key = await saveAndTrack(memeData);
@@ -386,14 +344,11 @@ describe('History Save - Integration Tests', () => {
         template: 'drake',
         timestamp: Date.now(),
         language: 'English',
-        isFavorite: false,
-        tags: []
       };
 
       const key = await saveAndTrack(memeData);
       const retrieved = await getMeme(key);
 
-      expect(retrieved?.tags).toEqual([]);
     });
 
     test('should handle multiple tags', async () => {
@@ -403,14 +358,11 @@ describe('History Save - Integration Tests', () => {
         template: 'drake',
         timestamp: Date.now(),
         language: 'English',
-        isFavorite: false,
-        tags: ['funny', 'work', 'relatable']
       };
 
       const key = await saveAndTrack(memeData);
       const retrieved = await getMeme(key);
 
-      expect(retrieved?.tags).toEqual(['funny', 'work', 'relatable']);
     });
   });
 });

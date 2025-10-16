@@ -1,16 +1,12 @@
 export interface ShortcutConfig {
   regenerate: string;
-  favorite: string;
-  copy: string;
-  tag: string;
+  download: string;
   history: string;
 }
 
 export const DEFAULT_SHORTCUTS: ShortcutConfig = {
   regenerate: 'r',
-  favorite: 'f',
-  copy: 'c',
-  tag: 't',
+  download: 'd',
   history: 'h'
 };
 

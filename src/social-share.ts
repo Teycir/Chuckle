@@ -68,10 +68,11 @@ function createShareMenu(imageUrl: string, text: string, lang: string): HTMLDivE
     const btn = document.createElement('button');
     btn.className = 'share-option';
     btn.innerHTML = `${platform.icon} ${getTranslation('shareOn', lang)} ${platform.name}`;
-    btn.onclick = () => {
+    btn.onclick = (e) => {
+      e.stopPropagation();
       window.open(platform.getUrl(imageUrl, text), '_blank');
       trackShare(platform.name);
-      menu.remove();
+      menu.classList.remove('visible');
     };
     menu.appendChild(btn);
   });
@@ -90,8 +91,16 @@ export function createShareButton(imageUrl: string, text: string, lang: string =
   
   btn.onclick = (e) => {
     e.stopPropagation();
-    menu.classList.toggle('visible');
+    const isVisible = menu.classList.contains('visible');
+    document.querySelectorAll('.share-menu').forEach(m => m.classList.remove('visible'));
+    if (!isVisible) menu.classList.add('visible');
   };
+  
+  document.addEventListener('click', (e) => {
+    if (!btn.contains(e.target as Node)) {
+      menu.classList.remove('visible');
+    }
+  });
   
   return btn;
 }

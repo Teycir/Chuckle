@@ -41,9 +41,7 @@ export async function generateMeme(text: string): Promise<void> {
       imageUrl,
       template,
       timestamp: Date.now(),
-      language: 'English',
-      isFavorite: false,
-      tags: []
+      language: 'English'
     };
     
     await saveMeme(memeData);
