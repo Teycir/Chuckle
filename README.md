@@ -16,6 +16,8 @@ Think of it as your personal meme generator that lives in your browser. No desig
 - 🌙 **Dark Mode** - Beautiful animated backgrounds that are easy on your eyes
 - 🚀 **Social Sharing** - Share instantly to Twitter, Reddit, LinkedIn, or Email
 - 📊 **Analytics Dashboard** - Track your meme stats, top templates, and share counts
+- 📁 **Collections** - Organize memes into themed albums (Work, Funny, Viral, etc.)
+- 🔥 **Trending Insights** - See your most-used templates, rising stars, and untried options
 - ✏️ **Edit Meme Text** - Click to edit text directly, no need to regenerate
 - 🎨 **Template Browser** - Discover all 20 available meme templates
 - 📋 **One-Click Copy** - Copy to clipboard instantly
@@ -71,7 +73,7 @@ Think of it as your personal meme generator that lives in your browser. No desig
 4. You'll see the Chuckle icon appear in your browser
 
 **Step 2: Get Your Free AI Key (1 minute)**
-1. Visit [Google AI Studio](https://aistudio.google.com/app/apikey)
+1. Visit [Google AI Studio](https://aistudio.google.com/api-keys)
 2. Sign in with your Google account
 3. Click "Create API Key"
 4. Copy the key (it looks like: AIza...)
@@ -171,6 +173,24 @@ Think of it as your personal meme generator that lives in your browser. No desig
   - Share counts (Twitter, Reddit, LinkedIn, Email)
 - Click "📥 Export Data" to download all your memes as JSON
 - Click "🎨 Browse Templates" to see all 20 available templates
+
+**📁 Organize with Collections**
+1. Click the Chuckle icon
+2. Go to the "📁 Collections" tab
+3. Click "+ New Collection" and name it (e.g., "Work Memes", "Viral Hits")
+4. When viewing a meme, click the 📁 button to add it to a collection
+5. Collections help you organize memes by theme, mood, or purpose
+6. Delete collections anytime without losing your memes
+
+**🔥 Discover Your Trending**
+- Click the Chuckle icon
+- Go to the "🔥 Trending" tab
+- See personalized insights:
+  - **Your Top Templates (7 days)** - Which templates you're using most
+  - **Your Most Shared** - Templates you share the most
+  - **Your Rising Stars** - Templates you're using more lately
+  - **Templates to Try** - Templates you haven't used yet
+- All data is local - it's YOUR trending, not global
 
 **⚡ Alt+M Quick Generate**
 - Highlight any text on any webpage
@@ -285,6 +305,12 @@ A: Click the Chuckle icon, go to Stats tab, and click "🎨 Browse Templates" to
 **Q: Can I create multiple meme variants?**
 A: Yes! Click the 🎲 button on any meme to instantly regenerate with a different template. You can also use the Batch Generate feature to create 1-3 variants at once.
 
+**Q: What are Collections?**
+A: Collections let you organize memes into themed albums (like "Work Humor", "Study Memes", "Viral Content"). Create unlimited collections and add memes to multiple collections.
+
+**Q: How does Trending work without a server?**
+A: Trending analyzes YOUR local meme history to show patterns - which templates you use most, which you share most, and which are rising in your usage. It's personalized to your meme style!
+
 ### Tips for Best Memes
 
 **✅ Do:**
@@ -385,6 +411,8 @@ A: Yes! Click the 🎲 button on any meme to instantly regenerate with a differe
 ### Key Features
 - **Social Sharing** - Twitter, Reddit, LinkedIn, Email integration
 - **Analytics Dashboard** - Track stats, export data
+- **Collections** - Organize memes into themed albums
+- **Trending Insights** - Personal analytics on template usage
 - **Editable Text** - Click to edit meme text inline
 - **Template Browser** - Discover 20 meme templates
 - **Keyboard Shortcuts** - Alt+M for instant generation

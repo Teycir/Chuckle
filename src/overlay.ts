@@ -6,6 +6,7 @@ import { enableShortcuts, disableShortcuts, registerShortcut } from './shortcuts
 import { analyzeMemeContext, generateMemeImage } from './geminiService';
 import { showLoading, hideLoading } from './loading';
 import { createShareButton } from './social-share';
+import { getCollections, addMemeToCollection, removeMemeFromCollection } from './collections';
 
 let tagsModule: typeof import('./tags') | null = null;
 
@@ -90,6 +91,50 @@ function createRegenerateButton(): HTMLButtonElement {
   regenBtn.setAttribute('role', 'button');
   regenBtn.title = 'Try Another (R)';
   return regenBtn;
+}
+
+function createCollectionButton(): HTMLButtonElement {
+  const btn = createButton('collection-btn', '📁', async () => {
+    const collections = await getCollections();
+    const dropdown = document.createElement('div');
+    dropdown.className = 'collection-dropdown';
+    Object.assign(dropdown.style, {
+      position: 'absolute',
+      background: '#fff',
+      border: '1px solid #ddd',
+      borderRadius: '8px',
+      padding: '8px',
+      zIndex: '10000',
+      minWidth: '150px',
+      boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
+    });
+
+    collections.forEach(col => {
+      const item = document.createElement('div');
+      item.textContent = col.name;
+      item.style.padding = '6px';
+      item.style.cursor = 'pointer';
+      item.onclick = async () => {
+        if (currentMemeKey) {
+          if (col.memeIds.includes(currentMemeKey)) {
+            await removeMemeFromCollection(col.id, currentMemeKey);
+            showToast(`Removed from ${col.name}`);
+          } else {
+            await addMemeToCollection(col.id, currentMemeKey);
+            showToast(`Added to ${col.name}`);
+          }
+        }
+        dropdown.remove();
+      };
+      dropdown.appendChild(item);
+    });
+
+    btn.appendChild(dropdown);
+    setTimeout(() => dropdown.onclick = (e) => e.stopPropagation(), 0);
+    setTimeout(() => document.addEventListener('click', () => dropdown.remove(), { once: true }), 0);
+  });
+  btn.title = 'Add to Collection';
+  return btn;
 }
 
 function createMemeImage(memeData: MemeData): HTMLImageElement {
@@ -404,6 +449,7 @@ export async function createOverlay(memeData: MemeData): Promise<void> {
   const starBtn = createStarButton(memeData);
   header.appendChild(starBtn);
   header.appendChild(createRegenerateButton());
+  header.appendChild(createCollectionButton());
   header.appendChild(createShareButton(memeData.imageUrl, memeData.text));
   header.appendChild(createCloseButton());
 

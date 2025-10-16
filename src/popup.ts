@@ -1,6 +1,8 @@
 import { getShortcuts, saveShortcuts, validateShortcut, hasConflict, DEFAULT_SHORTCUTS } from './shortcutConfig';
 import { getAnalytics, exportData } from './analytics';
 import { MEME_TEMPLATES } from './templates';
+import { getCollections, createCollection, deleteCollection, renameCollection, getCollectionMemes } from './collections';
+import { getTrendingData } from './trending';
 
 const translations = {
   English: { save: 'Save Settings', saved: 'Saved!' },
@@ -36,24 +38,25 @@ document.addEventListener('DOMContentLoaded', async () => {
   (document.getElementById('shortcut-tag') as HTMLInputElement).value = shortcuts.tag;
   (document.getElementById('shortcut-history') as HTMLInputElement).value = shortcuts.history;
 
-  document.getElementById('settingsTab')?.addEventListener('click', () => {
-    document.getElementById('settingsPanel')!.style.display = 'block';
-    document.getElementById('statsPanel')!.style.display = 'none';
-    document.getElementById('settingsTab')!.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-    document.getElementById('settingsTab')!.style.color = 'white';
-    document.getElementById('statsTab')!.style.background = '#f5f5f5';
-    document.getElementById('statsTab')!.style.color = '#666';
-  });
+  document.getElementById('settingsTab')?.addEventListener('click', () => switchTab('settings'));
+  document.getElementById('statsTab')?.addEventListener('click', () => switchTab('stats'));
+  document.getElementById('collectionsTab')?.addEventListener('click', () => switchTab('collections'));
+  document.getElementById('trendingTab')?.addEventListener('click', () => switchTab('trending'));
 
-  document.getElementById('statsTab')?.addEventListener('click', async () => {
-    document.getElementById('settingsPanel')!.style.display = 'none';
-    document.getElementById('statsPanel')!.style.display = 'block';
-    document.getElementById('statsTab')!.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-    document.getElementById('statsTab')!.style.color = 'white';
-    document.getElementById('settingsTab')!.style.background = '#f5f5f5';
-    document.getElementById('settingsTab')!.style.color = '#666';
-    await loadStats();
-  });
+  async function switchTab(tab: string) {
+    ['settings', 'stats', 'collections', 'trending'].forEach(t => {
+      const panel = document.getElementById(`${t}Panel`);
+      const btn = document.getElementById(`${t}Tab`);
+      if (panel) panel.style.display = t === tab ? 'block' : 'none';
+      if (btn) {
+        btn.style.background = t === tab ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : '#f5f5f5';
+        btn.style.color = t === tab ? 'white' : '#666';
+      }
+    });
+    if (tab === 'stats') await loadStats();
+    if (tab === 'collections') await loadCollections();
+    if (tab === 'trending') await loadTrending();
+  }
 
   document.getElementById('exportBtn')?.addEventListener('click', exportData);
   
@@ -73,7 +76,69 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('closeTemplates')?.addEventListener('click', () => {
     document.getElementById('templatesModal')!.style.display = 'none';
   });
+
+  document.getElementById('newCollectionBtn')?.addEventListener('click', async () => {
+    const name = prompt('Collection name:');
+    if (name?.trim()) {
+      await createCollection(name.trim());
+      await loadCollections();
+    }
+  });
+
+  (window as any).deleteCol = async (id: string) => {
+    if (confirm('Delete this collection?')) {
+      await deleteCollection(id);
+      await loadCollections();
+    }
+  };
 });
+
+async function loadCollections() {
+  const collections = await getCollections();
+  const content = document.getElementById('collectionsContent')!;
+  if (collections.length === 0) {
+    content.innerHTML = '<div style="text-align: center; color: #999; padding: 20px;">No collections yet</div>';
+    return;
+  }
+  content.innerHTML = collections.map(col => `
+    <div style="padding: 12px; background: #f5f5f5; border-radius: 8px; margin-bottom: 8px;">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div style="font-weight: 600; font-size: 12px;">${col.name}</div>
+        <button onclick="deleteCol('${col.id}')" style="background: none; border: none; cursor: pointer; font-size: 16px;">🗑️</button>
+      </div>
+      <div style="font-size: 10px; color: #666; margin-top: 4px;">${col.memeIds.length} memes</div>
+    </div>
+  `).join('');
+}
+
+async function loadTrending() {
+  const trending = await getTrendingData();
+  const content = document.getElementById('trendingContent')!;
+  content.innerHTML = `
+    <div style="display: grid; gap: 12px;">
+      ${trending.last7Days.length ? `
+      <div style="padding: 12px; background: #f5f5f5; border-radius: 8px;">
+        <div style="font-size: 11px; font-weight: 600; margin-bottom: 6px;">🔥 Your Top Templates (7 days)</div>
+        ${trending.last7Days.map(t => `<div style="font-size: 10px; color: #666;">${t.template}: ${t.count} uses</div>`).join('')}
+      </div>` : ''}
+      ${trending.mostShared.length ? `
+      <div style="padding: 12px; background: #f5f5f5; border-radius: 8px;">
+        <div style="font-size: 11px; font-weight: 600; margin-bottom: 6px;">📤 Your Most Shared</div>
+        ${trending.mostShared.map(t => `<div style="font-size: 10px; color: #666;">${t.template}: ~${t.shares} shares</div>`).join('')}
+      </div>` : ''}
+      ${trending.risingStars.length ? `
+      <div style="padding: 12px; background: #f5f5f5; border-radius: 8px;">
+        <div style="font-size: 11px; font-weight: 600; margin-bottom: 6px;">📈 Your Rising Stars</div>
+        ${trending.risingStars.map(t => `<div style="font-size: 10px; color: #666;">${t.trend} ${t.template}</div>`).join('')}
+      </div>` : ''}
+      ${trending.untried.length ? `
+      <div style="padding: 12px; background: #f5f5f5; border-radius: 8px;">
+        <div style="font-size: 11px; font-weight: 600; margin-bottom: 6px;">✨ Templates to Try</div>
+        ${trending.untried.map(t => `<div style="font-size: 10px; color: #666;">${t}</div>`).join('')}
+      </div>` : ''}
+    </div>
+  `;
+}
 
 async function loadStats() {
   const stats = await getAnalytics();
@@ -192,14 +257,14 @@ document.getElementById('saveKey')?.addEventListener('click', async () => {
   }
 });
 
-if (document.body.classList.contains('dark')) {
-  const style = document.createElement('style');
-  style.textContent = `
-    body.dark .tab-btn { background: #2a2a3e !important; color: #e0e0e0 !important; }
-    body.dark .tab-btn.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; color: white !important; }
-    body.dark #statsContent > div > div { background: #2a2a3e !important; color: #e0e0e0 !important; }
-    body.dark #templatesModal > div { background: #1a1a2e !important; color: #e0e0e0 !important; }
-    body.dark #templatesList > div { background: #2a2a3e !important; color: #e0e0e0 !important; }
-  `;
-  document.head.appendChild(style);
-}
+const darkStyle = document.createElement('style');
+darkStyle.textContent = `
+  body.dark .tab-btn { background: #2a2a3e !important; color: #e0e0e0 !important; }
+  body.dark .tab-btn.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; color: white !important; }
+  body.dark #statsContent > div > div { background: #2a2a3e !important; color: #e0e0e0 !important; }
+  body.dark #collectionsContent > div { background: #2a2a3e !important; color: #e0e0e0 !important; }
+  body.dark #trendingContent > div > div { background: #2a2a3e !important; color: #e0e0e0 !important; }
+  body.dark #templatesModal > div { background: #1a1a2e !important; color: #e0e0e0 !important; }
+  body.dark #templatesList > div { background: #2a2a3e !important; color: #e0e0e0 !important; }
+`;
+document.head.appendChild(darkStyle);

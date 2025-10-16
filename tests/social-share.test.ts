@@ -37,6 +37,29 @@ describe('Social Share', () => {
     global.chrome.storage.local.set = mockSet;
     global.chrome.storage.local.get = jest.fn().mockResolvedValue({ share_twitter: 5 });
     
+    global.Image = class {
+      onload: (() => void) | null = null;
+      src = '';
+      crossOrigin = '';
+      width = 500;
+      height = 500;
+      constructor() {
+        setTimeout(() => this.onload?.(), 0);
+      }
+    } as any;
+    
+    HTMLCanvasElement.prototype.getContext = jest.fn().mockReturnValue({
+      drawImage: jest.fn(),
+      fillText: jest.fn(),
+      strokeText: jest.fn(),
+      measureText: jest.fn().mockReturnValue({ width: 100 }),
+      font: '',
+      fillStyle: '',
+      strokeStyle: '',
+      lineWidth: 0
+    });
+    HTMLCanvasElement.prototype.toDataURL = jest.fn().mockReturnValue('data:image/png;base64,test');
+    
     const container = document.createElement('div');
     document.body.appendChild(container);
     const btn = createShareButton('https://example.com/meme.jpg', 'Test');
@@ -49,7 +72,7 @@ describe('Social Share', () => {
     global.open = jest.fn();
     twitterBtn?.dispatchEvent(new Event('click'));
     
-    await new Promise(resolve => setTimeout(resolve, 10));
+    await new Promise(resolve => setTimeout(resolve, 50));
     expect(mockSet).toHaveBeenCalledWith({ share_twitter: 6 });
   });
 

@@ -173,9 +173,11 @@
 </head>
 <body>
   <div class="container">
-    <div style="display: flex; gap: 8px; margin-bottom: 16px; border-bottom: 2px solid #e8eaed; padding-bottom: 8px;">
-      <button id="settingsTab" class="tab-btn active" style="flex: 1; padding: 8px; border: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600;">⚙️ Settings</button>
-      <button id="statsTab" class="tab-btn" style="flex: 1; padding: 8px; border: none; background: #f5f5f5; color: #666; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600;">📊 Stats</button>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 16px; border-bottom: 2px solid #e8eaed; padding-bottom: 8px;">
+      <button id="settingsTab" class="tab-btn active" style="padding: 8px; border: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600;">⚙️ Settings</button>
+      <button id="statsTab" class="tab-btn" style="padding: 8px; border: none; background: #f5f5f5; color: #666; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600;">📊 Stats</button>
+      <button id="collectionsTab" class="tab-btn" style="padding: 8px; border: none; background: #f5f5f5; color: #666; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600;">📁 Collections</button>
+      <button id="trendingTab" class="tab-btn" style="padding: 8px; border: none; background: #f5f5f5; color: #666; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600;">🔥 Trending</button>
     </div>
     <div id="settingsPanel">
     <h2>🎭 Chuckle Settings</h2>
@@ -233,6 +235,15 @@
       <div id="statsContent" style="font-size: 12px; color: #333;"></div>
       <button id="exportBtn" style="margin-top: 12px;">📥 Export Data</button>
       <button id="templatesBtn" style="margin-top: 8px; background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);">🎨 Browse Templates</button>
+    </div>
+    <div id="collectionsPanel" style="display: none;">
+      <h2>📁 Collections</h2>
+      <button id="newCollectionBtn" style="margin-bottom: 12px;">➕ New Collection</button>
+      <div id="collectionsContent" style="font-size: 12px; color: #333;"></div>
+    </div>
+    <div id="trendingPanel" style="display: none;">
+      <h2>🔥 Your Trending</h2>
+      <div id="trendingContent" style="font-size: 12px; color: #333;"></div>
     </div>
   </div>
   <div id="templatesModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center;">
