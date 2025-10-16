@@ -97,15 +97,19 @@ function normalizeText(text: string): string {
   return text
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[€$£¥]/g, '')
-    .replace(/[^a-zA-Z0-9\s]/g, '')
+    .replace(/[^a-zA-Z0-9\s$€£¥!?.,;:'-]/g, '')
     .replace(/\s+/g, '_');
 }
 
 export async function generateMemeImage(template: string, text: string, skipFormatting: boolean = false): Promise<{ watermarkedUrl: string; originalUrl: string; formattedText: string }> {
   try {
     const formattedTemplate = template.trim().toLowerCase().replace(/\s+/g, '_');
-    const formattedText = skipFormatting ? text : await formatTextForTemplate(text, formattedTemplate);
+    let processedText = text;
+    const sentenceMatch = text.match(/^[^.!?]+[.!?](?=\s+[A-Z])/);
+    if (sentenceMatch) {
+      processedText = sentenceMatch[0].replace(/[.!?]+$/, '').trim();
+    }
+    const formattedText = skipFormatting ? processedText : await formatTextForTemplate(processedText, formattedTemplate);
     const cleanText = formattedText.replace(/['']/g, "'").replace(/…/g, '...');
     
     const parts = cleanText.split(' / ').map(p => p.trim()).filter(p => p.length > 0);
@@ -113,7 +117,13 @@ export async function generateMemeImage(template: string, text: string, skipForm
     
     console.log('[Chuckle] Split parts:', parts);
     
-    if (parts.length >= 2) {
+    if (formattedTemplate === 'cmm') {
+      topText = '~';
+      bottomText = normalizeText(parts.join(' '));
+    } else if (formattedTemplate === 'grumpycat' && parts.length >= 2) {
+      topText = normalizeText(parts[0]);
+      bottomText = normalizeText(parts[1]);
+    } else if (parts.length >= 2) {
       topText = normalizeText(parts[0]);
       bottomText = normalizeText(parts.slice(1).join(' '));
     } else if (parts.length === 1 && parts[0]) {
@@ -127,8 +137,11 @@ export async function generateMemeImage(template: string, text: string, skipForm
     }
     
     console.log('[Chuckle] Top text:', topText, '| Bottom text:', bottomText);
-    const url = `${CONFIG.MEMEGEN_API_URL}/${formattedTemplate}/${topText}/${bottomText}.png`;
+    const url = formattedTemplate === 'cmm' 
+      ? `${CONFIG.MEMEGEN_API_URL}/${formattedTemplate}/${bottomText}.png`
+      : `${CONFIG.MEMEGEN_API_URL}/${formattedTemplate}/${topText}/${bottomText}.png`;
     console.log('[Chuckle] Trying meme URL:', url);
+    console.log('[Chuckle] Formatted text for display:', cleanText);
     const response = await fetch(url, { method: 'HEAD' });
     if (!response.ok) throw new Error(ERROR_MESSAGES.TEMPLATE_UNAVAILABLE);
     const watermarkedUrl = await addWatermark(url);

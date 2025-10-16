@@ -71,6 +71,7 @@ let currentOverlay: HTMLElement | null = null;
 let currentMemeKey: string | null = null;
 let currentMemeData: MemeData | null = null;
 let originalText: string | null = null;
+let baseText: string | null = null;
 let originalImageUrl: string | null = null;
 let isRegenerating = false;
 let currentTemplate: string | null = null;
@@ -144,10 +145,10 @@ async function regenerateMeme(specificTemplate?: string): Promise<void> {
   showLoading(getTranslation('regenerating'));
   
   try {
-    const truncatedText = originalText.slice(0, 100);
+    const textToUse = (specificTemplate && baseText) ? baseText : originalText;
+    const truncatedText = textToUse.slice(0, 100);
     const template = specificTemplate || currentTemplate || await analyzeMemeContext(truncatedText, Date.now());
     currentTemplate = template;
-    const wasManualEdit = isManualEdit;
     const { watermarkedUrl, originalUrl, formattedText } = await generateMemeImage(template, truncatedText, isManualEdit);
     isManualEdit = false;
     
@@ -178,7 +179,7 @@ async function regenerateMeme(specificTemplate?: string): Promise<void> {
       activeBtn?.classList.add('active');
       
       if (currentMemeKey) {
-        await updateMeme(currentMemeKey, { imageUrl: originalUrl, originalUrl, template, timestamp: currentMemeData.timestamp });
+        await updateMeme(currentMemeKey, { imageUrl: originalUrl, originalUrl, template, timestamp: currentMemeData.timestamp, text: currentMemeData.text });
       }
     }
   } catch (error) {
@@ -250,7 +251,10 @@ function createTemplateSelector(): HTMLDivElement {
     btn.className = 'template-btn';
     btn.textContent = template.name;
     btn.setAttribute('data-template', template.id);
-    btn.onclick = () => regenerateMeme(template.id);
+    btn.onclick = () => {
+      isManualEdit = false;
+      regenerateMeme(template.id);
+    };
     templatesRow.appendChild(btn);
   });
   
@@ -285,6 +289,7 @@ export async function createOverlay(memeData: MemeData): Promise<void> {
   content.className = 'meme-content';
 
   originalText = memeData.text;
+  baseText = memeData.text;
   originalImageUrl = memeData.originalUrl || memeData.imageUrl;
   currentTemplate = memeData.template;
 
@@ -344,6 +349,7 @@ export function closeOverlay(): void {
     currentMemeKey = null;
     currentMemeData = null;
     originalText = null;
+    baseText = null;
     originalImageUrl = null;
     currentTemplate = null;
     isManualEdit = false;

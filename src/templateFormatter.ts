@@ -2,25 +2,25 @@ import { CONFIG } from './config';
 import type { GeminiResponse } from './types';
 
 const TEMPLATE_PROMPTS: Record<string, string> = {
-  drake: 'Drake meme: TOP = bad/rejected option, BOTTOM = good/approved option. Format: "bad thing / good thing" (max 35 chars each)',
-  db: 'Distracted BF: TOP = current focus, BOTTOM = tempting distraction. Format: "current thing / tempting thing" (max 35 chars each)',
-  ds: 'Two Buttons: TOP = first option, BOTTOM = second option (both equally difficult). Format: "option 1 / option 2" (max 35 chars each)',
-  cmm: 'Change My Mind: TOP = setup, BOTTOM = controversial statement. Format: "setup / bold claim" (max 35 chars each)',
-  pigeon: 'Pigeon: TOP = thing being looked at, BOTTOM = "Is this [misidentification]?". Format: "thing / Is this X?" (max 35 chars each)',
-  'woman-cat': 'Woman Yelling at Cat: TOP = angry accusation, BOTTOM = dismissive response. Format: "accusation / dismissal" (max 35 chars each)',
-  fine: 'This is Fine: TOP = situation, BOTTOM = denial statement. Format: "situation / this is fine" (max 35 chars each)',
-  stonks: 'Stonks: TOP = failure/mistake, BOTTOM = unexpected success. Format: "mistake / stonks" (max 35 chars each)',
-  astronaut: 'Always Has Been: TOP = realization/question, BOTTOM = "Always has been". Format: "realization / Always has been" (max 35 chars each)',
-  success: 'Success Kid: TOP = setup/challenge, BOTTOM = unexpected win. Format: "challenge / victory" (max 35 chars each)',
-  blb: 'Bad Luck Brian: TOP = action taken, BOTTOM = unfortunate outcome. Format: "action / bad result" (max 35 chars each)',
-  mordor: 'One Does Not Simply: TOP = "One does not simply", BOTTOM = impossible task. Format: "One does not simply / task" (max 35 chars each)',
-  aag: 'Ancient Aliens: TOP = mysterious thing, BOTTOM = conspiracy explanation. Format: "mystery / aliens" (max 35 chars each)',
-  fry: 'Futurama Fry: TOP = "Not sure if", BOTTOM = suspicious alternative. Format: "Not sure if / or just" (max 35 chars each)',
-  fwp: 'First World Problems: TOP = privileged situation, BOTTOM = trivial complaint. Format: "situation / complaint" (max 35 chars each)',
-  doge: 'Doge: TOP = "much" statement, BOTTOM = "such/very" statement. Format: "much X / such Y" (max 35 chars each)',
-  iw: 'Insanity Wolf: TOP = extreme situation, BOTTOM = insane action. Format: "situation / extreme action" (max 35 chars each)',
-  philosoraptor: 'Philosoraptor: TOP = philosophical question part 1, BOTTOM = question part 2. Format: "question start / question end" (max 35 chars each)',
-  grumpycat: 'Grumpy Cat: TOP = suggestion/request, BOTTOM = grumpy "No" response. Format: "request / No" (max 35 chars each)'
+  drake: 'Drake meme: TOP = bad/rejected option, BOTTOM = good/approved option. Make it savage and brutally honest about preferences. Format: "bad thing / good thing" (max 35 chars each)',
+  db: 'Distracted BF: TOP = current focus, BOTTOM = tempting distraction. Make it about betrayal, temptation, or questionable priorities. Format: "current thing / tempting thing" (max 35 chars each)',
+  ds: 'Two Buttons: TOP = first option, BOTTOM = second option (both equally difficult). Make it about impossible choices or moral dilemmas. Format: "option 1 / option 2" (max 35 chars each)',
+  cmm: 'Change My Mind: TOP = setup, BOTTOM = controversial statement. Make it provocative, edgy, and designed to trigger debate. Format: "setup / bold claim" (max 35 chars each)',
+  pigeon: 'Pigeon: TOP = thing being looked at, BOTTOM = "Is this [misidentification]?". Make it about hilariously wrong assumptions or stupidity. Format: "thing / Is this X?" (max 35 chars each)',
+  'woman-cat': 'Woman Yelling at Cat: TOP = angry accusation, BOTTOM = dismissive response. Make it about conflict, drama, or not giving a damn. Format: "accusation / dismissal" (max 35 chars each)',
+  fine: 'This is Fine: TOP = situation, BOTTOM = denial statement. Make it about denial in the face of disaster or chaos. Format: "situation / this is fine" (max 35 chars each)',
+  stonks: 'Stonks: TOP = failure/mistake, BOTTOM = unexpected success. Make it about failing upward or absurd wins from stupid decisions. Format: "mistake / stonks" (max 35 chars each)',
+  astronaut: 'Always Has Been: TOP = realization/question, BOTTOM = "Always has been". Make it about dark revelations or conspiracy truths. Format: "realization / Always has been" (max 35 chars each)',
+  success: 'Success Kid: TOP = setup/challenge, BOTTOM = unexpected win. Make it about petty victories or savage comebacks. Format: "challenge / victory" (max 35 chars each)',
+  blb: 'Bad Luck Brian: TOP = action taken, BOTTOM = unfortunate outcome. Make it about catastrophic failure or the worst possible outcome. Format: "action / bad result" (max 35 chars each)',
+  mordor: 'One Does Not Simply: TOP = "One does not simply", BOTTOM = impossible task. Make it about ridiculously difficult or taboo things. Format: "One does not simply / task" (max 35 chars each)',
+  aag: 'Ancient Aliens: TOP = mysterious thing, BOTTOM = conspiracy explanation. Make it about absurd conspiracy theories or paranoid explanations. Format: "mystery / aliens" (max 35 chars each)',
+  fry: 'Futurama Fry: TOP = "Not sure if", BOTTOM = suspicious alternative. Make it about paranoia, suspicion, or questioning reality. Format: "Not sure if / or just" (max 35 chars each)',
+  fwp: 'First World Problems: TOP = privileged situation, BOTTOM = trivial complaint. Make it about entitled whining or absurdly privileged complaints. Format: "situation / complaint" (max 35 chars each)',
+  doge: 'Doge: TOP = "much" statement, BOTTOM = "such/very" statement. Make it silly, broken English, and overly enthusiastic. Format: "much X / such Y" (max 35 chars each)',
+  iw: 'Insanity Wolf: TOP = extreme situation, BOTTOM = insane action. Make it about psychotic overreactions or unhinged responses. Format: "situation / extreme action" (max 35 chars each)',
+  philosoraptor: 'Philosoraptor: TOP = philosophical question part 1, BOTTOM = question part 2. Make it a mind-bending or absurd philosophical paradox. Format: "question start / question end" (max 35 chars each)',
+  grumpycat: 'Grumpy Cat: TOP = suggestion/request, BOTTOM = grumpy "No" response. Make it about bitter rejection or misanthropic refusal. Format: "request / No" (max 35 chars each)'
 };
 
 function decodeHtmlEntities(text: string): string {
@@ -57,7 +57,7 @@ export async function formatTextForTemplate(text: string, template: string): Pro
   const { geminiApiKey } = await chrome.storage.local.get(['geminiApiKey']);
   if (!geminiApiKey) return smartSplit(text);
   
-  const prompt = `${templatePrompt}\n\nAdapt this text to match the template format. Make it EXTREMELY HILARIOUS and relatable with wit, irony, or exaggeration.\n\nSTRICT RULES:\n- MUST use " / " separator between top and bottom text\n- Each part MAX 35 characters\n- Use simple, clear language\n- NO emojis, NO special characters, NO HTML entities\n- NO hashtags, NO asterisks\n- Make it easy to understand\n\nText: "${text}"\n\nReturn ONLY the formatted text with " / " separator. Nothing else.`;
+  const prompt = `${templatePrompt}\n\nAdapt this text to match the template format and personality. Keep the CORE MEANING and topic of the original text, but make it HILARIOUS and OFFENSIVE.\n\nSTRICT RULES:\n- MUST keep the same topic/subject as the original text\n- MUST use " / " separator between top and bottom text\n- Each part MAX 35 characters\n- Make it edgy, provocative, savage, and darkly funny\n- Push boundaries while staying on topic\n- NO emojis, NO special characters, NO HTML entities\n- NO hashtags, NO asterisks\n\nText: "${text}"\n\nReturn ONLY the formatted text with " / " separator. Nothing else.`;
 
   try {
     const response = await fetch(`${CONFIG.GEMINI_API_URL}?key=${geminiApiKey}`, {

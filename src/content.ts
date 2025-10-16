@@ -87,11 +87,9 @@ export async function generateMeme(text: string): Promise<void> {
   try {
     showLoading('Generating meme...');
     const truncatedText = text.slice(0, 1000);
-    const optimizedText = await optimizeText(truncatedText);
-    console.log('[Chuckle] Optimized text:', optimizedText);
-    const template = await analyzeMemeContext(optimizedText);
+    const template = await analyzeMemeContext(truncatedText);
     console.log('[Chuckle] Template selected:', template);
-    const { watermarkedUrl, originalUrl, formattedText } = await generateMemeImage(template, optimizedText);
+    const { watermarkedUrl, originalUrl, formattedText } = await generateMemeImage(template, truncatedText);
     
     const memeData = {
       text: formattedText,
