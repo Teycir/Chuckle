@@ -388,7 +388,7 @@ export async function applyFilters(): Promise<void> {
   }
 }
 
-export async function searchHistory(query: string): Promise<void> {
+export async function searchHistory(_query: string): Promise<void> {
   await applyFilters();
 }
 

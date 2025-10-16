@@ -1,4 +1,3 @@
-import type { MemeData } from './types';
 import { getAllMemes } from './storage';
 
 export interface TrendingData {

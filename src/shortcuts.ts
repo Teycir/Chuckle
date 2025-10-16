@@ -2,8 +2,8 @@ import { undo } from './undo';
 import { getShortcuts } from './shortcutConfig';
 
 let shortcutsEnabled = false;
-let shortcutHandlers: Map<string, () => void | Promise<void>> = new Map();
-let actionMap: Map<string, string> = new Map();
+const shortcutHandlers: Map<string, () => void | Promise<void>> = new Map();
+const actionMap: Map<string, string> = new Map();
 
 export function enableShortcuts(): void {
   if (shortcutsEnabled) return;

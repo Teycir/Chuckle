@@ -1,4 +1,4 @@
-import type { MemeData, StorageResult } from './types';
+import type { MemeData } from './types';
 
 export function simpleHash(str: string): string {
   let hash = 0;

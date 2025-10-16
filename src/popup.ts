@@ -1,7 +1,7 @@
-import { getShortcuts, saveShortcuts, validateShortcut, hasConflict, DEFAULT_SHORTCUTS } from './shortcutConfig';
+import { getShortcuts, saveShortcuts, validateShortcut, hasConflict } from './shortcutConfig';
 import { getAnalytics, exportData } from './analytics';
 import { MEME_TEMPLATES } from './templates';
-import { getCollections, createCollection, deleteCollection, renameCollection, getCollectionMemes } from './collections';
+import { getCollections, createCollection, deleteCollection } from './collections';
 import { getTrendingData } from './trending';
 
 const translations = {
@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  (window as any).deleteCol = async (id: string) => {
+  (window as unknown as { deleteCol: (id: string) => Promise<void> }).deleteCol = async (id: string) => {
     if (confirm('Delete this collection?')) {
       await deleteCollection(id);
       await loadCollections();
