@@ -91,23 +91,84 @@ export async function analyzeMemeContext(text: string, variant: number = 0): Pro
   }
 }
 
+async function summarizeText(text: string): Promise<string> {
+  const { geminiApiKey } = await chrome.storage.local.get(['geminiApiKey']);
+  if (!geminiApiKey) {
+    const words = text.split(/\s+/);
+    return words.slice(0, 30).join(' ');
+  }
+  
+  console.log('[Chuckle] Summarizing long text');
+  
+  try {
+    const response = await fetchWithTimeout(
+      `${CONFIG.GEMINI_API_URL}?key=${geminiApiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{
+              text: `Summarize this text in EXACTLY 10 words or less. Keep the main point only.\n\nText: "${text}"\n\nReturn ONLY the summary (max 10 words), nothing else.`
+            }]
+          }],
+          generationConfig: {
+            temperature: 0.7,
+            topP: 0.9,
+            topK: 40
+          }
+        })
+      },
+      8000
+    );
+    
+    if (!response.ok) {
+      console.error('[Chuckle] Summarization failed:', response.status);
+      const words = text.split(/\s+/);
+      return words.slice(0, 30).join(' ');
+    }
+    
+    const data: GeminiResponse = await response.json();
+    const summary = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+    
+    if (summary && summary.length > 0) {
+      const wordCount = summary.split(/\s+/).length;
+      if (wordCount <= 10) {
+        console.log('[Chuckle] Text summarized:', summary, `(${wordCount} words)`);
+        return summary;
+      }
+    }
+    
+    const words = text.split(/\s+/);
+    return words.slice(0, 30).join(' ');
+  } catch (error) {
+    console.error('[Chuckle] Summarization error:', error);
+    const words = text.split(/\s+/);
+    return words.slice(0, 30).join(' ');
+  }
+}
+
 // Normalize text for URL compatibility across French, Spanish, German, Italian
 // Handles: é→e, ñ→n, ü→u, à→a, ö→o, ç→c, €→removed, etc.
 function normalizeText(text: string): string {
-  return text
+  const normalized = text
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-zA-Z0-9\s$€£¥!?.,;:'-]/g, '')
-    .replace(/\s+/g, '_');
+    .replace(/[^a-zA-Z0-9\s$€£¥!?.,;:'-]/g, '');
+  console.log('[Chuckle] Normalizing:', text, '→', normalized);
+  return normalized.replace(/\s+/g, '_');
 }
 
 export async function generateMemeImage(template: string, text: string, skipFormatting: boolean = false): Promise<{ watermarkedUrl: string; originalUrl: string; formattedText: string }> {
   try {
     const formattedTemplate = template.trim().toLowerCase().replace(/\s+/g, '_');
     let processedText = text;
-    const sentenceMatch = text.match(/^[^.!?]+[.!?](?=\s+[A-Z])/);
-    if (sentenceMatch) {
-      processedText = sentenceMatch[0].replace(/[.!?]+$/, '').trim();
+    
+    const words = text.split(/\s+/);
+    if (words.length > 12) {
+      processedText = words.slice(0, 12).join(' ');
+    } else {
+      processedText = text;
     }
     const formattedText = skipFormatting ? processedText : await formatTextForTemplate(processedText, formattedTemplate);
     const cleanText = formattedText.replace(/['']/g, "'").replace(/…/g, '...');
@@ -119,10 +180,11 @@ export async function generateMemeImage(template: string, text: string, skipForm
     
     if (formattedTemplate === 'cmm') {
       topText = '~';
-      bottomText = normalizeText(parts.join(' '));
+      bottomText = normalizeText(parts.join(', '));
     } else if (formattedTemplate === 'grumpycat' && parts.length >= 2) {
       topText = normalizeText(parts[0]);
-      bottomText = normalizeText(parts[1]);
+      bottomText = normalizeText(parts.slice(1).join(' '));
+      console.log('[Chuckle] Grumpy Cat - Parts:', parts, 'Bottom joined:', parts.slice(1).join(' '));
     } else if (parts.length >= 2) {
       topText = normalizeText(parts[0]);
       bottomText = normalizeText(parts.slice(1).join(' '));
@@ -137,7 +199,8 @@ export async function generateMemeImage(template: string, text: string, skipForm
     }
     
     console.log('[Chuckle] Top text:', topText, '| Bottom text:', bottomText);
-    const url = formattedTemplate === 'cmm' 
+    console.log('[Chuckle] Template:', formattedTemplate);
+    const url = formattedTemplate === 'cmm'
       ? `${CONFIG.MEMEGEN_API_URL}/${formattedTemplate}/${bottomText}.png`
       : `${CONFIG.MEMEGEN_API_URL}/${formattedTemplate}/${topText}/${bottomText}.png`;
     console.log('[Chuckle] Trying meme URL:', url);

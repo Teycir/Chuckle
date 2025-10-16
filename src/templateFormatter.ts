@@ -57,7 +57,7 @@ export async function formatTextForTemplate(text: string, template: string): Pro
   const { geminiApiKey } = await chrome.storage.local.get(['geminiApiKey']);
   if (!geminiApiKey) return smartSplit(text);
   
-  const prompt = `${templatePrompt}\n\nAdapt this text to match the template format and personality. Keep the CORE MEANING and topic of the original text, but make it HILARIOUS and OFFENSIVE.\n\nSTRICT RULES:\n- MUST keep the same topic/subject as the original text\n- MUST use " / " separator between top and bottom text\n- Each part MAX 35 characters\n- Make it edgy, provocative, savage, and darkly funny\n- Push boundaries while staying on topic\n- NO emojis, NO special characters, NO HTML entities\n- NO hashtags, NO asterisks\n\nText: "${text}"\n\nReturn ONLY the formatted text with " / " separator. Nothing else.`;
+  const prompt = `${templatePrompt}\n\nAdapt this text to match the template format and personality. Keep the CORE TOPIC from the original text but adapt it to fit the template's style.\n\nSTRICT RULES:\n- MUST stay on the same topic/subject as the original text\n- Adapt the text to match the template's personality and format\n- MUST use " / " separator between top and bottom text\n- Each part MAX 35 characters\n- Make it funny while keeping the original topic\n- NO emojis, NO special characters, NO HTML entities\n- NO hashtags, NO asterisks\n\nText: "${text}"\n\nReturn ONLY the formatted text with " / " separator. Nothing else.`;
 
   try {
     const response = await fetch(`${CONFIG.GEMINI_API_URL}?key=${geminiApiKey}`, {

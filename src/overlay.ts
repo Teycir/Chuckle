@@ -145,11 +145,13 @@ async function regenerateMeme(specificTemplate?: string): Promise<void> {
   showLoading(getTranslation('regenerating'));
   
   try {
-    const textToUse = (specificTemplate && baseText) ? baseText : originalText;
+    const textToUse = specificTemplate ? (baseText || originalText) : originalText;
+    console.log('[Chuckle] Regenerating with text:', textToUse, 'baseText:', baseText, 'specificTemplate:', specificTemplate);
     const truncatedText = textToUse.slice(0, 100);
     const template = specificTemplate || currentTemplate || await analyzeMemeContext(truncatedText, Date.now());
     currentTemplate = template;
-    const { watermarkedUrl, originalUrl, formattedText } = await generateMemeImage(template, truncatedText, isManualEdit);
+    const skipFormatting = isManualEdit;
+    const { watermarkedUrl, originalUrl, formattedText } = await generateMemeImage(template, truncatedText, skipFormatting);
     isManualEdit = false;
     
     if (currentMemeData && currentOverlay) {
@@ -305,7 +307,7 @@ export async function createOverlay(memeData: MemeData): Promise<void> {
   
   const actionsContainer = document.createElement('div');
   actionsContainer.className = 'meme-actions';
-  actionsContainer.style.cssText = 'position: absolute; right: 0; top: 0; display: flex; flex-direction: column; gap: 16px;';
+  actionsContainer.style.cssText = 'position: absolute; left: 8px; top: 8px; display: flex; flex-direction: column; gap: 12px;';
   actionsContainer.appendChild(createDownloadButton());
   actionsContainer.appendChild(createShareButton(memeData.originalUrl || memeData.imageUrl, memeData.text, currentLanguage));
   actionsContainer.appendChild(createCloseButton());

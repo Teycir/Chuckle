@@ -96,12 +96,12 @@
 .share-btn {
   background: #f8f9fa;
   border: 1px solid #e8eaed;
-  font-size: 20px;
+  font-size: 16px;
   color: #5f6368;
   cursor: pointer;
   padding: 0;
-  width: 36px;
-  height: 36px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -182,12 +182,12 @@
 .close-btn {
   background: #f8f9fa;
   border: 1px solid #e8eaed;
-  font-size: 24px;
+  font-size: 18px;
   color: #5f6368;
   cursor: pointer;
   padding: 0;
-  width: 36px;
-  height: 36px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   display: flex;
   align-items: center;
