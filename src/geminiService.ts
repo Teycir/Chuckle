@@ -102,10 +102,10 @@ function normalizeText(text: string): string {
     .replace(/\s+/g, '_');
 }
 
-export async function generateMemeImage(template: string, text: string): Promise<{ watermarkedUrl: string; originalUrl: string; formattedText: string }> {
+export async function generateMemeImage(template: string, text: string, skipFormatting: boolean = false): Promise<{ watermarkedUrl: string; originalUrl: string; formattedText: string }> {
   try {
     const formattedTemplate = template.trim().toLowerCase().replace(/\s+/g, '_');
-    const formattedText = await formatTextForTemplate(text, formattedTemplate);
+    const formattedText = skipFormatting ? text : await formatTextForTemplate(text, formattedTemplate);
     const cleanText = formattedText.replace(/['']/g, "'").replace(/…/g, '...');
     
     const parts = cleanText.split(' / ').map(p => p.trim()).filter(p => p.length > 0);

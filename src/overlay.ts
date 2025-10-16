@@ -65,6 +65,8 @@ let currentMemeData: MemeData | null = null;
 let originalText: string | null = null;
 let originalImageUrl: string | null = null;
 let isRegenerating = false;
+let currentTemplate: string | null = null;
+let isManualEdit = false;
 
 function createButton(className: string, text: string, onClick: () => void): HTMLButtonElement {
   const btn = document.createElement('button');
@@ -135,8 +137,11 @@ async function regenerateMeme(specificTemplate?: string): Promise<void> {
   
   try {
     const truncatedText = originalText.slice(0, 100);
-    const template = specificTemplate || await analyzeMemeContext(truncatedText, Date.now());
-    const { watermarkedUrl, originalUrl, formattedText } = await generateMemeImage(template, truncatedText);
+    const template = specificTemplate || currentTemplate || await analyzeMemeContext(truncatedText, Date.now());
+    currentTemplate = template;
+    const wasManualEdit = isManualEdit;
+    const { watermarkedUrl, originalUrl, formattedText } = await generateMemeImage(template, truncatedText, isManualEdit);
+    isManualEdit = false;
     
     if (currentMemeData && currentOverlay) {
       currentMemeData.imageUrl = watermarkedUrl;
@@ -145,8 +150,15 @@ async function regenerateMeme(specificTemplate?: string): Promise<void> {
       currentMemeData.timestamp = Date.now();
       originalImageUrl = originalUrl;
       
+      if (!wasManualEdit) {
+        originalText = formattedText;
+      }
+      
       const img = currentOverlay.querySelector('.meme-image') as HTMLImageElement;
       if (img) img.src = watermarkedUrl;
+      
+      const textInput = currentOverlay.querySelector('.text-editor-input') as HTMLInputElement;
+      if (textInput) textInput.value = originalText;
       
       const actionsContainer = currentOverlay.querySelector('.meme-actions');
       if (actionsContainer) {
@@ -157,10 +169,8 @@ async function regenerateMeme(specificTemplate?: string): Promise<void> {
       
       const templateButtons = currentOverlay.querySelectorAll('.template-btn');
       templateButtons.forEach(btn => btn.classList.remove('active'));
-      if (specificTemplate) {
-        const activeBtn = currentOverlay.querySelector(`[data-template="${specificTemplate}"]`);
-        activeBtn?.classList.add('active');
-      }
+      const activeBtn = currentOverlay.querySelector(`[data-template="${template}"]`);
+      activeBtn?.classList.add('active');
       
       if (currentMemeKey) {
         await updateMeme(currentMemeKey, { imageUrl: originalUrl, originalUrl, template, timestamp: currentMemeData.timestamp });
@@ -204,6 +214,7 @@ function createTextEditor(): HTMLDivElement {
   input.onkeydown = async (e) => {
     if (e.key === 'Enter' && input.value.trim()) {
       originalText = input.value.trim();
+      isManualEdit = true;
       await regenerateMeme();
     }
   };
@@ -272,6 +283,7 @@ export async function createOverlay(memeData: MemeData): Promise<void> {
 
   originalText = memeData.text;
   originalImageUrl = memeData.originalUrl || memeData.imageUrl;
+  currentTemplate = memeData.template;
 
   currentMemeKey = `meme_${simpleHash(memeData.text + memeData.timestamp)}`;
   currentMemeData = memeData;
@@ -322,6 +334,8 @@ export function closeOverlay(): void {
     currentMemeData = null;
     originalText = null;
     originalImageUrl = null;
+    currentTemplate = null;
+    isManualEdit = false;
     document.body.style.overflow = '';
     disableShortcuts();
   }
