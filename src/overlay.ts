@@ -14,7 +14,9 @@ const overlayTranslations = {
     regenerating: '🎲 Regenerating meme...',
     regenerationFailed: '❌ Regeneration failed',
     downloaded: 'Downloaded!',
-    downloadFailed: 'Download failed'
+    downloadFailed: 'Download failed',
+    textboxTooltip: 'You can change text and press Enter to update it on meme',
+    templateTooltip: 'Click to generate'
   },
   Spanish: {
     downloadPng: 'Descargar',
@@ -23,7 +25,9 @@ const overlayTranslations = {
     regenerating: '🎲 Regenerando meme...',
     regenerationFailed: '❌ Regeneración fallida',
     downloaded: '¡Descargado!',
-    downloadFailed: 'Descarga fallida'
+    downloadFailed: 'Descarga fallida',
+    textboxTooltip: 'Puedes cambiar el texto y presionar Enter para actualizarlo en el meme',
+    templateTooltip: 'Haz clic para generar'
   },
   French: {
     downloadPng: 'Télécharger',
@@ -32,7 +36,9 @@ const overlayTranslations = {
     regenerating: '🎲 Regénération du meme...',
     regenerationFailed: '❌ Échec de la regénération',
     downloaded: 'Téléchargé!',
-    downloadFailed: 'Échec du téléchargement'
+    downloadFailed: 'Échec du téléchargement',
+    textboxTooltip: 'Vous pouvez modifier le texte et appuyer sur Entrée pour le mettre à jour sur le meme',
+    templateTooltip: 'Cliquez pour générer'
   },
   German: {
     downloadPng: 'Herunterladen',
@@ -41,7 +47,9 @@ const overlayTranslations = {
     regenerating: '🎲 Meme wird regeneriert...',
     regenerationFailed: '❌ Regenerierung fehlgeschlagen',
     downloaded: 'Heruntergeladen!',
-    downloadFailed: 'Download fehlgeschlagen'
+    downloadFailed: 'Download fehlgeschlagen',
+    textboxTooltip: 'Sie können den Text ändern und Enter drücken, um ihn im Meme zu aktualisieren',
+    templateTooltip: 'Klicken Sie zum Generieren'
   }
 };
 
@@ -149,16 +157,13 @@ async function regenerateMeme(specificTemplate?: string): Promise<void> {
       currentMemeData.template = template;
       currentMemeData.timestamp = Date.now();
       originalImageUrl = originalUrl;
-      
-      if (!wasManualEdit) {
-        originalText = formattedText;
-      }
+      originalText = formattedText;
       
       const img = currentOverlay.querySelector('.meme-image') as HTMLImageElement;
       if (img) img.src = watermarkedUrl;
       
       const textInput = currentOverlay.querySelector('.text-editor-input') as HTMLDivElement;
-      if (textInput) textInput.textContent = originalText;
+      if (textInput) textInput.innerText = formattedText;
       
       const actionsContainer = currentOverlay.querySelector('.meme-actions');
       if (actionsContainer) {
@@ -199,17 +204,14 @@ function createMemeImage(memeData: MemeData): HTMLImageElement {
 
 function createTextEditor(): HTMLDivElement {
   const wrapper = document.createElement('div');
-  wrapper.style.cssText = 'display: flex; flex-direction: column; gap: 8px; padding: 16px 0; border-bottom: 1px solid #e8eaed; width: 100%;';
-  
-  const label = document.createElement('div');
-  label.textContent = 'Edit meme text (press Enter to regenerate):';
-  label.style.cssText = 'font-size: 12px; color: #5f6368; font-weight: 600;';
+  wrapper.style.cssText = 'display: flex; justify-content: center; align-items: center; padding: 8px 0; width: 100%;';
   
   const input = document.createElement('div');
   input.className = 'text-editor-input meme-text';
   input.contentEditable = 'true';
-  input.textContent = originalText || '';
-  input.style.cssText = 'padding: 8px 12px; border: 1px solid #dadce0; border-radius: 4px; font-size: 14px; width: 100%; box-sizing: border-box; min-height: 40px; background: white; color: black;';
+  input.innerText = originalText || '';
+  input.setAttribute('data-placeholder', 'Change text then click enter');
+  input.style.cssText = 'padding: 8px 16px; border: 1px solid #dadce0; border-radius: 8px; font-size: 14px; max-width: 90vw; width: 100%; box-sizing: border-box; min-height: 40px; background: white; color: black;';
   
   input.onblur = async () => {
     const newText = input.textContent?.trim() || '';
@@ -232,39 +234,16 @@ function createTextEditor(): HTMLDivElement {
     }
   };
   
-  wrapper.appendChild(label);
   wrapper.appendChild(input);
   return wrapper;
 }
 
-function createRegenerateButton(): HTMLDivElement {
-  const container = document.createElement('div');
-  container.style.cssText = 'display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 16px; margin-bottom: 8px;';
-  
-  const btn = createButton('star-btn regenerate-btn', '🎲', () => regenerateMeme());
-  btn.setAttribute('aria-label', getTranslation('tryAnother'));
-  btn.setAttribute('role', 'button');
-  
-  const label = document.createElement('div');
-  label.textContent = getTranslation('tryAnother');
-  label.style.cssText = 'font-size: 12px; color: #5f6368; font-weight: 600;';
-  
-  container.appendChild(btn);
-  container.appendChild(label);
-  return container;
-}
-
 function createTemplateSelector(): HTMLDivElement {
   const wrapper = document.createElement('div');
-  wrapper.style.cssText = 'display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 16px 0; border-bottom: 1px solid #e8eaed; width: 100%;';
-  
-  const heading = document.createElement('div');
-  heading.textContent = 'Choose template for meme';
-  heading.style.cssText = 'font-size: 12px; color: #5f6368; font-weight: 600; margin-bottom: 4px;';
-  wrapper.appendChild(heading);
+  wrapper.style.cssText = 'display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 16px 0 8px 0; width: 100%;';
   
   const templatesRow = document.createElement('div');
-  templatesRow.style.cssText = 'display: flex; flex-wrap: wrap; gap: 2px; justify-content: center; max-width: 800px;';
+  templatesRow.style.cssText = 'display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; max-width: 90vw; width: 100%;';
   
   MEME_TEMPLATES.forEach((template) => {
     const btn = document.createElement('button');
@@ -305,12 +284,6 @@ export async function createOverlay(memeData: MemeData): Promise<void> {
   const content = document.createElement('div');
   content.className = 'meme-content';
 
-  const actionsContainer = document.createElement('div');
-  actionsContainer.className = 'meme-actions';
-  actionsContainer.appendChild(createDownloadButton());
-  actionsContainer.appendChild(createShareButton(memeData.originalUrl || memeData.imageUrl, memeData.text, currentLanguage));
-  actionsContainer.appendChild(createCloseButton());
-
   originalText = memeData.text;
   originalImageUrl = memeData.originalUrl || memeData.imageUrl;
   currentTemplate = memeData.template;
@@ -318,14 +291,21 @@ export async function createOverlay(memeData: MemeData): Promise<void> {
   currentMemeKey = `meme_${simpleHash(memeData.text + memeData.timestamp)}`;
   currentMemeData = memeData;
 
-  content.appendChild(actionsContainer);
-  content.appendChild(createTextEditor());
   content.appendChild(createTemplateSelector());
-  content.appendChild(createRegenerateButton());
+  content.appendChild(createTextEditor());
   
   const imgWrapper = document.createElement('div');
-  imgWrapper.style.cssText = 'display: flex; justify-content: center; width: 100%;';
+  imgWrapper.style.cssText = 'display: flex; justify-content: center; align-items: flex-start; width: 100%; position: relative;';
   imgWrapper.appendChild(createMemeImage(memeData));
+  
+  const actionsContainer = document.createElement('div');
+  actionsContainer.className = 'meme-actions';
+  actionsContainer.style.cssText = 'position: absolute; right: 0; top: 0; display: flex; flex-direction: column; gap: 16px;';
+  actionsContainer.appendChild(createDownloadButton());
+  actionsContainer.appendChild(createShareButton(memeData.originalUrl || memeData.imageUrl, memeData.text, currentLanguage));
+  actionsContainer.appendChild(createCloseButton());
+  imgWrapper.appendChild(actionsContainer);
+  
   content.appendChild(imgWrapper);
   overlay.appendChild(content);
   

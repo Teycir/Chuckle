@@ -85,11 +85,9 @@
 
 .meme-actions {
   display: flex;
-  gap: 60px;
-  justify-content: center;
+  flex-direction: column;
+  gap: 16px;
   align-items: center;
-  margin-bottom: 20px;
-  position: relative;
 }
 
 .star-btn,
@@ -276,58 +274,96 @@ body.dark .share-menu {
 }
 
 .meme-image {
-  max-width: 100%;
-  max-height: 66vh;
+  max-width: 95%;
+  max-height: 62vh;
   width: auto;
   height: auto;
   border-radius: 8px;
   object-fit: contain;
-  margin-bottom: 30px;
+  margin-bottom: 10px;
 }
 
 .template-btn {
-  padding: 2px 6px;
+  padding: 6px 10px;
   border: none;
-  background: transparent;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   cursor: pointer;
-  font-size: 11px;
-  color: #5f6368;
-  transition: color 0.2s;
+  font-size: 10px;
+  color: white;
+  transition: all 0.3s ease;
   white-space: nowrap;
+  border-radius: 6px;
+  font-weight: 600;
+  box-shadow: 0 3px 10px rgba(102, 126, 234, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  letter-spacing: 0.2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  line-height: 1;
+  position: relative;
 }
 
+
+
 .template-btn:hover {
-  color: #202124;
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 .template-btn.active {
-  color: #c5221f;
-  font-weight: bold;
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  box-shadow: 0 5px 18px rgba(245, 87, 108, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
 }
 
 .meme-overlay.dark .template-btn {
-  color: #9aa0a6;
+  background: linear-gradient(135deg, #2d3561 0%, #1f2544 100%);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  color: #a8b3ff;
 }
 
+
+
 .meme-overlay.dark .template-btn:hover {
-  color: #e8eaed;
+  background: linear-gradient(135deg, #3d4571 0%, #2f3554 100%);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  color: #c8d3ff;
 }
 
 .meme-overlay.dark .template-btn.active {
-  color: #f28b82;
-  font-weight: bold;
+  background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+  box-shadow: 0 5px 18px rgba(250, 112, 154, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
+  color: #1a1a2e;
 }
 
 .text-editor-input {
   background: white;
   color: black;
+  position: relative;
 }
+
+.text-editor-input:empty:before {
+  content: attr(data-placeholder);
+  color: #9aa0a6;
+  pointer-events: none;
+}
+
+
 
 .meme-overlay.dark .text-editor-input {
   background: #2a2a3e;
   color: white;
   border-color: #3a3a4e;
 }
+
+.meme-overlay.dark .text-editor-input:empty:before {
+  color: #5f6368;
+}
+
+
 
 
 
