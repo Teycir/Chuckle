@@ -59,7 +59,7 @@ describe('Regenerate Feature', () => {
     regenBtn.click();
     await new Promise(resolve => setTimeout(resolve, 0));
 
-    expect(loading.showLoading).toHaveBeenCalledWith('Regenerating meme...');
+    expect(loading.showLoading).toHaveBeenCalledWith('🎲 Regenerating meme...');
     expect(geminiService.analyzeMemeContext).toHaveBeenCalledWith('Test meme', expect.any(Number));
   });
 

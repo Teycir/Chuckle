@@ -7,13 +7,22 @@ describe('Keyboard Shortcut', () => {
     const mockAddListener = jest.fn();
     
     global.chrome = {
-      runtime: { onInstalled: { addListener: jest.fn() } },
+      runtime: { 
+        onInstalled: { addListener: jest.fn() },
+        onMessage: { addListener: jest.fn() },
+        getURL: jest.fn((path) => `chrome-extension://test/${path}`)
+      },
       contextMenus: { 
         create: jest.fn(),
         onClicked: { addListener: jest.fn() }
       },
-      tabs: { sendMessage: jest.fn(), query: jest.fn() },
-      commands: { onCommand: { addListener: mockAddListener } }
+      tabs: { 
+        sendMessage: jest.fn(), 
+        query: jest.fn(),
+        create: jest.fn()
+      },
+      commands: { onCommand: { addListener: mockAddListener } },
+      action: { onClicked: { addListener: jest.fn() } }
     } as any;
 
     require('../src/background');

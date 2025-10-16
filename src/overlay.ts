@@ -6,7 +6,77 @@ import { enableShortcuts, disableShortcuts, registerShortcut } from './shortcuts
 import { analyzeMemeContext, generateMemeImage } from './geminiService';
 import { showLoading, hideLoading } from './loading';
 import { createShareButton } from './social-share';
-import { getCollections, addMemeToCollection, removeMemeFromCollection } from './collections';
+
+const overlayTranslations = {
+  English: {
+    addToFavorites: 'Add to favorites (F)',
+    removeFromFavorites: 'Remove from favorites (F)',
+    tryAnother: 'Try Another (R)',
+    doubleClickRegenerate: 'Double-click to regenerate',
+    clickToEdit: 'Click to edit text',
+    addTag: 'Add tag... (Press T)',
+    clickToAddTag: 'Click to add tag',
+    closeMeme: 'Close meme overlay',
+    regenerating: '🎲 Regenerating meme...',
+    regenerationFailed: '❌ Regeneration failed',
+    copiedToClipboard: 'Copied to clipboard',
+    copyFailed: 'Copy failed'
+  },
+  Spanish: {
+    addToFavorites: 'Añadir a favoritos (F)',
+    removeFromFavorites: 'Quitar de favoritos (F)',
+    tryAnother: 'Probar Otro (R)',
+    doubleClickRegenerate: 'Doble clic para regenerar',
+    clickToEdit: 'Clic para editar texto',
+    addTag: 'Añadir etiqueta... (Presiona T)',
+    clickToAddTag: 'Clic para añadir etiqueta',
+    closeMeme: 'Cerrar meme',
+    regenerating: '🎲 Regenerando meme...',
+    regenerationFailed: '❌ Regeneración fallida',
+    copiedToClipboard: 'Copiado al portapapeles',
+    copyFailed: 'Copia fallida'
+  },
+  French: {
+    addToFavorites: 'Ajouter aux favoris (F)',
+    removeFromFavorites: 'Retirer des favoris (F)',
+    tryAnother: 'Essayer un Autre (R)',
+    doubleClickRegenerate: 'Double-clic pour regénérer',
+    clickToEdit: 'Cliquer pour éditer le texte',
+    addTag: 'Ajouter une étiquette... (Appuyez sur T)',
+    clickToAddTag: 'Cliquer pour ajouter une étiquette',
+    closeMeme: 'Fermer le meme',
+    regenerating: '🎲 Regénération du meme...',
+    regenerationFailed: '❌ Échec de la regénération',
+    copiedToClipboard: 'Copié dans le presse-papiers',
+    copyFailed: 'Échec de la copie'
+  },
+  German: {
+    addToFavorites: 'Zu Favoriten hinzufügen (F)',
+    removeFromFavorites: 'Aus Favoriten entfernen (F)',
+    tryAnother: 'Anderen Versuchen (R)',
+    doubleClickRegenerate: 'Doppelklick zum Regenerieren',
+    clickToEdit: 'Klicken zum Bearbeiten',
+    addTag: 'Tag hinzufügen... (Drücke T)',
+    clickToAddTag: 'Klicken zum Hinzufügen',
+    closeMeme: 'Meme schließen',
+    regenerating: '🎲 Meme wird regeneriert...',
+    regenerationFailed: '❌ Regenerierung fehlgeschlagen',
+    copiedToClipboard: 'In Zwischenablage kopiert',
+    copyFailed: 'Kopieren fehlgeschlagen'
+  }
+};
+
+let currentLanguage = 'English';
+
+async function loadLanguage(): Promise<void> {
+  const { selectedLanguage } = await chrome.storage.local.get(['selectedLanguage']);
+  currentLanguage = selectedLanguage || 'English';
+}
+
+function getTranslation(key: keyof typeof overlayTranslations.English): string {
+  const lang = currentLanguage as keyof typeof overlayTranslations;
+  return overlayTranslations[lang]?.[key] || overlayTranslations.English[key];
+}
 
 let tagsModule: typeof import('./tags') | null = null;
 
@@ -35,8 +105,9 @@ async function toggleFavorite(memeData: MemeData, starBtn: HTMLButtonElement): P
   const oldValue = memeData.isFavorite;
   memeData.isFavorite = !memeData.isFavorite;
   starBtn.textContent = memeData.isFavorite ? '⭐' : '☆';
-  starBtn.setAttribute('aria-label', memeData.isFavorite ? 'Remove from favorites' : 'Add to favorites');
-  starBtn.setAttribute('data-tooltip', memeData.isFavorite ? 'Remove from favorites (F)' : 'Add to favorites (F)');
+  const tooltip = memeData.isFavorite ? getTranslation('removeFromFavorites') : getTranslation('addToFavorites');
+  starBtn.setAttribute('aria-label', tooltip);
+  starBtn.setAttribute('data-tooltip', tooltip);
   if (currentMemeKey) {
     pushUndo({ type: 'favorite', memeKey: currentMemeKey, oldValue, newValue: memeData.isFavorite });
     await updateMeme(currentMemeKey, { isFavorite: memeData.isFavorite });
@@ -47,16 +118,19 @@ function createStarButton(memeData: MemeData): HTMLButtonElement {
   const starBtn = createButton('star-btn', memeData.isFavorite ? '⭐' : '☆', async () => {
     await toggleFavorite(memeData, starBtn);
   });
-  starBtn.setAttribute('aria-label', memeData.isFavorite ? 'Remove from favorites' : 'Add to favorites');
+  const tooltip = memeData.isFavorite ? getTranslation('removeFromFavorites') : getTranslation('addToFavorites');
+  starBtn.setAttribute('aria-label', tooltip);
   starBtn.setAttribute('role', 'button');
-  starBtn.setAttribute('data-tooltip', memeData.isFavorite ? 'Remove from favorites (F)' : 'Add to favorites (F)');
+  starBtn.setAttribute('data-tooltip', tooltip);
   return starBtn;
 }
 
 function createCloseButton(): HTMLButtonElement {
   const closeBtn = createButton('close-btn', '×', closeOverlay);
-  closeBtn.setAttribute('aria-label', 'Close meme overlay');
+  const tooltip = getTranslation('closeMeme');
+  closeBtn.setAttribute('aria-label', tooltip);
   closeBtn.setAttribute('role', 'button');
+  closeBtn.setAttribute('data-tooltip', tooltip);
   return closeBtn;
 }
 
@@ -64,7 +138,7 @@ async function regenerateMeme(): Promise<void> {
   if (!originalText || isRegenerating) return;
   isRegenerating = true;
   
-  showLoading('🎲 Regenerating meme...');
+  showLoading(getTranslation('regenerating'));
   
   try {
     const truncatedText = originalText.slice(0, 100);
@@ -85,7 +159,7 @@ async function regenerateMeme(): Promise<void> {
     }
   } catch (error) {
     console.error('Regeneration failed:', error);
-    showToast('❌ Regeneration failed');
+    showToast(getTranslation('regenerationFailed'));
   } finally {
     hideLoading();
     isRegenerating = false;
@@ -94,66 +168,11 @@ async function regenerateMeme(): Promise<void> {
 
 function createRegenerateButton(): HTMLButtonElement {
   const regenBtn = createButton('regenerate-btn', '🎲', regenerateMeme);
-  regenBtn.setAttribute('aria-label', 'Try another meme variant');
+  const tooltip = getTranslation('tryAnother');
+  regenBtn.setAttribute('aria-label', tooltip);
   regenBtn.setAttribute('role', 'button');
-  regenBtn.setAttribute('data-tooltip', 'Try Another (R)');
+  regenBtn.setAttribute('data-tooltip', tooltip);
   return regenBtn;
-}
-
-function createCollectionButton(): HTMLButtonElement {
-  const btn = createButton('collection-btn', '📁', () => {});
-  btn.setAttribute('data-tooltip', 'Add to Collection');
-  
-  const dropdown = document.createElement('div');
-  dropdown.className = 'collection-dropdown';
-  Object.assign(dropdown.style, {
-    position: 'absolute',
-    top: 'calc(100% + 8px)',
-    left: '50%',
-    transform: 'translateX(-50%)'
-  });
-
-  const loadCollections = async () => {
-    const collections = await getCollections();
-    dropdown.innerHTML = '';
-    
-    if (collections.length === 0) {
-      const msg = document.createElement('div');
-      msg.textContent = 'No collections yet';
-      msg.style.padding = '6px';
-      msg.style.color = '#999';
-      msg.style.fontSize = '12px';
-      dropdown.appendChild(msg);
-    } else {
-      collections.forEach(col => {
-        const item = document.createElement('div');
-        item.textContent = col.name;
-        item.style.padding = '6px';
-        item.style.cursor = 'pointer';
-        item.style.borderRadius = '4px';
-        item.style.transition = 'background 0.2s';
-        item.onmouseenter = () => item.style.background = '#f5f5f5';
-        item.onmouseleave = () => item.style.background = 'transparent';
-        item.onclick = async () => {
-          if (currentMemeKey) {
-            if (col.memeIds.includes(currentMemeKey)) {
-              await removeMemeFromCollection(col.id, currentMemeKey);
-              showToast(`Removed from ${col.name}`);
-            } else {
-              await addMemeToCollection(col.id, currentMemeKey);
-              showToast(`Added to ${col.name}`);
-            }
-          }
-        };
-        dropdown.appendChild(item);
-      });
-    }
-  };
-
-  btn.onmouseenter = () => loadCollections();
-  btn.appendChild(dropdown);
-  
-  return btn;
 }
 
 function createMemeImage(memeData: MemeData): HTMLImageElement {
@@ -163,7 +182,7 @@ function createMemeImage(memeData: MemeData): HTMLImageElement {
   img.alt = `Meme: ${memeData.text}`;
   img.ondblclick = regenerateMeme;
   img.style.cursor = 'pointer';
-  img.setAttribute('data-tooltip', 'Double-click to regenerate');
+  img.setAttribute('data-tooltip', getTranslation('doubleClickRegenerate'));
   return img;
 }
 
@@ -172,7 +191,7 @@ function createMemeText(memeData: MemeData): HTMLDivElement {
   text.className = 'meme-text';
   text.contentEditable = 'true';
   text.textContent = memeData.text;
-  text.setAttribute('data-tooltip', 'Click to edit text');
+  text.setAttribute('data-tooltip', getTranslation('clickToEdit'));
   text.onblur = async () => {
     const newText = text.textContent?.trim() || memeData.text;
     if (newText !== memeData.text && currentMemeKey) {
@@ -351,7 +370,7 @@ function createTagsSection(memeData: MemeData): HTMLDivElement {
         const chip = document.createElement('button');
         chip.className = 'quick-tag-chip';
         chip.textContent = tag;
-        chip.title = 'Click to add tag';
+        chip.title = getTranslation('clickToAddTag');
         chip.onclick = async () => {
           const key = currentMemeKey;
           if (key && !memeData.tags.includes(tag)) {
@@ -396,8 +415,8 @@ function createTagsSection(memeData: MemeData): HTMLDivElement {
   const tagInput = document.createElement('input');
   tagInput.className = 'tag-input';
   tagInput.type = 'text';
-  tagInput.placeholder = 'Add tag... (Press T)';
-  tagInput.setAttribute('aria-label', 'Add tag to meme');
+  tagInput.placeholder = getTranslation('addTag');
+  tagInput.setAttribute('aria-label', getTranslation('addTag'));
 
   const dropdown = document.createElement('div');
   dropdown.className = 'tag-autocomplete';
@@ -436,9 +455,9 @@ async function copyToClipboard(): Promise<void> {
     const response = await fetch(currentMemeData.imageUrl);
     const blob = await response.blob();
     await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
-    showToast('Copied to clipboard');
+    showToast(getTranslation('copiedToClipboard'));
   } catch {
-    showToast('Copy failed');
+    showToast(getTranslation('copyFailed'));
   }
 }
 
@@ -453,6 +472,7 @@ function showToast(message: string): void {
 export async function createOverlay(memeData: MemeData): Promise<void> {
   if (currentOverlay) closeOverlay();
 
+  await loadLanguage();
   const { darkMode } = await chrome.storage.local.get(['darkMode']);
 
   const overlay = document.createElement('div');
@@ -463,16 +483,13 @@ export async function createOverlay(memeData: MemeData): Promise<void> {
   const content = document.createElement('div');
   content.className = 'meme-content';
 
-  const closeBtn = createCloseButton();
-  content.appendChild(closeBtn);
-
   const actionsContainer = document.createElement('div');
   actionsContainer.className = 'meme-actions';
   const starBtn = createStarButton(memeData);
   actionsContainer.appendChild(starBtn);
   actionsContainer.appendChild(createRegenerateButton());
-  actionsContainer.appendChild(createCollectionButton());
-  actionsContainer.appendChild(createShareButton(memeData.imageUrl, memeData.text));
+  actionsContainer.appendChild(createShareButton(memeData.imageUrl, memeData.text, currentLanguage));
+  actionsContainer.appendChild(createCloseButton());
 
   originalText = memeData.text;
 
@@ -501,7 +518,8 @@ export async function createOverlay(memeData: MemeData): Promise<void> {
     tagInput?.focus();
   });
 
-  closeBtn?.focus();
+  const closeButton = overlay.querySelector('.close-btn') as HTMLButtonElement;
+  closeButton?.focus();
 
   let escapeHandler: ((e: KeyboardEvent) => void) | null = null;
   escapeHandler = (e: KeyboardEvent) => {

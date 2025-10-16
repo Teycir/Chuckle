@@ -30,7 +30,7 @@ describe('Text Editing', () => {
     const textEl = document.querySelector('.meme-text') as HTMLDivElement;
     expect(textEl).toBeTruthy();
     expect(textEl.contentEditable).toBe('true');
-    expect(textEl.title).toBe('Click to edit text');
+    expect(textEl.getAttribute('data-tooltip')).toBe('Click to edit text');
   });
 
   test('has blur handler for saving', async () => {

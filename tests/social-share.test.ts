@@ -15,8 +15,8 @@ describe('Social Share', () => {
 
   test('creates share button', () => {
     const btn = createShareButton('https://example.com/meme.jpg', 'Test meme');
-    expect(btn.textContent).toBe('🚀');
-    expect(btn.title).toBe('Share meme');
+    expect(btn.className).toBe('share-btn');
+    expect(btn.getAttribute('data-tooltip')).toBe('Share meme');
   });
 
   test('opens share menu on click', () => {
@@ -25,11 +25,9 @@ describe('Social Share', () => {
     const btn = createShareButton('https://example.com/meme.jpg', 'Test meme');
     container.appendChild(btn);
     
-    btn.click();
-    
-    const menu = document.querySelector('.share-menu');
+    const menu = btn.querySelector('.share-menu');
     expect(menu).toBeTruthy();
-    expect(menu?.querySelectorAll('button').length).toBe(4);
+    expect(menu?.querySelectorAll('button').length).toBe(3);
   });
 
   test('tracks share clicks', async () => {
@@ -65,9 +63,9 @@ describe('Social Share', () => {
     const btn = createShareButton('https://example.com/meme.jpg', 'Test');
     container.appendChild(btn);
     
-    btn.click();
-    const twitterBtn = Array.from(document.querySelectorAll('.share-menu button'))
-      .find(b => b.textContent === '𝕏');
+    const menu = btn.querySelector('.share-menu');
+    const twitterBtn = Array.from(menu?.querySelectorAll('button') || [])
+      .find(b => b.textContent?.includes('Twitter'));
     
     global.open = jest.fn();
     twitterBtn?.dispatchEvent(new Event('click'));
@@ -82,11 +80,11 @@ describe('Social Share', () => {
     const btn = createShareButton('https://example.com/meme.jpg', 'Test meme');
     container.appendChild(btn);
     
-    btn.click();
-    const emailBtn = Array.from(document.querySelectorAll('.share-menu button'))
-      .find(b => b.textContent === '📧') as HTMLButtonElement;
+    const menu = btn.querySelector('.share-menu');
+    const emailBtn = Array.from(menu?.querySelectorAll('button') || [])
+      .find(b => b.textContent?.includes('Email')) as HTMLButtonElement;
     
     expect(emailBtn).toBeTruthy();
-    expect(emailBtn?.title).toBe('Share on Email');
+    expect(emailBtn?.textContent).toContain('Email');
   });
 });

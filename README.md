@@ -16,7 +16,6 @@ Think of it as your personal meme generator that lives in your browser. No desig
 - 🌙 **Dark Mode** - Beautiful animated backgrounds that are easy on your eyes
 - 🚀 **Social Sharing** - Share instantly to Twitter, Reddit, LinkedIn, or Email
 - 📊 **Analytics Dashboard** - Track your meme stats, top templates, and share counts
-- 📁 **Collections** - Organize memes into themed albums (Work, Funny, Viral, etc.)
 - 🔥 **Trending Insights** - See your most-used templates, rising stars, and untried options
 - ✏️ **Edit Meme Text** - Click to edit text directly, no need to regenerate
 - 🎨 **Template Browser** - Discover all 20 available meme templates
@@ -24,7 +23,6 @@ Think of it as your personal meme generator that lives in your browser. No desig
 - 🆓 **Free to Use** - Get 1,500 free memes every day using Google AI Studio's free tier
 - 🏷️ **Smart Organization** - Tag and favorite your memes for easy access
 - 📚 **History Panel** - Browse all your created memes with search and filters
-- ⚡ **Batch Generation** - Create multiple meme variants at once
 - ⌨️ **Keyboard Shortcuts** - Alt+M (generate), R (regenerate), F (favorite), C (copy), T (tag), H (history)
 - 🔄 **Undo Support** - Easily revert changes to favorites and tags
 - 📤 **Export Data** - Download all your memes as JSON backup
@@ -112,13 +110,6 @@ Think of it as your personal meme generator that lives in your browser. No desig
 - Filter by favorites or tags
 - Click any meme to view it again
 
-**⚡ Batch Generate Memes**
-1. Click the Chuckle icon
-2. Select "Batch Generate"
-3. Enter multiple texts (one per line)
-4. Choose 1-3 variants per text
-5. Generate all at once
-
 **⌨️ Keyboard Shortcuts**
 - **Alt+M**: Generate meme from selected text (anywhere on any page)
 - **R**: Regenerate meme (when viewing a meme)
@@ -173,14 +164,6 @@ Think of it as your personal meme generator that lives in your browser. No desig
   - Share counts (Twitter, Reddit, LinkedIn, Email)
 - Click "📥 Export Data" to download all your memes as JSON
 - Click "🎨 Browse Templates" to see all 20 available templates
-
-**📁 Organize with Collections**
-1. Click the Chuckle icon
-2. Go to the "📁 Collections" tab
-3. Click "+ New Collection" and name it (e.g., "Work Memes", "Viral Hits")
-4. When viewing a meme, click the 📁 button to add it to a collection
-5. Collections help you organize memes by theme, mood, or purpose
-6. Delete collections anytime without losing your memes
 
 **🔥 Discover Your Trending**
 - Click the Chuckle icon
@@ -252,7 +235,6 @@ Chuckle works in 4 languages:
 
 **⚡ Performance**
 - LRU cache for faster meme generation
-- Parallel processing for batch operations
 - Lazy loading for optimal performance
 
 ### Common Questions
@@ -303,10 +285,7 @@ A: Yes! Go to the Stats tab and click "📥 Export Data" to download all your me
 A: Click the Chuckle icon, go to Stats tab, and click "🎨 Browse Templates" to see all 20 templates.
 
 **Q: Can I create multiple meme variants?**
-A: Yes! Click the 🎲 button on any meme to instantly regenerate with a different template. You can also use the Batch Generate feature to create 1-3 variants at once.
-
-**Q: What are Collections?**
-A: Collections let you organize memes into themed albums (like "Work Humor", "Study Memes", "Viral Content"). Create unlimited collections and add memes to multiple collections.
+A: Yes! Click the 🎲 button on any meme to instantly regenerate with a different template.
 
 **Q: How does Trending work without a server?**
 A: Trending analyzes YOUR local meme history to show patterns - which templates you use most, which you share most, and which are rising in your usage. It's personalized to your meme style!
@@ -411,14 +390,12 @@ A: Trending analyzes YOUR local meme history to show patterns - which templates 
 ### Key Features
 - **Social Sharing** - Twitter, Reddit, LinkedIn, Email integration
 - **Analytics Dashboard** - Track stats, export data
-- **Collections** - Organize memes into themed albums
 - **Trending Insights** - Personal analytics on template usage
 - **Editable Text** - Click to edit meme text inline
 - **Template Browser** - Discover 20 meme templates
 - **Keyboard Shortcuts** - Alt+M for instant generation
 - **LRU Cache** - 1-hour TTL for API responses
 - **Lazy Loading** - Tags module loaded on demand
-- **Parallel Processing** - Batch operations optimized
 - **Security** - XSS protection, input sanitization
 - **Performance** - Debounced inputs, optimized rendering
 
