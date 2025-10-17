@@ -3,7 +3,7 @@ const path = require('path');
 const { minify } = require('terser');
 
 const distDir = path.join(__dirname, 'dist');
-const files = ['background.js', 'content.js', 'popup.js', 'popup-batch.js'];
+const files = ['background.js', 'content.js', 'popup.js'];
 
 async function minifyFiles() {
   console.log('\n🔧 Minifying JavaScript files...\n');

@@ -2,6 +2,7 @@ import { CONFIG } from './config';
 import type { GeminiResponse } from './types';
 import { getErrorMessage } from './errorMessages';
 import { formattedCache } from './cache';
+import { decodeHtmlEntities, cleanText } from '../lib/text-utils';
 
 const TEMPLATE_PROMPTS: Record<string, string> = {
   drake: 'Drake (rejecting/approving): TOP=rejected option (what Drake pushes away), BOTTOM=approved option (what Drake wants). Keep original sentiment. Example: "Paid ads / One viral Reddit post"',
@@ -24,26 +25,6 @@ const TEMPLATE_PROMPTS: Record<string, string> = {
   philosoraptor: 'Philosoraptor: Mind-bending question. Example: "If Reddit gave me users / Did I find Reddit or did it find me?"',
   grumpycat: 'Grumpy Cat: Grumpy rejection. Example: "Celebrate 40 users? / No."'
 };
-
-function decodeHtmlEntities(text: string): string {
-  const entities: Record<string, string> = {
-    '&quot;': '"', '&#34;': '"', '&apos;': "'", '&#39;': "'",
-    '&amp;': '&', '&#38;': '&', '&lt;': '<', '&#60;': '<',
-    '&gt;': '>', '&#62;': '>', '&nbsp;': ' ', '&#160;': ' '
-  };
-  return text.replace(/&[#a-z0-9]+;/gi, match => entities[match.toLowerCase()] || '');
-}
-
-function cleanText(text: string): string {
-  return text
-    .replace(/[\u{1F300}-\u{1F9FF}]/gu, '')
-    .replace(/[\u{2600}-\u{26FF}]/gu, '')
-    .replace(/[\u{2700}-\u{27BF}]/gu, '')
-    .replace(/[*#@]/g, '')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
-
 
 
 export async function formatTextForTemplate(text: string, template: string): Promise<string> {

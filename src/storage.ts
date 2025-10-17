@@ -1,14 +1,7 @@
 import type { MemeData } from './types';
+import { simpleHash } from '../lib/hash';
 
-export function simpleHash(str: string): string {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    hash = ((hash << 5) - hash) + str.charCodeAt(i);
-    hash = hash & hash;
-  }
-  const hashStr = Math.abs(hash).toString(36);
-  return hashStr.padEnd(8, '0').slice(0, 8);
-}
+export { simpleHash };
 
 export async function saveMeme(memeData: MemeData): Promise<string> {
   const key = `meme_${simpleHash(memeData.text + memeData.timestamp)}`;
