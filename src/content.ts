@@ -4,6 +4,7 @@ import { analyzeMemeContext, generateMemeImage } from './geminiService';
 import { createOverlay } from './overlay';
 import { saveMeme } from './storage';
 import { optimizeText } from './textOptimizer';
+import { performCleanup, shouldCleanup } from './cleanup';
 
 function showError(message: string): void {
   const errorDiv = document.createElement('div');
@@ -88,6 +89,14 @@ async function getErrorMessage(error: unknown): Promise<string> {
 
 export async function generateMeme(text: string): Promise<void> {
   console.log('[Chuckle] Starting meme generation for text:', text.slice(0, 50));
+  
+  // Auto-cleanup if needed
+  if (await shouldCleanup()) {
+    const result = await performCleanup();
+    if (result.removed > 0) {
+      console.log(`[Chuckle] Auto-cleaned ${result.removed} memes, freed ${(result.freedBytes / 1024).toFixed(1)}KB`);
+    }
+  }
   
   const wordCount = text.trim().split(/\s+/).length;
   

@@ -22,7 +22,11 @@ describe('Keyboard Shortcut', () => {
         create: jest.fn()
       },
       commands: { onCommand: { addListener: mockAddListener } },
-      action: { onClicked: { addListener: jest.fn() } }
+      action: { onClicked: { addListener: jest.fn() } },
+      alarms: {
+        create: jest.fn(),
+        onAlarm: { addListener: jest.fn() }
+      }
     } as any;
 
     require('../src/background');
