@@ -80,7 +80,7 @@ Think of it as your personal meme generator that lives in your browser. No desig
 
 **Step 3: Start Making Memes**
 1. Go to any website
-2. Highlight any text (example: "When you finally understand recursion")
+2. Highlight 6-30 words of text (example: "When you finally understand recursion")
 3. Right-click and select "Remix as a Meme"
 4. Wait 2-3 seconds
 5. Your meme is ready! Add tags, mark as favorite, or save to history
@@ -255,7 +255,7 @@ A: You get 1,500 per day. That resets every 24 hours. Most people use 10-20 per 
 A: Not yet. Chuckle only works on Chrome browser on computers right now.
 
 **Q: Does Chuckle work on all websites?**
-A: Yes! Chuckle works on any website where you can highlight text.
+A: Yes! Chuckle works on any website where you can highlight text. Just make sure to select between 6 and 30 words for best results.
 
 **Q: Why do I need my own API key?**
 A: This keeps Chuckle free and private. You connect directly to Google AI, not through our servers.
@@ -293,7 +293,7 @@ A: Trending analyzes YOUR local meme history to show patterns - which templates 
 ### Tips for Best Memes
 
 **✅ Do:**
-- Highlight short, punchy text (5-15 words works best)
+- Highlight 6-30 words (required for best results)
 - Use text with clear emotions or situations
 - Try different phrases to see what works
 - Press R or double-click to try different templates
@@ -304,7 +304,8 @@ A: Trending analyzes YOUR local meme history to show patterns - which templates 
 - Export your memes regularly as backup
 
 **❌ Don't:**
-- Highlight very long paragraphs (keep it short!)
+- Select less than 6 words (too little context)
+- Select more than 30 words (too long for memes)
 - Use text without context or humor
 - Expect perfect results every time (AI is creative!)
 
@@ -338,6 +339,9 @@ A: Trending analyzes YOUR local meme history to show patterns - which templates 
 
 **Problem: Meme takes too long**
 - Solution: Check your internet connection. Memes usually take 2-3 seconds.
+
+**Problem: "You must select between 6 and 30 words"**
+- Solution: Make sure you highlight at least 6 words but no more than 30 words. This ensures the AI has enough context without being too long.
 
 **Problem: "Could not generate meme"**
 - Solution: Try highlighting different text. Some phrases work better than others.

@@ -35,8 +35,7 @@ English: {
   network: 'Network error. Check internet connection.',
   rateLimit: 'API exhausted. Please wait a moment and try again.',
   generic: 'Meme generation failed. Try again.',
-  minWords: 'Please select at least 6 words.',
-  maxWords: 'Please select no more than 30 words.'
+  wordRange: 'You must select between 6 and 30 words.'
 },
 Spanish: {
   storageFull: 'Almacenamiento lleno. Borra memes antiguos.',
@@ -44,8 +43,7 @@ Spanish: {
   network: 'Error de red. Verifica tu conexión.',
   rateLimit: 'API agotada. Por favor, espera un momento e inténtalo de nuevo.',
   generic: 'Error al generar meme. Intenta de nuevo.',
-  minWords: 'Por favor, selecciona al menos 6 palabras.',
-  maxWords: 'Por favor, selecciona no más de 30 palabras.'
+  wordRange: 'Debes seleccionar entre 6 y 30 palabras.'
 },
 French: {
   storageFull: 'Stockage plein. Supprimez anciens memes.',
@@ -53,8 +51,7 @@ French: {
   network: 'Erreur réseau. Vérifiez connexion internet.',
   rateLimit: 'API épuisée. Veuillez attendre un moment et réessayer.',
   generic: 'Échec génération meme. Réessayez.',
-  minWords: 'Veuillez sélectionner au moins 6 mots.',
-  maxWords: 'Veuillez sélectionner pas plus de 30 mots.'
+  wordRange: 'Vous devez sélectionner entre 6 et 30 mots.'
 },
 German: {
   storageFull: 'Speicher voll. Alte Memes löschen.',
@@ -62,8 +59,7 @@ German: {
   network: 'Netzwerkfehler. Internetverbindung prüfen.',
   rateLimit: 'API erschöpft. Bitte warten Sie einen Moment und versuchen Sie es erneut.',
   generic: 'Meme-Erstellung fehlgeschlagen. Erneut versuchen.',
-  minWords: 'Bitte wählen Sie mindestens 6 Wörter aus.',
-  maxWords: 'Bitte wählen Sie nicht mehr als 30 Wörter aus.'
+  wordRange: 'Sie müssen zwischen 6 und 30 Wörter auswählen.'
 }
 };
 
@@ -94,17 +90,12 @@ export async function generateMeme(text: string): Promise<void> {
   console.log('[Chuckle] Starting meme generation for text:', text.slice(0, 50));
   
   const wordCount = text.trim().split(/\s+/).length;
-  const { selectedLanguage } = await chrome.storage.local.get(['selectedLanguage']);
-  const lang = (selectedLanguage || 'English') as keyof typeof errorMessages;
-  const messages = errorMessages[lang] || errorMessages.English;
   
-  if (wordCount < 6) {
-    showError(messages.minWords);
-    return;
-  }
-  
-  if (wordCount > 30) {
-    showError(messages.maxWords);
+  if (wordCount < 6 || wordCount > 30) {
+    const { selectedLanguage } = await chrome.storage.local.get(['selectedLanguage']);
+    const lang = (selectedLanguage || 'English') as keyof typeof errorMessages;
+    const messages = errorMessages[lang] || errorMessages.English;
+    showError(messages.wordRange);
     return;
   }
   
