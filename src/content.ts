@@ -34,28 +34,36 @@ English: {
   apiKey: 'API key invalid. Check settings.',
   network: 'Network error. Check internet connection.',
   rateLimit: 'API exhausted. Please wait a moment and try again.',
-  generic: 'Meme generation failed. Try again.'
+  generic: 'Meme generation failed. Try again.',
+  minWords: 'Please select at least 6 words.',
+  maxWords: 'Please select no more than 30 words.'
 },
 Spanish: {
   storageFull: 'Almacenamiento lleno. Borra memes antiguos.',
   apiKey: 'Clave API inválida. Verifica configuración.',
   network: 'Error de red. Verifica tu conexión.',
   rateLimit: 'API agotada. Por favor, espera un momento e inténtalo de nuevo.',
-  generic: 'Error al generar meme. Intenta de nuevo.'
+  generic: 'Error al generar meme. Intenta de nuevo.',
+  minWords: 'Por favor, selecciona al menos 6 palabras.',
+  maxWords: 'Por favor, selecciona no más de 30 palabras.'
 },
 French: {
   storageFull: 'Stockage plein. Supprimez anciens memes.',
   apiKey: 'Clé API invalide. Vérifiez paramètres.',
   network: 'Erreur réseau. Vérifiez connexion internet.',
   rateLimit: 'API épuisée. Veuillez attendre un moment et réessayer.',
-  generic: 'Échec génération meme. Réessayez.'
+  generic: 'Échec génération meme. Réessayez.',
+  minWords: 'Veuillez sélectionner au moins 6 mots.',
+  maxWords: 'Veuillez sélectionner pas plus de 30 mots.'
 },
 German: {
   storageFull: 'Speicher voll. Alte Memes löschen.',
   apiKey: 'API-Schlüssel ungültig. Einstellungen prüfen.',
   network: 'Netzwerkfehler. Internetverbindung prüfen.',
   rateLimit: 'API erschöpft. Bitte warten Sie einen Moment und versuchen Sie es erneut.',
-  generic: 'Meme-Erstellung fehlgeschlagen. Erneut versuchen.'
+  generic: 'Meme-Erstellung fehlgeschlagen. Erneut versuchen.',
+  minWords: 'Bitte wählen Sie mindestens 6 Wörter aus.',
+  maxWords: 'Bitte wählen Sie nicht mehr als 30 Wörter aus.'
 }
 };
 
@@ -84,6 +92,22 @@ async function getErrorMessage(error: unknown): Promise<string> {
 
 export async function generateMeme(text: string): Promise<void> {
   console.log('[Chuckle] Starting meme generation for text:', text.slice(0, 50));
+  
+  const wordCount = text.trim().split(/\s+/).length;
+  const { selectedLanguage } = await chrome.storage.local.get(['selectedLanguage']);
+  const lang = (selectedLanguage || 'English') as keyof typeof errorMessages;
+  const messages = errorMessages[lang] || errorMessages.English;
+  
+  if (wordCount < 6) {
+    showError(messages.minWords);
+    return;
+  }
+  
+  if (wordCount > 30) {
+    showError(messages.maxWords);
+    return;
+  }
+  
   try {
     showLoading('Generating meme...');
     const truncatedText = text.slice(0, 1000);

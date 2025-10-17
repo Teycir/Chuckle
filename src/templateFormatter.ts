@@ -50,6 +50,47 @@ function smartSplit(text: string): string {
   return `${words.slice(0, mid).join(' ')} / ${words.slice(mid).join(' ')}`;
 }
 
+async function extractTopic(text: string): Promise<string> {
+  const { geminiApiKey } = await chrome.storage.local.get(['geminiApiKey']);
+  if (!geminiApiKey) return text;
+  
+  const prompt = `Extract the CORE TOPIC from this text in 5-10 words. What is this REALLY about?
+
+Examples:
+- "I know 40 isn't a lot but it feels like a huge accomplishment" → "getting 40 users/achievements feels huge"
+- "When you finally understand recursion" → "understanding recursion finally"
+- "My code works but I don't know why" → "code works mysteriously"
+
+Text: "${text}"
+
+Return ONLY the core topic (5-10 words). Nothing else.`;
+
+  try {
+    const response = await fetch(`${CONFIG.GEMINI_API_URL}?key=${geminiApiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0.3, topP: 0.8, topK: 20 }
+      })
+    });
+    
+    if (!response.ok) return text;
+    
+    const data: GeminiResponse = await response.json();
+    const topic = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+    
+    if (topic && topic.length > 0 && topic.length < 100) {
+      console.log('[Chuckle] Extracted topic:', topic);
+      return topic;
+    }
+    return text;
+  } catch (error) {
+    console.error('[Chuckle] Topic extraction failed:', error);
+    return text;
+  }
+}
+
 export async function formatTextForTemplate(text: string, template: string): Promise<string> {
   const templatePrompt = TEMPLATE_PROMPTS[template] || 'Format as two parts: "part 1 / part 2" (max 35 chars each)';
   
@@ -58,7 +99,9 @@ export async function formatTextForTemplate(text: string, template: string): Pro
   const { geminiApiKey } = await chrome.storage.local.get(['geminiApiKey']);
   if (!geminiApiKey) return smartSplit(text);
   
-  const prompt = `${templatePrompt}\n\nAdapt this text to match the template format and personality. IMPORTANT: Keep the EXACT SAME CORE TOPIC, DETAILS, and MEANING from the original text - do NOT change the subject matter.\n\nSTRICT RULES:\n- MUST stay on the EXACT SAME topic/subject/details as the original text\n- Adapt the text to match the template's personality and format\n- MUST use " / " separator between top and bottom text\n- Each part MAX 35 characters\n- Make it funny while keeping the original topic\n- NO emojis, NO special characters, NO HTML entities\n- NO hashtags, NO asterisks\n\nText: "${text}"\n\nReturn ONLY the formatted text with " / " separator. Nothing else.`;
+  const topic = await extractTopic(text);
+  
+  const prompt = `${templatePrompt}\n\nCORE TOPIC: ${topic}\n\nAdapt this text to match the template format and personality. CRITICAL: The meme MUST be about "${topic}" - do NOT change the subject to something else.\n\nSTRICT RULES:\n- MUST stay on topic: "${topic}"\n- If the topic mentions numbers (like 40 users), keep that EXACT context - don't confuse it with age or other meanings\n- Adapt the text to match the template's personality and format\n- MUST use " / " separator between top and bottom text\n- Each part MAX 35 characters\n- Make it funny while keeping the original topic\n- NO emojis, NO special characters, NO HTML entities\n- NO hashtags, NO asterisks\n\nOriginal text: "${text}"\n\nReturn ONLY the formatted text with " / " separator. Nothing else.`;
 
   try {
     const response = await fetch(`${CONFIG.GEMINI_API_URL}?key=${geminiApiKey}`, {
@@ -69,9 +112,9 @@ export async function formatTextForTemplate(text: string, template: string): Pro
           parts: [{ text: prompt }]
         }],
         generationConfig: {
-          temperature: 1.4,
-          topP: 0.98,
-          topK: 64
+          temperature: 1.0,
+          topP: 0.95,
+          topK: 40
         }
       })
     });
