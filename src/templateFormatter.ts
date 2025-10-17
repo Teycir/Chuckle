@@ -3,25 +3,25 @@ import type { GeminiResponse } from './types';
 import { getErrorMessage } from './errorMessages';
 
 const TEMPLATE_PROMPTS: Record<string, string> = {
-  drake: 'Drake meme: TOP = bad/rejected option, BOTTOM = good/approved option. Make it OFFENSIVE and brutally honest about preferences. Use harsh language and be extremely blunt. Format: "bad thing / good thing" (max 35 chars each)',
-  db: 'Distracted BF: TOP = tempting distraction, BOTTOM = current focus. Make it MILDLY OFFENSIVE about betrayal, temptation, or questionable priorities. Use slightly vulgar language and be merciless. Format: "tempting thing / current thing" (max 35 chars each)',
-  ds: 'Two Buttons: TOP = first option, BOTTOM = second option (both equally difficult). Make it CHEESY and overly dramatic about impossible choices or moral dilemmas. Use corny expressions and exaggerated emotions. Format: "option 1 / option 2" (max 35 chars each)',
-  cmm: 'Change My Mind: TOP = setup, BOTTOM = controversial statement. Make it provocative, edgy, and designed to trigger debate. Format: "setup / bold claim" (max 35 chars each)',
-  pigeon: 'Pigeon: TOP = thing being looked at, BOTTOM = "Is this [misidentification]?". Make it about hilariously wrong assumptions or stupidity. Format: "thing / Is this X?" (max 35 chars each)',
-  'woman-cat': 'Woman Yelling at Cat: TOP = angry accusation, BOTTOM = dismissive response. Make it about conflict, drama, or not giving a damn. Format: "accusation / dismissal" (max 35 chars each)',
-  fine: 'This is Fine: TOP = situation, BOTTOM = denial statement. Make it about denial in the face of disaster or chaos. Format: "situation / this is fine" (max 35 chars each)',
-  stonks: 'Stonks: TOP = failure/mistake, BOTTOM = unexpected success. Make it about failing upward or absurd wins from stupid decisions. Format: "mistake / stonks" (max 35 chars each)',
-  astronaut: 'Always Has Been: TOP = realization/question, BOTTOM = "Always has been". Make it about dark revelations or conspiracy truths. Format: "realization / Always has been" (max 35 chars each)',
-  success: 'Success Kid: TOP = setup/challenge, BOTTOM = unexpected win. Make it about petty victories or mildly sassy comebacks. Format: "challenge / victory" (max 35 chars each)',
-  blb: 'Bad Luck Brian: TOP = action taken, BOTTOM = unfortunate outcome. Make it about catastrophic failure or the worst possible outcome. Format: "action / bad result" (max 35 chars each)',
-  mordor: 'One Does Not Simply: TOP = "One does not simply", BOTTOM = impossible task. Make it about ridiculously difficult or taboo things. Format: "One does not simply / task" (max 35 chars each)',
-  aag: 'Ancient Aliens: TOP = mysterious thing, BOTTOM = conspiracy explanation. Make it about absurd conspiracy theories or paranoid explanations. Format: "mystery / aliens" (max 35 chars each)',
-  fry: 'Futurama Fry: TOP = "Not sure if", BOTTOM = suspicious alternative. Make it about paranoia, suspicion, or questioning reality. Format: "Not sure if / or just" (max 35 chars each)',
-  fwp: 'First World Problems: TOP = privileged situation, BOTTOM = trivial complaint. Make it about entitled whining or absurdly privileged complaints. Format: "situation / complaint" (max 35 chars each)',
-  doge: 'Doge: TOP = "much" statement, BOTTOM = "such/very" statement. Make it silly, broken English, and overly enthusiastic. Format: "much X / such Y" (max 35 chars each)',
-  iw: 'Insanity Wolf: TOP = extreme situation, BOTTOM = insane action. Make it about mildly unhinged overreactions or bold responses. Format: "situation / extreme action" (max 35 chars each)',
-  philosoraptor: 'Philosoraptor: TOP = philosophical question part 1, BOTTOM = question part 2. Make it a mind-bending or absurd philosophical paradox. Format: "question start / question end" (max 35 chars each)',
-  grumpycat: 'Grumpy Cat: TOP = suggestion/request, BOTTOM = grumpy rejection. Make it mildly grumpy and sarcastic about rejection or refusal. Use dry, sarcastic language and be negative but not hateful. Format: "request / grumpy rejection" (max 35 chars each)'
+  drake: 'Drake (rejecting/approving): TOP=rejected option (what Drake pushes away), BOTTOM=approved option (what Drake wants). Keep original sentiment. Example: "Paid ads / One viral Reddit post"',
+  db: 'Distracted Boyfriend: TOP=tempting new thing, BOTTOM=current thing being ignored. About temptation/distraction. Example: "New framework / Finishing current project"',
+  ds: 'Two Buttons (sweating): Both options equally difficult/impossible. About hard choices. Example: "Ship buggy code / Miss deadline"',
+  cmm: 'Change My Mind: Controversial/bold statement. Example: "Reddit > paid marketing"',
+  pigeon: 'Pigeon (Is this...?): TOP=thing seen, BOTTOM="Is this [wrong label]?". About misidentification. Example: "40 users / Is this going viral?"',
+  'woman-cat': 'Woman Yelling at Cat: TOP=angry accusation, BOTTOM=calm dismissal. Example: "You need more users! / I got 40, I\'m good"',
+  fine: 'This is Fine (dog in fire): Denial during disaster. Example: "0 users for 3 weeks / This is fine"',
+  stonks: 'Stonks: Failing upward, unexpected win from mistake. Example: "One lazy Reddit post / 40 users"',
+  astronaut: 'Always Has Been: Dark revelation. TOP=realization, BOTTOM="Always has been". Example: "Wait, Reddit works? / Always has been"',
+  success: 'Success Kid (fist pump): CELEBRATING small wins, feeling accomplished. Example: "Only got 40 users / Feels like a million"',
+  blb: 'Bad Luck Brian: Worst possible outcome. Example: "Posted on Reddit / Got roasted instead"',
+  mordor: 'One Does Not Simply: Impossible task. TOP="One does not simply", BOTTOM=task. Example: "One does not simply / Get users from Reddit"',
+  aag: 'Ancient Aliens: Conspiracy theory explanation. Example: "Reddit success / Aliens"',
+  fry: 'Futurama Fry (squinting): Suspicion/paranoia. TOP="Not sure if", BOTTOM="or". Example: "Not sure if good post / Or just got lucky"',
+  fwp: 'First World Problems: Privileged complaint. Example: "Got 40 users / But wanted 100"',
+  doge: 'Doge: Broken English, enthusiastic. TOP="much/wow", BOTTOM="such/very". Example: "much Reddit success / very 40 users wow"',
+  iw: 'Insanity Wolf: Extreme overreaction. Example: "Got 40 users / QUIT JOB, GO FULL TIME"',
+  philosoraptor: 'Philosoraptor: Mind-bending question. Example: "If Reddit gave me users / Did I find Reddit or did it find me?"',
+  grumpycat: 'Grumpy Cat: Grumpy rejection. Example: "Celebrate 40 users? / No."'
 };
 
 function decodeHtmlEntities(text: string): string {
@@ -50,20 +50,23 @@ function smartSplit(text: string): string {
   return `${words.slice(0, mid).join(' ')} / ${words.slice(mid).join(' ')}`;
 }
 
-async function extractTopic(text: string): Promise<string> {
+async function extractSentiment(text: string): Promise<{topic: string; sentiment: string; key_numbers: string}> {
   const { geminiApiKey } = await chrome.storage.local.get(['geminiApiKey']);
-  if (!geminiApiKey) return text;
+  if (!geminiApiKey) return {topic: text, sentiment: 'neutral', key_numbers: ''};
   
-  const prompt = `Extract the CORE TOPIC from this text in 5-10 words. What is this REALLY about?
+  const prompt = `Analyze this text and extract:
+1. TOPIC (what it's about in 3-5 words)
+2. SENTIMENT (positive/negative/neutral/excited/proud/frustrated)
+3. KEY_NUMBERS (any important numbers with context, e.g., "40 users")
 
 Examples:
-- "I know 40 isn't a lot but it feels like a huge accomplishment" → "getting 40 users/achievements feels huge"
-- "When you finally understand recursion" → "understanding recursion finally"
-- "My code works but I don't know why" → "code works mysteriously"
+- "I know 40 isn't a lot but it feels like a huge accomplishment" → TOPIC: getting first users | SENTIMENT: proud/excited | KEY_NUMBERS: 40 users
+- "When you finally understand recursion" → TOPIC: understanding recursion | SENTIMENT: excited | KEY_NUMBERS: none
+- "My code works but I don't know why" → TOPIC: mysterious code success | SENTIMENT: confused/lucky | KEY_NUMBERS: none
 
 Text: "${text}"
 
-Return ONLY the core topic (5-10 words). Nothing else.`;
+Return in format: TOPIC: xxx | SENTIMENT: xxx | KEY_NUMBERS: xxx`;
 
   try {
     const response = await fetch(`${CONFIG.GEMINI_API_URL}?key=${geminiApiKey}`, {
@@ -71,23 +74,30 @@ Return ONLY the core topic (5-10 words). Nothing else.`;
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 0.3, topP: 0.8, topK: 20 }
+        generationConfig: { temperature: 0.2, topP: 0.7, topK: 10, maxOutputTokens: 50 }
       })
     });
     
-    if (!response.ok) return text;
+    if (!response.ok) return {topic: text, sentiment: 'neutral', key_numbers: ''};
     
     const data: GeminiResponse = await response.json();
-    const topic = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+    const result = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
     
-    if (topic && topic.length > 0 && topic.length < 100) {
-      console.log('[Chuckle] Extracted topic:', topic);
-      return topic;
-    }
-    return text;
+    const topicMatch = result.match(/TOPIC:\s*([^|]+)/);
+    const sentimentMatch = result.match(/SENTIMENT:\s*([^|]+)/);
+    const numbersMatch = result.match(/KEY_NUMBERS:\s*(.+)/);
+    
+    const analysis = {
+      topic: topicMatch?.[1]?.trim() || text,
+      sentiment: sentimentMatch?.[1]?.trim() || 'neutral',
+      key_numbers: numbersMatch?.[1]?.trim() || ''
+    };
+    
+    console.log('[Chuckle] Sentiment analysis:', analysis);
+    return analysis;
   } catch (error) {
-    console.error('[Chuckle] Topic extraction failed:', error);
-    return text;
+    console.error('[Chuckle] Sentiment extraction failed:', error);
+    return {topic: text, sentiment: 'neutral', key_numbers: ''};
   }
 }
 
@@ -99,9 +109,25 @@ export async function formatTextForTemplate(text: string, template: string): Pro
   const { geminiApiKey } = await chrome.storage.local.get(['geminiApiKey']);
   if (!geminiApiKey) return smartSplit(text);
   
-  const topic = await extractTopic(text);
+  const analysis = await extractSentiment(text);
   
-  const prompt = `${templatePrompt}\n\nCORE TOPIC: ${topic}\n\nAdapt this text to match the template format and personality. CRITICAL: The meme MUST be about "${topic}" - do NOT change the subject to something else.\n\nSTRICT RULES:\n- MUST stay on topic: "${topic}"\n- If the topic mentions numbers (like 40 users), keep that EXACT context - don't confuse it with age or other meanings\n- Adapt the text to match the template's personality and format\n- MUST use " / " separator between top and bottom text\n- Each part MAX 35 characters\n- Make it funny while keeping the original topic\n- NO emojis, NO special characters, NO HTML entities\n- NO hashtags, NO asterisks\n\nOriginal text: "${text}"\n\nReturn ONLY the formatted text with " / " separator. Nothing else.`;
+  const prompt = `Template: ${templatePrompt}
+
+Context:
+- Topic: ${analysis.topic}
+- Sentiment: ${analysis.sentiment}
+- Key info: ${analysis.key_numbers || 'none'}
+- Original: "${text}"
+
+RULES:
+1. Each part MAX 30 chars (strict!)
+2. Use " / " separator
+3. Match template personality
+4. Keep sentiment (${analysis.sentiment})
+5. Include key info if relevant (${analysis.key_numbers})
+6. NO emojis/special chars
+
+Return ONLY: "top text / bottom text"`;
 
   try {
     const response = await fetch(`${CONFIG.GEMINI_API_URL}?key=${geminiApiKey}`, {
@@ -112,9 +138,10 @@ export async function formatTextForTemplate(text: string, template: string): Pro
           parts: [{ text: prompt }]
         }],
         generationConfig: {
-          temperature: 1.0,
-          topP: 0.95,
-          topK: 40
+          temperature: 0.7,
+          topP: 0.85,
+          topK: 25,
+          maxOutputTokens: 30
         }
       })
     });
@@ -140,24 +167,22 @@ export async function formatTextForTemplate(text: string, template: string): Pro
       
       if (firstLine.includes(' / ')) {
         const parts = firstLine.split(' / ').map(p => p.trim());
-        if (parts.length >= 2 && parts[0].length <= 35 && parts[1].length <= 35) {
-          const cleanedLine = `${parts[0]} / ${parts[1]}`;
-          console.log('[Chuckle] Text formatted for template:', cleanedLine);
+        if (parts.length >= 2) {
+          const part1 = parts[0].slice(0, 35);
+          const part2 = parts[1].slice(0, 35);
+          const cleanedLine = `${part1} / ${part2}`;
+          console.log('[Chuckle] Text formatted for template:', cleanedLine, `(${part1.length}/${part2.length} chars)`);
           return cleanedLine;
         }
       }
     }
     
-    console.log('[Chuckle] Formatted text too long, using smart split');
-    return smartSplit(text);
+    throw new Error('AI failed to format with separator');
   } catch (error) {
     console.error('[Chuckle] Template formatting error:', error);
-    if (error instanceof Error) {
-      const tooManyMsg = await getErrorMessage('tooManyRequests');
-      if (error.message.includes(tooManyMsg) || error.message.includes('Too many requests')) {
-        throw error;
-      }
+    if (error instanceof Error && (error.message.includes('Too many requests') || error.message.includes('429'))) {
+      throw error;
     }
-    return smartSplit(text);
+    throw new Error(`Failed to format text for ${template}: ${error}`);
   }
 }

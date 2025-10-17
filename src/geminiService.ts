@@ -225,12 +225,7 @@ export async function generateMemeImage(template: string, text: string, skipForm
     const formattedTemplate = template.trim().toLowerCase().replace(/\s+/g, '_');
     let processedText = text;
     
-    const words = text.split(/\s+/);
-    if (words.length > 12) {
-      processedText = words.slice(0, 12).join(' ');
-    } else {
-      processedText = text;
-    }
+    processedText = text;
     const formattedText = (skipFormatting && text.includes(' / ')) ? processedText : await formatTextForTemplate(processedText, formattedTemplate);
     const cleanText = formattedText.replace(/['']/g, "'").replace(/…/g, '...');
     
