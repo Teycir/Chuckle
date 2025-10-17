@@ -13,11 +13,10 @@ const TEMPLATE_PROMPTS: Record<string, string> = {
   'woman-cat': 'Woman Yelling at Cat: TOP=angry accusation, BOTTOM=calm dismissal. Example: "You need more users! / I got 40, I\'m good"',
   fine: 'This is Fine (dog in fire): Denial during disaster. Example: "0 users for 3 weeks / This is fine"',
   stonks: 'Stonks: Failing upward, unexpected win from mistake. Example: "One lazy Reddit post / 40 users"',
-  astronaut: 'Always Has Been: Dark revelation. TOP=realization, BOTTOM="Always has been". Example: "Wait, Reddit works? / Always has been"',
+
   success: 'Success Kid (fist pump): CELEBRATING small wins, feeling accomplished. Example: "Only got 40 users / Feels like a million"',
   blb: 'Bad Luck Brian: Worst possible outcome. Example: "Posted on Reddit / Got roasted instead"',
-  mordor: 'One Does Not Simply: Impossible task. TOP="One does not simply", BOTTOM=task. Example: "One does not simply / Get users from Reddit"',
-  aag: 'Ancient Aliens: Conspiracy theory explanation. Example: "Reddit success / Aliens"',
+
   fry: 'Futurama Fry (squinting): Suspicion/paranoia. TOP="Not sure if", BOTTOM="or". Example: "Not sure if good post / Or just got lucky"',
   fwp: 'First World Problems: Privileged complaint. Example: "Got 40 users / But wanted 100"',
   doge: 'Doge: Broken English, enthusiastic. TOP="much/wow", BOTTOM="such/very". Example: "much Reddit success / very 40 users wow"',

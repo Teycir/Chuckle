@@ -109,39 +109,19 @@ async function downloadPng(): Promise<void> {
   }
 }
 
-function createDownloadButton(): HTMLDivElement {
-  const container = document.createElement('div');
-  container.style.cssText = 'display: flex; flex-direction: column; align-items: center; gap: 4px;';
-  
+function createDownloadButton(): HTMLButtonElement {
   const downloadBtn = createButton('star-btn', '↓', downloadPng);
   downloadBtn.style.fontWeight = '900';
   downloadBtn.setAttribute('aria-label', getTranslation('downloadPng'));
   downloadBtn.setAttribute('role', 'button');
-  
-  const label = document.createElement('div');
-  label.textContent = getTranslation('downloadPng');
-  label.style.cssText = 'font-size: 10px; color: #5f6368; font-weight: 500;';
-  
-  container.appendChild(downloadBtn);
-  container.appendChild(label);
-  return container;
+  return downloadBtn;
 }
 
-function createCloseButton(): HTMLDivElement {
-  const container = document.createElement('div');
-  container.style.cssText = 'display: flex; flex-direction: column; align-items: center; gap: 4px;';
-  
+function createCloseButton(): HTMLButtonElement {
   const closeBtn = createButton('close-btn', '×', closeOverlay);
   closeBtn.setAttribute('aria-label', getTranslation('closeMeme'));
   closeBtn.setAttribute('role', 'button');
-  
-  const label = document.createElement('div');
-  label.textContent = getTranslation('closeMeme');
-  label.style.cssText = 'font-size: 10px; color: #5f6368; font-weight: 500;';
-  
-  container.appendChild(closeBtn);
-  container.appendChild(label);
-  return container;
+  return closeBtn;
 }
 
 async function regenerateMeme(specificTemplate?: string): Promise<void> {
@@ -172,7 +152,10 @@ async function regenerateMeme(specificTemplate?: string): Promise<void> {
       }
       
       const img = currentOverlay.querySelector('.meme-image') as HTMLImageElement;
-      if (img) img.src = watermarkedUrl;
+      if (img) {
+        img.src = watermarkedUrl;
+        img.setAttribute('data-template', template);
+      }
       
       const textInput = currentOverlay.querySelector('.text-editor-input') as HTMLDivElement;
       if (textInput) textInput.innerText = formattedText;
@@ -225,6 +208,7 @@ function createMemeImage(memeData: MemeData): HTMLImageElement {
   img.alt = `Meme: ${memeData.text}`;
   img.ondblclick = () => regenerateMeme();
   img.style.cursor = 'pointer';
+  img.setAttribute('data-template', memeData.template);
   return img;
 }
 
