@@ -197,8 +197,11 @@ async function regenerateMeme(specificTemplate?: string): Promise<void> {
     let errorMessage: string;
     if (error instanceof Error) {
       const rateLimitMessage = await getErrorMessage('tooManyRequests');
-      if (error.message.includes(rateLimitMessage)) {
+      if (error.message.includes(rateLimitMessage) || error.message.includes('API exhausted') || error.message.includes('429')) {
         errorMessage = rateLimitMessage;
+      } else if (error.message.includes('Failed to format text')) {
+        const match = error.message.match(/Error: (.+)$/);
+        errorMessage = match ? match[1] : error.message;
       } else {
         errorMessage = error.message;
       }
