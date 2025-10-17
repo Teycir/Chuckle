@@ -1,5 +1,4 @@
 import { CONFIG } from './config';
-import type { GeminiResponse } from './types';
 import { getErrorMessage } from './errorMessages';
 import { formattedCache } from './cache';
 import { decodeHtmlEntities, cleanText } from '../lib/text-utils';
@@ -7,16 +6,16 @@ import { decodeHtmlEntities, cleanText } from '../lib/text-utils';
 const TEMPLATE_PROMPTS: Record<string, string> = {
   drake: 'Drake (rejecting/approving): TOP=rejected option (what Drake pushes away), BOTTOM=approved option (what Drake wants). Keep original sentiment. Example: "Paid ads / One viral Reddit post"',
   db: 'Distracted Boyfriend: TOP=tempting new thing, BOTTOM=current thing being ignored. About temptation/distraction. Example: "New framework / Finishing current project"',
-  ds: 'Two Buttons (sweating): Both options equally difficult/impossible. About hard choices. Example: "Ship buggy code / Miss deadline"',
+  ds: 'Two Buttons (sweating): Both options equally impossible. About very hard choices. Example: "Ship buggy code, get fired / Miss deadline, get fired"',
   cmm: 'Change My Mind: Controversial/bold statement. Example: "Reddit > paid marketing"',
   pigeon: 'Pigeon (Is this...?): TOP=thing seen, BOTTOM="Is this [wrong label]?". About misidentification. Example: "40 users / Is this going viral?"',
   'woman-cat': 'Woman Yelling at Cat: TOP=angry accusation, BOTTOM=calm dismissal. Example: "You need more users! / I got 40, I\'m good"',
-  fine: 'This is Fine (dog in fire): TOP=situation, BOTTOM=denial statement. Example: "0 users for 3 weeks / This is fine"',
-  stonks: 'Stonks: TOP=failure/mistake, BOTTOM=unexpected success. Example: "One lazy Reddit post / 40 users"',
+  fine: 'This is Fine (dog in fire):TOP=Catastrophic situation,BOTTOM= Denial during disaster. Example: "0 users for 3 weeks / This is fine"',
+  stonks: 'Stonks: TOP=huge failure/mistake, BOTTOM=unexpected huge success. Example: "One lazy Reddit post / 40 users"',
 
-  success: 'Success Kid (fist pump): TOP=setup/challenge, BOTTOM=unexpected win. Example: "Only got 40 users / Feels like a million"',
-  blb: 'Bad Luck Brian: TOP=action taken, BOTTOM=unfortunate outcome. Make it about catastrophic failure or the worst possible outcome. Example: "Posted on Reddit / Got roasted instead"',
-  fry: 'Futurama Fry (squinting): Suspicion/paranoia. TOP="Not sure if", BOTTOM="or". Example: "Not sure if good post / Or just got lucky"',
+  success: 'Success Kid (fist pump): TOP=small challenge, BOTTOM=seen as a win from a bright side. Make it about petty victories or savage comebacks. Example: "Only got 40 users / Feels like a million"',
+  blb: 'Bad Luck Brian: TOP=big action taken, BOTTOM=very unfortunate outcome. Make it about catastrophic failure or the worst possible outcome. Example: "Posted on Reddit / Got roasted instead"',
+  fry: 'Futurama Fry (squinting): Extreme Suspicion/paranoia. TOP="Not sure if", BOTTOM="or". Example: "Not sure if good post / Or just got lucky"',
   fwp: 'First World Problems: Privileged complaint. Example: "Got 40 users / But wanted 100"',
   doge: 'Doge: Broken English, enthusiastic. TOP="much/wow", BOTTOM="such/very". Example: "much Reddit success / very 40 users wow"',
   iw: 'Insanity Wolf: Extreme overreaction. Example: "Got 40 users / QUIT JOB, GO FULL TIME"',
