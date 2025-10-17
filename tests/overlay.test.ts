@@ -63,6 +63,7 @@ describe('Overlay - Deep Tests', () => {
       const memeData = createMemeData({ text: 'funny meme text' });
       await createOverlay(memeData);
 
+      await new Promise(resolve => setTimeout(resolve, 3100));
       const text = document.querySelector('.text-editor-input') as HTMLDivElement;
       expect(text?.innerText).toBe('funny meme text');
     });
@@ -107,6 +108,7 @@ describe('Overlay - Deep Tests', () => {
       const memeData = createMemeData({ text: longText });
       await createOverlay(memeData);
 
+      await new Promise(resolve => setTimeout(resolve, 3100));
       const text = document.querySelector('.text-editor-input') as HTMLDivElement;
       expect(text?.innerText).toBe(longText);
     });
@@ -116,6 +118,7 @@ describe('Overlay - Deep Tests', () => {
       const memeData = createMemeData({ text: specialText });
       await createOverlay(memeData);
 
+      await new Promise(resolve => setTimeout(resolve, 3100));
       const text = document.querySelector('.text-editor-input') as HTMLDivElement;
       expect(text?.innerText).toBe(specialText);
     });
@@ -125,6 +128,7 @@ describe('Overlay - Deep Tests', () => {
       const memeData = createMemeData({ text: unicodeText });
       await createOverlay(memeData);
 
+      await new Promise(resolve => setTimeout(resolve, 3100));
       const text = document.querySelector('.text-editor-input') as HTMLDivElement;
       expect(text?.innerText).toBe(unicodeText);
     });
@@ -133,6 +137,7 @@ describe('Overlay - Deep Tests', () => {
       const memeData = createMemeData({ text: '' });
       await createOverlay(memeData);
 
+      await new Promise(resolve => setTimeout(resolve, 3100));
       const text = document.querySelector('.text-editor-input') as HTMLDivElement;
       expect(text?.innerText).toBe('');
     });

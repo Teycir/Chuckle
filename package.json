@@ -14,7 +14,11 @@
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint src/**/*.ts --fix",
     "format": "prettier --write src/**/*.ts",
-    "format:check": "prettier --check src/**/*.ts"
+    "format:check": "prettier --check src/**/*.ts",
+    "audit": "npm audit",
+    "audit:fix": "npm audit fix",
+    "security": "npm audit --audit-level=moderate",
+    "pretest": "npm run security"
   },
   "devDependencies": {
     "@types/chrome": "^0.0.268",
