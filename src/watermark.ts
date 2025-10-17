@@ -18,7 +18,7 @@ export async function addWatermark(imageUrl: string): Promise<string> {
       ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
       ctx.lineWidth = 2;
       
-      const text = 'Made with Chuckle';
+      const text = 'teycirbensoltane.tn';
       const padding = 10;
       const x = img.width - ctx.measureText(text).width - padding;
       const y = img.height - padding;
