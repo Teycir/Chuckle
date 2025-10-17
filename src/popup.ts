@@ -1,10 +1,204 @@
-import { getShortcuts, saveShortcuts, validateShortcut, hasConflict } from './shortcutConfig';
 import { getAnalytics, exportData } from './analytics';
+
+let cachedModels: any = null;
+let cachedApiKey: string | null = null;
+let elements: any = null;
+
+function getElements() {
+  if (!elements) {
+    elements = {
+      providerSelect: document.getElementById('providerSelect'),
+      geminiApiKey: document.getElementById('geminiApiKey'),
+      openrouterApiKey: document.getElementById('openrouterApiKey'),
+      languageSelect: document.getElementById('languageSelect'),
+      darkMode: document.getElementById('darkMode'),
+      statusMsg: document.getElementById('statusMsg')
+    };
+  }
+  return elements;
+}
+
+function constantTimeCompare(a: string, b: string): boolean {
+  if (typeof a !== 'string' || typeof b !== 'string') return false;
+  if (a.length !== b.length) return false;
+  let result = 0;
+  for (let i = 0; i < a.length; i++) {
+    result |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return result === 0;
+}
+
+async function loadOpenRouterModels(apiKey: string): Promise<any[]> {
+  if (!apiKey || typeof apiKey !== 'string' || apiKey.length < 20) return [];
+  
+  const { statusMsg } = getElements();
+  
+  try {
+    if (statusMsg) {
+      statusMsg.textContent = 'Loading models...';
+      statusMsg.className = 'status-msg';
+    }
+    
+    const response = await fetch('https://openrouter.ai/api/v1/models', {
+      headers: { 'Authorization': `Bearer ${apiKey}` }
+    });
+    
+    if (!response.ok) throw new Error(`API error: ${response.status}`);
+    const data = await response.json();
+    
+    const script = document.createElement('script');
+    script.src = chrome.runtime.getURL('lib/model-selector.js');
+    await new Promise((resolve, reject) => {
+      script.onload = resolve;
+      script.onerror = reject;
+      document.head.appendChild(script);
+    });
+    
+    const selected = (window as any).selectBestOpenAIModels(data.data);
+    
+    if (!selected.primary) throw new Error('No free models found');
+    
+    await chrome.storage.local.set({ 
+      openrouterPrimaryModel: selected.primary,
+      openrouterFallbackModels: selected.fallbacks
+    });
+    
+    const modelName = selected.primary.split('/').pop();
+    const tooltip = document.getElementById('openrouterModelTooltip');
+    console.log('[Chuckle] OpenRouter tooltip element:', tooltip);
+    console.log('[Chuckle] OpenRouter model name:', modelName);
+    if (tooltip) {
+      tooltip.textContent = `🤖 ${modelName}`;
+      console.log('[Chuckle] OpenRouter tooltip updated:', tooltip.textContent);
+    } else {
+      console.error('[Chuckle] OpenRouter tooltip element not found!');
+    }
+    
+    if (statusMsg) {
+      statusMsg.textContent = `✓ Model: ${modelName}`;
+      statusMsg.className = 'status-msg success';
+      setTimeout(() => {
+        statusMsg.textContent = '';
+        statusMsg.className = 'status-msg';
+      }, 2000);
+    }
+    
+    return data.data;
+  } catch (error) {
+    console.error('Failed to load OpenRouter models:', error);
+    if (statusMsg) {
+      statusMsg.textContent = `⚠️ ${error instanceof Error ? error.message : 'Error'}`;
+      statusMsg.className = 'status-msg error';
+      setTimeout(() => {
+        statusMsg.textContent = '';
+        statusMsg.className = 'status-msg';
+      }, 4000);
+    }
+    return [];
+  }
+}
+
+async function loadModels(apiKey: string): Promise<any[]> {
+  if (!apiKey || typeof apiKey !== 'string' || apiKey.length < 39) return [];
+  if (cachedModels && constantTimeCompare(cachedApiKey || '', apiKey)) {
+    return cachedModels;
+  }
+  
+  const { statusMsg } = getElements();
+  
+  try {
+    if (statusMsg) {
+      statusMsg.textContent = 'Loading models...';
+      statusMsg.className = 'status-msg';
+    }
+    
+    const url = new URL('https://generativelanguage.googleapis.com/v1beta/models');
+    url.searchParams.set('key', apiKey);
+    
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000);
+    
+    const response = await fetch(url.toString(), { signal: controller.signal });
+    clearTimeout(timeout);
+    
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error?.message || `API error: ${response.status}`);
+    }
+    const data = await response.json();
+    
+    const models = data.models?.filter((m: any) => {
+      if (!m.supportedGenerationMethods?.includes('generateContent')) return false;
+      const displayName = m.displayName.toLowerCase();
+      return displayName.includes('flash') && !displayName.includes('lite');
+    }).sort((a: any, b: any) => {
+      const aName = a.name.toLowerCase();
+      const bName = b.name.toLowerCase();
+      const aVersion = parseFloat((aName.match(/(\d+\.\d+)/) || ['0'])[0]);
+      const bVersion = parseFloat((bName.match(/(\d+\.\d+)/) || ['0'])[0]);
+      if (aVersion !== bVersion) return bVersion - aVersion;
+      const aHasPreview = aName.includes('preview');
+      const bHasPreview = bName.includes('preview');
+      if (aHasPreview !== bHasPreview) return aHasPreview ? 1 : -1;
+      return a.name.length - b.name.length;
+    }) || [];
+    
+    const latestVersion = models[0] ? parseFloat((models[0].name.toLowerCase().match(/(\d+\.\d+)/) || ['0'])[0]) : 0;
+    const latestStable = models.find((m: any) => !m.name.toLowerCase().includes('preview') && parseFloat((m.name.toLowerCase().match(/(\d+\.\d+)/) || ['0'])[0]) === latestVersion);
+    const latestPreview = models.find((m: any) => m.name.toLowerCase().includes('preview') && parseFloat((m.name.toLowerCase().match(/(\d+\.\d+)/) || ['0'])[0]) === latestVersion);
+    const prevVersion = models.find((m: any) => parseFloat((m.name.toLowerCase().match(/(\d+\.\d+)/) || ['0'])[0]) < latestVersion);
+    
+    const primary = latestStable?.name || latestPreview?.name || prevVersion?.name;
+    const fallbacks = [latestPreview?.name, prevVersion?.name].filter(Boolean).filter((m: any) => m !== primary).slice(0, 2);
+    
+    cachedModels = models;
+    cachedApiKey = apiKey;
+    
+    await chrome.storage.local.set({ 
+      primaryModel: primary,
+      fallbackModels: fallbacks
+    });
+    
+    if (primary) {
+      const modelName = primary.split('/').pop();
+      const tooltip = document.getElementById('geminiModelTooltip');
+      if (tooltip) tooltip.textContent = `🤖 ${modelName}`;
+    }
+    
+    if (statusMsg) {
+      statusMsg.textContent = primary ? `✓ Model loaded` : '⚠️ No models found';
+      statusMsg.className = primary ? 'status-msg success' : 'status-msg error';
+      setTimeout(() => {
+        statusMsg.textContent = '';
+        statusMsg.className = 'status-msg';
+      }, 2000);
+    }
+    
+    return models;
+  } catch (error) {
+    console.error('Failed to load models:', error);
+    
+    if (statusMsg) {
+      const isAbort = error instanceof Error && error.name === 'AbortError';
+      statusMsg.textContent = isAbort ? '⚠️ Request timeout' : `⚠️ ${error instanceof Error ? error.message : 'Error'}`;
+      statusMsg.className = 'status-msg error';
+      setTimeout(() => {
+        statusMsg.textContent = '';
+        statusMsg.className = 'status-msg';
+      }, 4000);
+    }
+    
+    return [];
+  }
+}
 
 const translations = {
   English: {
     title: '🎭 Chuckle Settings',
+    providerLabel: '🔐 AI Provider',
     apiKeyLabel: '🔑 Gemini API Key',
+    apiHelp: 'Get key from',
+    openrouterKeyLabel: '🔑 OpenRouter Key',
     languageLabel: '🌐 Language',
     darkModeLabel: '🌙 Dark Mode',
     saveButton: '💾 Save Settings',
@@ -22,7 +216,10 @@ const translations = {
   },
   Spanish: {
     title: '🎭 Configuración de Chuckle',
+    providerLabel: '🔐 Proveedor de IA',
     apiKeyLabel: '🔑 Clave API de Gemini',
+    apiHelp: 'Obtener clave de',
+    openrouterKeyLabel: '🔑 Clave OpenRouter',
     languageLabel: '🌐 Idioma',
     darkModeLabel: '🌙 Modo Oscuro',
     saveButton: '💾 Guardar Configuración',
@@ -40,7 +237,10 @@ const translations = {
   },
   French: {
     title: '🎭 Paramètres Chuckle',
+    providerLabel: '🔐 Fournisseur IA',
     apiKeyLabel: '🔑 Clé API Gemini',
+    apiHelp: 'Obtenir la clé de',
+    openrouterKeyLabel: '🔑 Clé OpenRouter',
     languageLabel: '🌐 Langue',
     darkModeLabel: '🌙 Mode Sombre',
     saveButton: '💾 Enregistrer',
@@ -58,7 +258,10 @@ const translations = {
   },
   German: {
     title: '🎭 Chuckle Einstellungen',
+    providerLabel: '🔐 KI-Anbieter',
     apiKeyLabel: '🔑 Gemini API-Schlüssel',
+    apiHelp: 'Schlüssel erhalten von',
+    openrouterKeyLabel: '🔑 OpenRouter-Schlüssel',
     languageLabel: '🌐 Sprache',
     darkModeLabel: '🌙 Dunkler Modus',
     saveButton: '💾 Speichern',
@@ -82,8 +285,20 @@ function updateUILanguage(lang: string) {
   const title = document.querySelector('#settingsPanel h2');
   if (title) title.textContent = t.title;
   
+  const providerLabel = document.querySelector('label[for="providerSelect"]');
+  if (providerLabel) providerLabel.textContent = t.providerLabel;
+  
   const apiKeyLabel = document.querySelector('label[for="geminiApiKey"]');
   if (apiKeyLabel) apiKeyLabel.textContent = t.apiKeyLabel;
+  
+  const openrouterKeyLabel = document.querySelector('label[for="openrouterApiKey"]');
+  if (openrouterKeyLabel) openrouterKeyLabel.textContent = t.openrouterKeyLabel;
+  
+  const geminiHelpText = document.getElementById('geminiKeyHelpText');
+  if (geminiHelpText) geminiHelpText.textContent = t.apiHelp;
+  
+  const openrouterHelpText = document.getElementById('openrouterKeyHelpText');
+  if (openrouterHelpText) openrouterHelpText.textContent = t.apiHelp;
   
   const langLabel = document.querySelector('label[for="languageSelect"]');
   if (langLabel) langLabel.textContent = t.languageLabel;
@@ -106,31 +321,48 @@ function updateUILanguage(lang: string) {
   const exportBtn = document.getElementById('exportBtn');
   if (exportBtn) exportBtn.textContent = t.exportData;
   
-  const infoTexts = document.querySelectorAll('.info');
-  if (infoTexts[0]) {
-    const link = infoTexts[0].querySelector('a');
-    infoTexts[0].innerHTML = `${t.getKeyInfo} <a href="https://aistudio.google.com/api-keys" target="_blank" rel="noopener noreferrer">Google AI Studio</a>`;
-  }
-  if (infoTexts[1]) {
-    infoTexts[1].textContent = t.howToUse;
-  }
+
   
-  const footer = document.querySelector('.footer-text');
-  if (footer) {
-    const link = footer.querySelector('a');
-    footer.innerHTML = `<span>${t.madeBy}</span> <a href="https://teycirbensoltane.tn/" target="_blank" rel="noopener noreferrer">Teycir</a>`;
-  }
+
 }
 
+document.getElementById('providerSelect')?.addEventListener('change', (e) => {
+  const isOpenRouter = (e.target as HTMLSelectElement).value === 'openrouter';
+  const geminiGroup = document.getElementById('geminiKeyGroup');
+  const openrouterGroup = document.getElementById('openrouterKeyGroup');
+  const geminiHelp = document.getElementById('geminiKeyHelp');
+  const openrouterHelp = document.getElementById('openrouterKeyHelp');
+  if (geminiGroup) geminiGroup.style.display = isOpenRouter ? 'none' : 'block';
+  if (openrouterGroup) openrouterGroup.style.display = isOpenRouter ? 'block' : 'none';
+  if (geminiHelp) geminiHelp.style.display = isOpenRouter ? 'none' : 'block';
+  if (openrouterHelp) openrouterHelp.style.display = isOpenRouter ? 'block' : 'none';
+});
+
 document.addEventListener('DOMContentLoaded', async () => {
-  const data = await chrome.storage.local.get(['geminiApiKey', 'selectedLanguage', 'darkMode']);
-  const geminiInput = document.getElementById('geminiApiKey') as HTMLInputElement;
-  const langSelect = document.getElementById('languageSelect') as HTMLSelectElement;
-  const darkModeCheckbox = document.getElementById('darkMode') as HTMLInputElement;
+  const data = await chrome.storage.local.get(['aiProvider', 'geminiApiKey', 'openrouterApiKey', 'selectedLanguage', 'darkMode']);
+  const { providerSelect, geminiApiKey: geminiInput, openrouterApiKey: openrouterInput, languageSelect: langSelect, darkMode: darkModeCheckbox } = getElements();
+  
+  if (providerSelect) {
+    providerSelect.value = data.aiProvider || 'google';
+    const isOpenRouter = (data.aiProvider || 'google') === 'openrouter';
+    const geminiGroup = document.getElementById('geminiKeyGroup');
+    const openrouterGroup = document.getElementById('openrouterKeyGroup');
+    const geminiHelp = document.getElementById('geminiKeyHelp');
+    const openrouterHelp = document.getElementById('openrouterKeyHelp');
+    if (geminiGroup) geminiGroup.style.display = isOpenRouter ? 'none' : 'block';
+    if (openrouterGroup) openrouterGroup.style.display = isOpenRouter ? 'block' : 'none';
+    if (geminiHelp) geminiHelp.style.display = isOpenRouter ? 'none' : 'block';
+    if (openrouterHelp) openrouterHelp.style.display = isOpenRouter ? 'block' : 'none';
+  }
   
   if (geminiInput && data.geminiApiKey) {
     geminiInput.value = data.geminiApiKey;
     geminiInput.classList.add('valid');
+  }
+  
+  if (openrouterInput && data.openrouterApiKey) {
+    openrouterInput.value = data.openrouterApiKey;
+    openrouterInput.classList.add('valid');
   }
   
   if (langSelect && data.selectedLanguage) {
@@ -142,11 +374,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     darkModeCheckbox.checked = data.darkMode || false;
     if (data.darkMode) document.body.classList.add('dark');
   }
+  
+  const { primaryModel, openrouterPrimaryModel } = await chrome.storage.local.get(['primaryModel', 'openrouterPrimaryModel']);
+  
+  if (primaryModel) {
+    const modelName = primaryModel.split('/').pop();
+    const tooltip = document.getElementById('geminiModelTooltip');
+    if (tooltip) tooltip.textContent = `🤖 ${modelName}`;
+  }
+  
+  if (openrouterPrimaryModel && !openrouterPrimaryModel.includes('scout')) {
+    const modelName = openrouterPrimaryModel.split('/').pop();
+    const tooltip = document.getElementById('openrouterModelTooltip');
+    if (tooltip) tooltip.textContent = `🤖 ${modelName}`;
+  }
 
   document.getElementById('settingsTab')?.addEventListener('click', () => switchTab('settings'));
   document.getElementById('statsTab')?.addEventListener('click', () => switchTab('stats'));
   
-  langSelect?.addEventListener('change', (e) => {
+  langSelect?.addEventListener('change', (e: Event) => {
     const lang = (e.target as HTMLSelectElement).value;
     updateUILanguage(lang);
   });
@@ -212,48 +458,114 @@ document.getElementById('geminiApiKey')?.addEventListener('input', (e) => {
   }
 });
 
+document.getElementById('openrouterApiKey')?.addEventListener('input', (e) => {
+  const key = (e.target as HTMLInputElement).value.trim();
+  const input = e.target as HTMLInputElement;
+  if (key.length >= 20) {
+    input.classList.add('valid');
+  } else {
+    input.classList.remove('valid');
+  }
+});
+
 document.getElementById('saveKey')?.addEventListener('click', async () => {
-  const geminiInput = document.getElementById('geminiApiKey') as HTMLInputElement;
-  const langSelect = document.getElementById('languageSelect') as HTMLSelectElement;
-  const statusMsg = document.getElementById('statusMsg') as HTMLDivElement;
+  const { providerSelect, geminiApiKey: geminiInput, openrouterApiKey: openrouterInput, languageSelect: langSelect, statusMsg } = getElements();
   const saveBtn = document.getElementById('saveKey') as HTMLButtonElement;
   
-  const key = geminiInput.value.trim();
+  if (!statusMsg) return;
+  
+  const provider = providerSelect.value;
+  const geminiKey = geminiInput.value.trim();
+  const openrouterKey = openrouterInput.value.trim();
   const lang = langSelect.value;
   
-  if (!key || key.length < 39 || !/^AIza[0-9A-Za-z_-]{35}$/.test(key)) {
-    statusMsg.textContent = '⚠️ Please enter a valid API key';
-    statusMsg.className = 'status-msg error';
-    setTimeout(() => { statusMsg.textContent = ''; statusMsg.className = 'status-msg'; }, 3000);
-    return;
+  if (provider === 'google') {
+    if (!geminiKey || geminiKey.length < 39 || !/^AIza[0-9A-Za-z_-]{35}$/.test(geminiKey)) {
+      statusMsg.textContent = '⚠️ Please enter a valid Google AI API key';
+      statusMsg.className = 'status-msg error';
+      geminiInput.style.borderColor = '#c5221f';
+      setTimeout(() => { statusMsg.textContent = ''; statusMsg.className = 'status-msg'; }, 3000);
+      return;
+    }
+  } else {
+    if (!openrouterKey || openrouterKey.length < 20) {
+      statusMsg.textContent = '⚠️ Please enter a valid OpenRouter API key';
+      statusMsg.className = 'status-msg error';
+      openrouterInput.style.borderColor = '#c5221f';
+      setTimeout(() => { statusMsg.textContent = ''; statusMsg.className = 'status-msg'; }, 3000);
+      return;
+    }
   }
 
   try {
-    saveBtn.disabled = true;
+    if (saveBtn) saveBtn.disabled = true;
     statusMsg.textContent = 'Saving...';
     statusMsg.className = 'status-msg';
     
-    await chrome.storage.local.set({ 
-      geminiApiKey: key,
+    await chrome.storage.local.remove(['primaryModel', 'fallbackModels', 'openrouterPrimaryModel', 'openrouterFallbackModels']);
+    
+    let primary, fallbacks;
+    if (provider === 'google') {
+      await loadModels(geminiKey);
+      const { primaryModel, fallbackModels } = await chrome.storage.local.get(['primaryModel', 'fallbackModels']);
+      primary = primaryModel;
+      fallbacks = fallbackModels;
+    } else {
+      await loadOpenRouterModels(openrouterKey);
+      const { openrouterPrimaryModel, openrouterFallbackModels } = await chrome.storage.local.get(['openrouterPrimaryModel', 'openrouterFallbackModels']);
+      primary = openrouterPrimaryModel;
+      fallbacks = openrouterFallbackModels;
+    }
+    
+    const storageData: any = { 
+      aiProvider: provider,
+      geminiApiKey: geminiKey,
+      openrouterApiKey: openrouterKey,
       selectedLanguage: lang
-    });
+    };
+    
+    if (provider === 'google') {
+      storageData.primaryModel = primary;
+      storageData.fallbackModels = fallbacks;
+    } else {
+      storageData.openrouterPrimaryModel = primary;
+      storageData.openrouterFallbackModels = fallbacks;
+    }
+    
+    await chrome.storage.local.set(storageData);
+    
+    if (provider === 'google' && primary) {
+      const modelName = primary.split('/').pop();
+      const tooltip = document.getElementById('geminiModelTooltip');
+      if (tooltip) tooltip.textContent = `🤖 ${modelName}`;
+    } else if (provider === 'openrouter' && primary) {
+      const modelName = primary.split('/').pop();
+      const tooltip = document.getElementById('openrouterModelTooltip');
+      if (tooltip) tooltip.textContent = `🤖 ${modelName}`;
+    }
     
     updateUILanguage(lang);
     
     const t = translations[lang as keyof typeof translations] || translations.English;
     statusMsg.textContent = `✓ ${t.saved}`;
     statusMsg.className = 'status-msg success';
-    geminiInput.classList.add('valid');
+    if (provider === 'google') {
+      geminiInput.classList.add('valid');
+      geminiInput.style.borderColor = '';
+    } else {
+      openrouterInput.classList.add('valid');
+      openrouterInput.style.borderColor = '';
+    }
     
     setTimeout(() => {
       statusMsg.textContent = '';
       statusMsg.className = 'status-msg';
     }, 2000);
   } catch (error) {
-    statusMsg.textContent = '⚠️ Failed to save';
+    statusMsg.textContent = '⚠️ Failed to save settings';
     statusMsg.className = 'status-msg error';
   } finally {
-    saveBtn.disabled = false;
+    if (saveBtn) saveBtn.disabled = false;
   }
 });
 

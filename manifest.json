@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "description": "Transform any text into shareable memes using AI",
   "permissions": ["contextMenus", "activeTab", "storage"],
-  "host_permissions": ["https://generativelanguage.googleapis.com/*"],
+  "host_permissions": ["https://generativelanguage.googleapis.com/*", "https://openrouter.ai/*"],
   "background": {
     "service_worker": "background.js"
   },
@@ -32,6 +32,12 @@
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'; style-src 'self' 'unsafe-inline'"
   },
+  "web_accessible_resources": [
+    {
+      "resources": ["lib/model-selector.js"],
+      "matches": ["<all_urls>"]
+    }
+  ],
   "commands": {
     "generate-meme": {
       "suggested_key": {

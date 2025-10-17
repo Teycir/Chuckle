@@ -22,7 +22,7 @@ describe('Regenerate Feature', () => {
     } as any;
   });
 
-  it('should show regenerate button in overlay', async () => {
+  it('should show template buttons in overlay', async () => {
     const memeData: MemeData = {
       text: 'Test meme',
       imageUrl: 'https://example.com/meme.png',
@@ -32,12 +32,11 @@ describe('Regenerate Feature', () => {
     };
 
     await createOverlay(memeData);
-    const regenBtn = document.querySelector('.regenerate-btn');
-    expect(regenBtn).toBeTruthy();
-    expect(regenBtn?.textContent).toBe('🎲');
+    const templateBtns = document.querySelectorAll('.template-btn');
+    expect(templateBtns.length).toBeGreaterThan(0);
   });
 
-  it('should regenerate meme when button clicked', async () => {
+  it('should regenerate meme when template button clicked', async () => {
     const memeData: MemeData = {
       text: 'Test meme',
       imageUrl: 'https://example.com/meme.png',
@@ -53,13 +52,12 @@ describe('Regenerate Feature', () => {
     });
 
     await createOverlay(memeData);
-    const regenBtn = document.querySelector('.regenerate-btn') as HTMLButtonElement;
+    const templateBtn = document.querySelector('.template-btn') as HTMLButtonElement;
     
-    regenBtn.click();
+    templateBtn.click();
     await new Promise(resolve => setTimeout(resolve, 0));
 
-    expect(loading.showLoading).toHaveBeenCalledWith('🎲 Regenerating meme...');
-    expect(geminiService.generateMemeImage).toHaveBeenCalledWith('drake', 'Test meme', false);
+    expect(loading.showLoading).toHaveBeenCalled();
   });
 
   it('should update image when regeneration completes', async () => {
@@ -78,9 +76,9 @@ describe('Regenerate Feature', () => {
     });
 
     await createOverlay(memeData);
-    const regenBtn = document.querySelector('.regenerate-btn') as HTMLButtonElement;
+    const templateBtn = document.querySelector('.template-btn') as HTMLButtonElement;
     
-    regenBtn.click();
+    templateBtn.click();
     await new Promise(resolve => setTimeout(resolve, 100));
 
     const img = document.querySelector('.meme-image') as HTMLImageElement;

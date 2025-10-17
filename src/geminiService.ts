@@ -33,39 +33,73 @@ export async function analyzeMemeContext(text: string, variant: number = 0): Pro
     }
   }
 
-  console.log('[Chuckle] Calling Gemini API for text:', text.slice(0, 50), isRegenerate ? '(regenerate)' : '');
+  console.log('[Chuckle] Calling AI API for text:', text.slice(0, 50), isRegenerate ? '(regenerate)' : '');
 
-  const { geminiApiKey } = await chrome.storage.local.get(['geminiApiKey']);
-  if (!geminiApiKey) throw new Error(await getErrorMessage('noApiKey'));
-  if (!validateApiKey(geminiApiKey)) throw new Error(await getErrorMessage('invalidApiKey'));
+  const { aiProvider, geminiApiKey, openrouterApiKey, primaryModel, openrouterPrimaryModel } = await chrome.storage.local.get(['aiProvider', 'geminiApiKey', 'openrouterApiKey', 'primaryModel', 'openrouterPrimaryModel']);
+  const provider = aiProvider || 'google';
+  
+  if (provider === 'google') {
+    if (!geminiApiKey) throw new Error(await getErrorMessage('noApiKey'));
+    if (!validateApiKey(geminiApiKey)) throw new Error(await getErrorMessage('invalidApiKey'));
+  } else {
+    if (!openrouterApiKey) throw new Error(await getErrorMessage('noApiKey'));
+  }
 
   try {
-      const response = await fetchWithTimeout(
-        `${CONFIG.GEMINI_API_URL}?key=${geminiApiKey}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{
-              parts: [{
-                text: isRegenerate
+      let response: Response;
+      
+      if (provider === 'google') {
+        response = await fetchWithTimeout(
+          `${CONFIG.GEMINI_API_URL}?key=${geminiApiKey}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{
+                parts: [{
+                  text: isRegenerate
+                    ? `${GEMINI_PROMPT_TEMPLATE(text)}\n\nIMPORTANT: Provide a DIFFERENT template than you might have suggested before for this text. Choose an alternative that fits the context.`
+                    : GEMINI_PROMPT_TEMPLATE(text)
+                }]
+              }],
+              generationConfig: isRegenerate ? {
+                temperature: 1.3,
+                topP: 0.98,
+                topK: 64
+              } : {
+                temperature: 1.0,
+                topP: 0.95,
+                topK: 40
+              }
+            })
+          },
+          10000
+        );
+      } else {
+        const model = openrouterPrimaryModel || 'meta-llama/llama-3.2-3b-instruct:free';
+        response = await fetchWithTimeout(
+          'https://openrouter.ai/api/v1/chat/completions',
+          {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${openrouterApiKey}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              model,
+              messages: [{
+                role: 'user',
+                content: isRegenerate
                   ? `${GEMINI_PROMPT_TEMPLATE(text)}\n\nIMPORTANT: Provide a DIFFERENT template than you might have suggested before for this text. Choose an alternative that fits the context.`
                   : GEMINI_PROMPT_TEMPLATE(text)
-              }]
-            }],
-            generationConfig: isRegenerate ? {
-              temperature: 1.3,
-              topP: 0.98,
-              topK: 64
-            } : {
-              temperature: 1.0,
-              topP: 0.95,
-              topK: 40
-            }
-          })
-        },
-        10000
-      );
+              }],
+              temperature: isRegenerate ? 1.3 : 1.0,
+              top_p: isRegenerate ? 0.98 : 0.95
+            })
+          },
+          10000
+        );
+      }
 
       if (!response.ok) {
         console.error('[Chuckle] Gemini API error:', response.status);
@@ -75,14 +109,23 @@ export async function analyzeMemeContext(text: string, variant: number = 0): Pro
         throw new Error(`API error: ${response.status}`);
       }
 
-      const data: GeminiResponse = await response.json();
-      console.log('[Chuckle] Gemini API response received');
-      if (data.error) throw new Error(data.error.message);
-      if (!data.candidates?.[0]?.content?.parts?.[0]?.text) {
-        throw new Error(`Invalid API response for text: "${text.slice(0, 50)}..."`);
+      const data: any = await response.json();
+      console.log('[Chuckle] AI API response received');
+      
+      let result: string;
+      if (provider === 'google') {
+        if (data.error) throw new Error(data.error.message);
+        if (!data.candidates?.[0]?.content?.parts?.[0]?.text) {
+          throw new Error(`Invalid API response for text: "${text.slice(0, 50)}..."`);
+        }
+        result = data.candidates[0].content.parts[0].text.trim().replace(/\s+/g, ' ');
+      } else {
+        if (data.error) throw new Error(data.error.message);
+        if (!data.choices?.[0]?.message?.content) {
+          throw new Error(`Invalid API response for text: "${text.slice(0, 50)}..."`);
+        }
+        result = data.choices[0].message.content.trim().replace(/\s+/g, ' ');
       }
-
-      const result = data.candidates[0].content.parts[0].text.trim().replace(/\s+/g, ' ');
       console.log('[Chuckle] Template from API:', result);
       if (!isRegenerate) {
         geminiCache.set(cacheKey, result);
@@ -96,8 +139,10 @@ export async function analyzeMemeContext(text: string, variant: number = 0): Pro
 }
 
 async function summarizeText(text: string): Promise<string> {
-  const { geminiApiKey } = await chrome.storage.local.get(['geminiApiKey']);
-  if (!geminiApiKey) {
+  const { aiProvider, geminiApiKey, openrouterApiKey } = await chrome.storage.local.get(['aiProvider', 'geminiApiKey', 'openrouterApiKey']);
+  const provider = aiProvider || 'google';
+  
+  if ((provider === 'google' && !geminiApiKey) || (provider === 'openrouter' && !openrouterApiKey)) {
     const words = text.split(/\s+/);
     return words.slice(0, 30).join(' ');
   }

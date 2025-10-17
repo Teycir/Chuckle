@@ -63,8 +63,8 @@ describe('Overlay - Deep Tests', () => {
       const memeData = createMemeData({ text: 'funny meme text' });
       await createOverlay(memeData);
 
-      const text = document.querySelector('.meme-text');
-      expect(text?.textContent).toBe('funny meme text');
+      const text = document.querySelector('.text-editor-input') as HTMLDivElement;
+      expect(text?.innerText).toBe('funny meme text');
     });
 
     test('should create close button', async () => {
@@ -107,8 +107,8 @@ describe('Overlay - Deep Tests', () => {
       const memeData = createMemeData({ text: longText });
       await createOverlay(memeData);
 
-      const text = document.querySelector('.meme-text');
-      expect(text?.textContent).toBe(longText);
+      const text = document.querySelector('.text-editor-input') as HTMLDivElement;
+      expect(text?.innerText).toBe(longText);
     });
 
     test('should handle special characters in text', async () => {
@@ -116,8 +116,8 @@ describe('Overlay - Deep Tests', () => {
       const memeData = createMemeData({ text: specialText });
       await createOverlay(memeData);
 
-      const text = document.querySelector('.meme-text');
-      expect(text?.textContent).toBe(specialText);
+      const text = document.querySelector('.text-editor-input') as HTMLDivElement;
+      expect(text?.innerText).toBe(specialText);
     });
 
     test('should handle unicode in text', async () => {
@@ -125,16 +125,16 @@ describe('Overlay - Deep Tests', () => {
       const memeData = createMemeData({ text: unicodeText });
       await createOverlay(memeData);
 
-      const text = document.querySelector('.meme-text');
-      expect(text?.textContent).toBe(unicodeText);
+      const text = document.querySelector('.text-editor-input') as HTMLDivElement;
+      expect(text?.innerText).toBe(unicodeText);
     });
 
     test('should handle empty text', async () => {
       const memeData = createMemeData({ text: '' });
       await createOverlay(memeData);
 
-      const text = document.querySelector('.meme-text');
-      expect(text?.textContent).toBe('');
+      const text = document.querySelector('.text-editor-input') as HTMLDivElement;
+      expect(text?.innerText).toBe('');
     });
 
     test('should handle invalid image URL gracefully', async () => {
