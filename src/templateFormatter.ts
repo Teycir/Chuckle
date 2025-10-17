@@ -23,7 +23,7 @@ const TEMPLATE_PROMPTS: Record<string, string> = {
   doge: 'Doge: Broken English, enthusiastic. TOP="much/wow", BOTTOM="such/very". Example: "much Reddit success / very 40 users wow"',
   iw: 'Insanity Wolf: Extreme overreaction. Example: "Got 40 users / QUIT JOB, GO FULL TIME"',
   philosoraptor: 'Philosoraptor: Mind-bending question. Example: "If Reddit gave me users / Did I find Reddit or did it find me?"',
-  grumpycat: 'Grumpy Cat: Grumpy rejection. Example: "Celebrate 40 users? / No."'
+  grumpycat: 'Grumpy Cat: TOP = suggestion/request, BOTTOM = grumpy rejection. Make it mildly grumpy and sarcastic about rejection or refusal. Use dry, sarcastic language and be negative but not hateful. Format: "request / grumpy rejection" (max 35 chars each)'
 };
 
 
