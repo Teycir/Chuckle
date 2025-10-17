@@ -38,8 +38,9 @@ export async function formatTextForTemplate(text: string, template: string): Pro
   const templatePrompt = TEMPLATE_PROMPTS[template] || 'Format as two parts: "part 1 / part 2" (max 35 chars each)';
   console.log(`[Chuckle] Formatting text for ${template}`);
   
-  const { aiProvider, geminiApiKey, openrouterApiKey, openrouterPrimaryModel } = await chrome.storage.local.get(['aiProvider', 'geminiApiKey', 'openrouterApiKey', 'openrouterPrimaryModel']);
+  const { aiProvider, geminiApiKey, openrouterApiKey, openrouterPrimaryModel, selectedLanguage } = await chrome.storage.local.get(['aiProvider', 'geminiApiKey', 'openrouterApiKey', 'openrouterPrimaryModel', 'selectedLanguage']);
   const provider = aiProvider || 'google';
+  const language = selectedLanguage || 'English';
   
   if (provider === 'google' && !geminiApiKey) throw new Error('No API key');
   if (provider === 'openrouter' && !openrouterApiKey) throw new Error('No API key');
@@ -54,8 +55,9 @@ RULES:
 3. MUST include " / " separator
 4. NO explanations, NO extra text
 5. Match the template style
+6. IMPORTANT: Write the meme text in ${language}
 
-Your response (ONLY the formatted text):`;
+Your response (ONLY the formatted text in ${language}):`;
 
   try {
     let response: Response;
