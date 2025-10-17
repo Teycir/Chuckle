@@ -27,6 +27,7 @@ export interface MemeData {
   template: string;
   timestamp: number;
   language: string;
+  originalInput?: string;
 }
 
 export interface StorageResult {

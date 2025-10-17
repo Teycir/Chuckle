@@ -72,7 +72,7 @@ let currentOverlay: HTMLElement | null = null;
 let currentMemeKey: string | null = null;
 let currentMemeData: MemeData | null = null;
 let originalText: string | null = null;
-let baseText: string | null = null;
+let originalInput: string | null = null;
 let originalImageUrl: string | null = null;
 let isRegenerating = false;
 let currentTemplate: string | null = null;
@@ -140,15 +140,15 @@ function createCloseButton(): HTMLDivElement {
 }
 
 async function regenerateMeme(specificTemplate?: string): Promise<void> {
-  if (!originalText || isRegenerating) return;
+  if (!originalInput || isRegenerating) return;
   isRegenerating = true;
   
   showLoading(getTranslation('regenerating'));
   
   try {
-    const textToUse = specificTemplate ? (baseText || originalText) : originalText;
-    console.log('[Chuckle] Regenerating with text:', textToUse, 'baseText:', baseText, 'specificTemplate:', specificTemplate);
-    const truncatedText = textToUse.slice(0, 100);
+    const textToUse = isManualEdit ? originalText : originalInput;
+    console.log('[Chuckle] Regenerating with text:', textToUse, 'originalInput:', originalInput, 'specificTemplate:', specificTemplate);
+    const truncatedText = textToUse?.slice(0, 100) || '';
     const template = specificTemplate || currentTemplate || await analyzeMemeContext(truncatedText, Date.now());
     currentTemplate = template;
     const skipFormatting = isManualEdit;
@@ -162,6 +162,9 @@ async function regenerateMeme(specificTemplate?: string): Promise<void> {
       currentMemeData.timestamp = Date.now();
       originalImageUrl = originalUrl;
       originalText = formattedText;
+      if (!isManualEdit) {
+        originalInput = currentMemeData.originalInput || originalInput;
+      }
       
       const img = currentOverlay.querySelector('.meme-image') as HTMLImageElement;
       if (img) img.src = watermarkedUrl;
@@ -304,7 +307,7 @@ export async function createOverlay(memeData: MemeData): Promise<void> {
   content.className = 'meme-content';
 
   originalText = memeData.text;
-  baseText = memeData.text;
+  originalInput = memeData.originalInput || memeData.text;
   originalImageUrl = memeData.originalUrl || memeData.imageUrl;
   currentTemplate = memeData.template;
 
@@ -364,7 +367,7 @@ export function closeOverlay(): void {
     currentMemeKey = null;
     currentMemeData = null;
     originalText = null;
-    baseText = null;
+    originalInput = null;
     originalImageUrl = null;
     currentTemplate = null;
     isManualEdit = false;

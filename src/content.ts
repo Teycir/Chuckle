@@ -97,7 +97,8 @@ export async function generateMeme(text: string): Promise<void> {
       originalUrl,
       template,
       timestamp: Date.now(),
-      language: 'English'
+      language: 'English',
+      originalInput: truncatedText
     };
     
     const displayData = {
