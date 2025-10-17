@@ -231,7 +231,7 @@ export async function generateMemeImage(template: string, text: string, skipForm
     } else {
       processedText = text;
     }
-    const formattedText = skipFormatting ? processedText : await formatTextForTemplate(processedText, formattedTemplate);
+    const formattedText = (skipFormatting && text.includes(' / ')) ? processedText : await formatTextForTemplate(processedText, formattedTemplate);
     const cleanText = formattedText.replace(/['']/g, "'").replace(/…/g, '...');
     
     const parts = cleanText.split(' / ').map(p => p.trim()).filter(p => p.length > 0);

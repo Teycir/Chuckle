@@ -196,7 +196,6 @@ async function regenerateMeme(specificTemplate?: string): Promise<void> {
     console.error('Regeneration failed:', error);
     let errorMessage: string;
     if (error instanceof Error) {
-      // Check if it's a rate limit error by looking for the specific message
       const rateLimitMessage = await getErrorMessage('tooManyRequests');
       if (error.message.includes(rateLimitMessage)) {
         errorMessage = rateLimitMessage;
@@ -206,7 +205,7 @@ async function regenerateMeme(specificTemplate?: string): Promise<void> {
     } else {
       errorMessage = await getErrorMessage('generationFailed');
     }
-    showToast(errorMessage);
+    showError(errorMessage);
   } finally {
     hideLoading();
     isRegenerating = false;
@@ -298,6 +297,15 @@ function showToast(message: string): void {
   toast.textContent = message;
   document.body.appendChild(toast);
   setTimeout(() => toast.remove(), 4000);
+}
+
+function showError(message: string): void {
+  const errorDiv = document.createElement('div');
+  errorDiv.className = 'meme-error';
+  errorDiv.textContent = message;
+  errorDiv.style.cssText = 'position:fixed;top:20px;right:20px;background:#c5221f;color:#fff;padding:15px 20px;border-radius:8px;z-index:10001;box-shadow:0 4px 12px rgba(0,0,0,0.3)';
+  document.body.appendChild(errorDiv);
+  setTimeout(() => errorDiv.remove(), 5000);
 }
 
 export async function createOverlay(memeData: MemeData): Promise<void> {
