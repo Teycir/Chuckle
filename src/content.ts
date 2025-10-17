@@ -29,34 +29,34 @@ chrome.runtime.onMessage.addListener((message) => {
 });
 
 const errorMessages = {
-  English: {
-    storageFull: 'Chrome storage full. Clear old memes in History.',
-    apiKey: 'API key invalid. Check settings.',
-    network: 'Network error. Check internet connection.',
-    rateLimit: 'API rate limit. Try again later.',
-    generic: 'Meme generation failed. Try again.'
-  },
-  Spanish: {
-    storageFull: 'Almacenamiento lleno. Borra memes antiguos.',
-    apiKey: 'Clave API inválida. Verifica configuración.',
-    network: 'Error de red. Verifica tu conexión.',
-    rateLimit: 'Límite de API. Intenta más tarde.',
-    generic: 'Error al generar meme. Intenta de nuevo.'
-  },
-  French: {
-    storageFull: 'Stockage plein. Supprimez anciens memes.',
-    apiKey: 'Clé API invalide. Vérifiez paramètres.',
-    network: 'Erreur réseau. Vérifiez connexion internet.',
-    rateLimit: 'Limite API. Réessayez plus tard.',
-    generic: 'Échec génération meme. Réessayez.'
-  },
-  German: {
-    storageFull: 'Speicher voll. Alte Memes löschen.',
-    apiKey: 'API-Schlüssel ungültig. Einstellungen prüfen.',
-    network: 'Netzwerkfehler. Internetverbindung prüfen.',
-    rateLimit: 'API-Limit. Später versuchen.',
-    generic: 'Meme-Erstellung fehlgeschlagen. Erneut versuchen.'
-  }
+English: {
+  storageFull: 'Chrome storage full. Clear old memes in History.',
+  apiKey: 'API key invalid. Check settings.',
+  network: 'Network error. Check internet connection.',
+  rateLimit: 'API exhausted. Please wait a moment and try again.',
+  generic: 'Meme generation failed. Try again.'
+},
+Spanish: {
+  storageFull: 'Almacenamiento lleno. Borra memes antiguos.',
+  apiKey: 'Clave API inválida. Verifica configuración.',
+  network: 'Error de red. Verifica tu conexión.',
+  rateLimit: 'API agotada. Por favor, espera un momento e inténtalo de nuevo.',
+  generic: 'Error al generar meme. Intenta de nuevo.'
+},
+French: {
+  storageFull: 'Stockage plein. Supprimez anciens memes.',
+  apiKey: 'Clé API invalide. Vérifiez paramètres.',
+  network: 'Erreur réseau. Vérifiez connexion internet.',
+  rateLimit: 'API épuisée. Veuillez attendre un moment et réessayer.',
+  generic: 'Échec génération meme. Réessayez.'
+},
+German: {
+  storageFull: 'Speicher voll. Alte Memes löschen.',
+  apiKey: 'API-Schlüssel ungültig. Einstellungen prüfen.',
+  network: 'Netzwerkfehler. Internetverbindung prüfen.',
+  rateLimit: 'API erschöpft. Bitte warten Sie einen Moment und versuchen Sie es erneut.',
+  generic: 'Meme-Erstellung fehlgeschlagen. Erneut versuchen.'
+}
 };
 
 async function getErrorMessage(error: unknown): Promise<string> {
@@ -75,7 +75,7 @@ async function getErrorMessage(error: unknown): Promise<string> {
   if (errorStr.includes('Network') || errorStr.includes('fetch') || errorStr.includes('timeout')) {
     return messages.network;
   }
-  if (errorStr.includes('429') || errorStr.includes('rate limit')) {
+  if (errorStr.includes('429') || errorStr.includes('rate limit') || errorStr.includes('API exhausted')) {
     return messages.rateLimit;
   }
   

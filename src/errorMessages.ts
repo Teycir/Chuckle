@@ -1,6 +1,6 @@
 export const ERROR_MESSAGES = {
   English: {
-    tooManyRequests: 'Too many requests. Please wait a moment and try again.',
+    tooManyRequests: 'API exhausted. Please wait a moment and try again.',
     generationFailed: 'Meme generation failed. Please try again.',
     noApiKey: 'API key not configured. Please add your API key in settings.',
     invalidApiKey: 'Invalid API key format.',
@@ -8,7 +8,7 @@ export const ERROR_MESSAGES = {
     templateUnavailable: 'Template unavailable. Please try another template.'
   },
   Spanish: {
-    tooManyRequests: 'Demasiadas solicitudes. Por favor, espera un momento e inténtalo de nuevo.',
+    tooManyRequests: 'API agotada. Por favor, espera un momento e inténtalo de nuevo.',
     generationFailed: 'Generación de meme fallida. Por favor, inténtalo de nuevo.',
     noApiKey: 'Clave API no configurada. Por favor, agrega tu clave API en la configuración.',
     invalidApiKey: 'Formato de clave API inválido.',
@@ -16,7 +16,7 @@ export const ERROR_MESSAGES = {
     templateUnavailable: 'Plantilla no disponible. Por favor, prueba otra plantilla.'
   },
   French: {
-    tooManyRequests: 'Trop de requêtes. Veuillez attendre un moment et réessayer.',
+    tooManyRequests: 'API épuisée. Veuillez attendre un moment et réessayer.',
     generationFailed: 'Échec de la génération du meme. Veuillez réessayer.',
     noApiKey: 'Clé API non configurée. Veuillez ajouter votre clé API dans les paramètres.',
     invalidApiKey: 'Format de clé API invalide.',
@@ -24,7 +24,7 @@ export const ERROR_MESSAGES = {
     templateUnavailable: 'Modèle non disponible. Veuillez essayer un autre modèle.'
   },
   German: {
-    tooManyRequests: 'Zu viele Anfragen. Bitte warten Sie einen Moment und versuchen Sie es erneut.',
+    tooManyRequests: 'API erschöpft. Bitte warten Sie einen Moment und versuchen Sie es erneut.',
     generationFailed: 'Meme-Generierung fehlgeschlagen. Bitte versuchen Sie es erneut.',
     noApiKey: 'API-Schlüssel nicht konfiguriert. Bitte fügen Sie Ihren API-Schlüssel in den Einstellungen hinzu.',
     invalidApiKey: 'Ungültiges API-Schlüsselformat.',

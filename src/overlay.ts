@@ -187,7 +187,18 @@ async function regenerateMeme(specificTemplate?: string): Promise<void> {
     }
   } catch (error) {
     console.error('Regeneration failed:', error);
-    const errorMessage = error instanceof Error ? error.message : await getErrorMessage('generationFailed');
+    let errorMessage: string;
+    if (error instanceof Error) {
+      // Check if it's a rate limit error by looking for the specific message
+      const rateLimitMessage = await getErrorMessage('tooManyRequests');
+      if (error.message.includes(rateLimitMessage)) {
+        errorMessage = rateLimitMessage;
+      } else {
+        errorMessage = error.message;
+      }
+    } else {
+      errorMessage = await getErrorMessage('generationFailed');
+    }
     showToast(errorMessage);
   } finally {
     hideLoading();

@@ -2,7 +2,8 @@ import type { GeminiResponse } from './types';
 import { CONFIG } from './config';
 import { geminiCache } from './cache';
 import { logger } from './logger';
-import { API_KEY_REGEX, GEMINI_PROMPT_TEMPLATE, ERROR_MESSAGES } from './constants';
+import { API_KEY_REGEX, GEMINI_PROMPT_TEMPLATE } from './constants';
+import { getErrorMessage } from './errorMessages';
 import { addWatermark } from './watermark';
 import { formatTextForTemplate } from './templateFormatter';
 
@@ -23,7 +24,7 @@ async function fetchWithTimeout(url: string, options: RequestInit, timeoutMs: nu
 export async function analyzeMemeContext(text: string, variant: number = 0): Promise<string> {
   const isRegenerate = variant > 0;
   const cacheKey = `gemini:${text}${isRegenerate ? `:v${variant}` : ''}`;
-  
+
   if (!isRegenerate) {
     const cached = geminiCache.get(cacheKey);
     if (cached) {
@@ -31,13 +32,13 @@ export async function analyzeMemeContext(text: string, variant: number = 0): Pro
       return cached;
     }
   }
-  
+
   console.log('[Chuckle] Calling Gemini API for text:', text.slice(0, 50), isRegenerate ? '(regenerate)' : '');
 
   const { geminiApiKey } = await chrome.storage.local.get(['geminiApiKey']);
-  if (!geminiApiKey) throw new Error(ERROR_MESSAGES.NO_API_KEY);
-  if (!validateApiKey(geminiApiKey)) throw new Error(ERROR_MESSAGES.INVALID_API_KEY);
-  
+  if (!geminiApiKey) throw new Error(await getErrorMessage('noApiKey'));
+  if (!validateApiKey(geminiApiKey)) throw new Error(await getErrorMessage('invalidApiKey'));
+
   try {
       const response = await fetchWithTimeout(
         `${CONFIG.GEMINI_API_URL}?key=${geminiApiKey}`,
@@ -47,7 +48,7 @@ export async function analyzeMemeContext(text: string, variant: number = 0): Pro
           body: JSON.stringify({
             contents: [{
               parts: [{
-                text: isRegenerate 
+                text: isRegenerate
                   ? `${GEMINI_PROMPT_TEMPLATE(text)}\n\nIMPORTANT: Provide a DIFFERENT template than you might have suggested before for this text. Choose an alternative that fits the context.`
                   : GEMINI_PROMPT_TEMPLATE(text)
               }]
@@ -65,19 +66,22 @@ export async function analyzeMemeContext(text: string, variant: number = 0): Pro
         },
         10000
       );
-      
+
       if (!response.ok) {
         console.error('[Chuckle] Gemini API error:', response.status);
-        throw new Error(ERROR_MESSAGES.API_ERROR(response.status));
+        if (response.status === 429) {
+          throw new Error(await getErrorMessage('tooManyRequests'));
+        }
+        throw new Error(`API error: ${response.status}`);
       }
-      
+
       const data: GeminiResponse = await response.json();
       console.log('[Chuckle] Gemini API response received');
       if (data.error) throw new Error(data.error.message);
       if (!data.candidates?.[0]?.content?.parts?.[0]?.text) {
-        throw new Error(`${ERROR_MESSAGES.INVALID_RESPONSE} for text: "${text.slice(0, 50)}..."`);
+        throw new Error(`Invalid API response for text: "${text.slice(0, 50)}..."`);
       }
-      
+
       const result = data.candidates[0].content.parts[0].text.trim().replace(/\s+/g, ' ');
       console.log('[Chuckle] Template from API:', result);
       if (!isRegenerate) {
@@ -87,7 +91,7 @@ export async function analyzeMemeContext(text: string, variant: number = 0): Pro
   } catch (error) {
     const lastError = error instanceof Error ? error : new Error(String(error));
     console.error('[Chuckle] API call failed:', lastError.message);
-    throw new Error(`Network error: ${lastError.message || 'Connection failed'}. Check your internet connection and API key.`);
+    throw lastError;
   }
 }
 
@@ -124,6 +128,11 @@ async function summarizeText(text: string): Promise<string> {
     
     if (!response.ok) {
       console.error('[Chuckle] Summarization failed:', response.status);
+      if (response.status === 429) {
+        console.warn('[Chuckle] Rate limit hit during summarization, using fallback');
+        const words = text.split(/\s+/);
+        return words.slice(0, 30).join(' ');
+      }
       const words = text.split(/\s+/);
       return words.slice(0, 30).join(' ');
     }
@@ -222,11 +231,19 @@ export async function generateMemeImage(template: string, text: string, skipForm
     console.log('[Chuckle] FULL meme URL:', url);
     console.log('[Chuckle] Formatted text for display:', cleanText);
     const response = await fetch(url, { method: 'HEAD' });
-    if (!response.ok) throw new Error(ERROR_MESSAGES.TEMPLATE_UNAVAILABLE);
+    if (!response.ok) {
+      if (response.status === 429) {
+        throw new Error(await getErrorMessage('tooManyRequests'));
+      }
+      throw new Error('Template unavailable');
+    }
     const watermarkedUrl = await addWatermark(url);
     return { watermarkedUrl, originalUrl: url, formattedText: cleanText };
   } catch (error) {
     logger.error('Meme image generation failed', error);
+    if (error instanceof Error && error.message.includes(await getErrorMessage('tooManyRequests'))) {
+      throw error; // Re-throw rate limit errors to be handled by overlay
+    }
     return { watermarkedUrl: CONFIG.FALLBACK_IMAGE_URL, originalUrl: CONFIG.FALLBACK_IMAGE_URL, formattedText: text };
   }
 }
