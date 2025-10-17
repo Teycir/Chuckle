@@ -17,7 +17,8 @@ const overlayTranslations = {
     downloaded: 'Downloaded!',
     downloadFailed: 'Download failed',
     textboxTooltip: 'You can change text and press Enter to update it on meme',
-    templateTooltip: 'Click to generate'
+    templateTooltip: 'Click to generate',
+    textboxPlaceholder: 'Change text then press Enter'
   },
   Spanish: {
     downloadPng: 'Descargar',
@@ -28,7 +29,8 @@ const overlayTranslations = {
     downloaded: '¡Descargado!',
     downloadFailed: 'Descarga fallida',
     textboxTooltip: 'Puedes cambiar el texto y presionar Enter para actualizarlo en el meme',
-    templateTooltip: 'Haz clic para generar'
+    templateTooltip: 'Haz clic para generar',
+    textboxPlaceholder: 'Cambia el texto y presiona Enter'
   },
   French: {
     downloadPng: 'Télécharger',
@@ -39,7 +41,8 @@ const overlayTranslations = {
     downloaded: 'Téléchargé!',
     downloadFailed: 'Échec du téléchargement',
     textboxTooltip: 'Vous pouvez modifier le texte et appuyer sur Entrée pour le mettre à jour sur le meme',
-    templateTooltip: 'Cliquez pour générer'
+    templateTooltip: 'Cliquez pour générer',
+    textboxPlaceholder: 'Modifiez le texte puis appuyez sur Entrée'
   },
   German: {
     downloadPng: 'Herunterladen',
@@ -50,7 +53,8 @@ const overlayTranslations = {
     downloaded: 'Heruntergeladen!',
     downloadFailed: 'Download fehlgeschlagen',
     textboxTooltip: 'Sie können den Text ändern und Enter drücken, um ihn im Meme zu aktualisieren',
-    templateTooltip: 'Klicken Sie zum Generieren'
+    templateTooltip: 'Klicken Sie zum Generieren',
+    textboxPlaceholder: 'Text ändern und Enter drücken'
   }
 };
 
@@ -228,9 +232,13 @@ function createTextEditor(): HTMLDivElement {
   const input = document.createElement('div');
   input.className = 'text-editor-input meme-text';
   input.contentEditable = 'true';
-  input.innerText = originalText || '';
-  input.setAttribute('data-placeholder', 'Change text then click enter');
-  input.style.cssText = 'padding: 8px 16px; border: 1px solid #dadce0; border-radius: 8px; font-size: 14px; max-width: 90vw; width: 100%; box-sizing: border-box; min-height: 40px; background: white; color: black;';
+  input.setAttribute('data-placeholder', getTranslation('textboxPlaceholder'));
+  input.style.cssText = 'padding: 8px 16px; border: 1px solid #dadce0; border-radius: 8px; font-size: 14px; max-width: 90vw; width: 100%; box-sizing: border-box; min-height: 40px; background: white; color: #9aa0a6;';
+  
+  setTimeout(() => {
+    input.innerText = originalText || '';
+    input.style.color = 'black';
+  }, 3000);
   
   input.onblur = async () => {
     const newText = input.textContent?.trim() || '';

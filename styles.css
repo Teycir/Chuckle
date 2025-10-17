@@ -351,8 +351,6 @@ body.dark .share-menu {
   pointer-events: none;
 }
 
-
-
 .meme-overlay.dark .text-editor-input {
   background: #2a2a3e;
   color: white;
@@ -360,6 +358,10 @@ body.dark .share-menu {
 }
 
 .meme-overlay.dark .text-editor-input:empty:before {
+  color: #5f6368;
+}
+
+.meme-overlay.dark .text-editor-input {
   color: #5f6368;
 }
 
