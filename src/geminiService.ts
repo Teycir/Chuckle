@@ -33,10 +33,11 @@ export async function analyzeMemeContext(text: string, variant: number = 0): Pro
     }
   }
 
-  console.log('[Chuckle] Calling AI API for text:', text.slice(0, 50), isRegenerate ? '(regenerate)' : '');
-
   const { aiProvider, geminiApiKey, openrouterApiKey, primaryModel, openrouterPrimaryModel } = await chrome.storage.local.get(['aiProvider', 'geminiApiKey', 'openrouterApiKey', 'primaryModel', 'openrouterPrimaryModel']);
   const provider = aiProvider || 'google';
+  const model = provider === 'google' ? (primaryModel || 'gemini-2.0-flash-exp') : (openrouterPrimaryModel || 'meta-llama/llama-3.2-3b-instruct:free');
+  
+  console.log('[Chuckle] Calling AI API for text:', text.slice(0, 50), isRegenerate ? '(regenerate)' : '', `| Provider: ${provider} | Model: ${model}`);
   
   if (provider === 'google') {
     if (!geminiApiKey) throw new Error(await getErrorMessage('noApiKey'));
@@ -76,7 +77,6 @@ export async function analyzeMemeContext(text: string, variant: number = 0): Pro
           10000
         );
       } else {
-        const model = openrouterPrimaryModel || 'meta-llama/llama-3.2-3b-instruct:free';
         response = await fetchWithTimeout(
           'https://openrouter.ai/api/v1/chat/completions',
           {
