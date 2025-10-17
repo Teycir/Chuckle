@@ -11,12 +11,11 @@ const TEMPLATE_PROMPTS: Record<string, string> = {
   cmm: 'Change My Mind: Controversial/bold statement. Example: "Reddit > paid marketing"',
   pigeon: 'Pigeon (Is this...?): TOP=thing seen, BOTTOM="Is this [wrong label]?". About misidentification. Example: "40 users / Is this going viral?"',
   'woman-cat': 'Woman Yelling at Cat: TOP=angry accusation, BOTTOM=calm dismissal. Example: "You need more users! / I got 40, I\'m good"',
-  fine: 'This is Fine (dog in fire): Denial during disaster. Example: "0 users for 3 weeks / This is fine"',
-  stonks: 'Stonks: Failing upward, unexpected win from mistake. Example: "One lazy Reddit post / 40 users"',
+  fine: 'This is Fine (dog in fire): TOP=situation, BOTTOM=denial statement. Example: "0 users for 3 weeks / This is fine"',
+  stonks: 'Stonks: TOP=failure/mistake, BOTTOM=unexpected success. Example: "One lazy Reddit post / 40 users"',
 
-  success: 'Success Kid (fist pump): CELEBRATING small wins, feeling accomplished. Example: "Only got 40 users / Feels like a million"',
-  blb: 'Bad Luck Brian: Worst possible outcome. Example: "Posted on Reddit / Got roasted instead"',
-
+  success: 'Success Kid (fist pump): TOP=setup/challenge, BOTTOM=unexpected win. Example: "Only got 40 users / Feels like a million"',
+  blb: 'Bad Luck Brian: TOP=action taken, BOTTOM=unfortunate outcome. Make it about catastrophic failure or the worst possible outcome. Example: "Posted on Reddit / Got roasted instead"',
   fry: 'Futurama Fry (squinting): Suspicion/paranoia. TOP="Not sure if", BOTTOM="or". Example: "Not sure if good post / Or just got lucky"',
   fwp: 'First World Problems: Privileged complaint. Example: "Got 40 users / But wanted 100"',
   doge: 'Doge: Broken English, enthusiastic. TOP="much/wow", BOTTOM="such/very". Example: "much Reddit success / very 40 users wow"',
