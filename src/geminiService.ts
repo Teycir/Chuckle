@@ -150,12 +150,20 @@ async function summarizeText(text: string): Promise<string> {
 
 // Normalize text for URL compatibility across French, Spanish, German, Italian
 // Handles: é→e, ñ→n, ü→u, à→a, ö→o, ç→c, €→removed, etc.
+// Also URL-encodes special characters like ?, &, etc.
+// For Grumpy Cat, we need to be more careful with question marks and other special chars
 function normalizeText(text: string): string {
-  return text
+  // First clean the text of unicode characters
+  let cleaned = text
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-zA-Z0-9\s$€£¥!?.,;:'-]/g, '')
-    .replace(/\s+/g, '_');
+    .replace(/[^a-zA-Z0-9\s$€£¥!?.,;:'-]/g, '');
+
+  // Convert spaces to underscores for URL compatibility
+  cleaned = cleaned.replace(/\s+/g, '_');
+
+  // URL encode to handle special characters like ?, &, etc.
+  return encodeURIComponent(cleaned);
 }
 
 export async function generateMemeImage(template: string, text: string, skipFormatting: boolean = false): Promise<{ watermarkedUrl: string; originalUrl: string; formattedText: string }> {
@@ -199,12 +207,18 @@ export async function generateMemeImage(template: string, text: string, skipForm
       bottomText = 'yes';
     }
     
+    console.log('[Chuckle] Formatted template:', formattedTemplate);
     console.log('[Chuckle] FINAL Top text:', topText);
     console.log('[Chuckle] FINAL Bottom text:', bottomText);
-    console.log('[Chuckle] Template:', formattedTemplate);
-    const url = formattedTemplate === 'cmm'
-      ? `${CONFIG.MEMEGEN_API_URL}/${formattedTemplate}/${bottomText}.png`
-      : `${CONFIG.MEMEGEN_API_URL}/${formattedTemplate}/${topText}/${bottomText}.png`;
+    let url: string;
+    if (formattedTemplate === 'cmm') {
+      url = `${CONFIG.MEMEGEN_API_URL}/${formattedTemplate}/${bottomText}.png`;
+    } else if (formattedTemplate === 'grumpycat') {
+      // Grumpy Cat uses a different format: /grumpycat/top_text/bottom_text.png
+      url = `${CONFIG.MEMEGEN_API_URL}/${formattedTemplate}/${topText}/${bottomText}.png`;
+    } else {
+      url = `${CONFIG.MEMEGEN_API_URL}/${formattedTemplate}/${topText}/${bottomText}.png`;
+    }
     console.log('[Chuckle] FULL meme URL:', url);
     console.log('[Chuckle] Formatted text for display:', cleanText);
     const response = await fetch(url, { method: 'HEAD' });

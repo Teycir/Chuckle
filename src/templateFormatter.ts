@@ -3,9 +3,9 @@ import type { GeminiResponse } from './types';
 import { getErrorMessage } from './errorMessages';
 
 const TEMPLATE_PROMPTS: Record<string, string> = {
-  drake: 'Drake meme: TOP = bad/rejected option, BOTTOM = good/approved option. Make it savage and brutally honest about preferences. Format: "bad thing / good thing" (max 35 chars each)',
-  db: 'Distracted BF: TOP = current focus, BOTTOM = tempting distraction. Make it about betrayal, temptation, or questionable priorities. Format: "current thing / tempting thing" (max 35 chars each)',
-  ds: 'Two Buttons: TOP = first option, BOTTOM = second option (both equally difficult). Make it about impossible choices or moral dilemmas. Format: "option 1 / option 2" (max 35 chars each)',
+  drake: 'Drake meme: TOP = bad/rejected option, BOTTOM = good/approved option. Make it SAVAGELY OFFENSIVE and brutally honest about preferences. Use harsh language and be extremely blunt. Format: "bad thing / good thing" (max 35 chars each)',
+  db: 'Distracted BF: TOP = tempting distraction, BOTTOM = current focus. Make it EXTREMELY OFFENSIVE about betrayal, temptation, or questionable priorities. Use vulgar language and be merciless. Format: "tempting thing / current thing" (max 35 chars each)',
+  ds: 'Two Buttons: TOP = first option, BOTTOM = second option (both equally difficult). Make it CHEESY and overly dramatic about impossible choices or moral dilemmas. Use corny expressions and exaggerated emotions. Format: "option 1 / option 2" (max 35 chars each)',
   cmm: 'Change My Mind: TOP = setup, BOTTOM = controversial statement. Make it provocative, edgy, and designed to trigger debate. Format: "setup / bold claim" (max 35 chars each)',
   pigeon: 'Pigeon: TOP = thing being looked at, BOTTOM = "Is this [misidentification]?". Make it about hilariously wrong assumptions or stupidity. Format: "thing / Is this X?" (max 35 chars each)',
   'woman-cat': 'Woman Yelling at Cat: TOP = angry accusation, BOTTOM = dismissive response. Make it about conflict, drama, or not giving a damn. Format: "accusation / dismissal" (max 35 chars each)',
@@ -21,7 +21,7 @@ const TEMPLATE_PROMPTS: Record<string, string> = {
   doge: 'Doge: TOP = "much" statement, BOTTOM = "such/very" statement. Make it silly, broken English, and overly enthusiastic. Format: "much X / such Y" (max 35 chars each)',
   iw: 'Insanity Wolf: TOP = extreme situation, BOTTOM = insane action. Make it about psychotic overreactions or unhinged responses. Format: "situation / extreme action" (max 35 chars each)',
   philosoraptor: 'Philosoraptor: TOP = philosophical question part 1, BOTTOM = question part 2. Make it a mind-bending or absurd philosophical paradox. Format: "question start / question end" (max 35 chars each)',
-  grumpycat: 'Grumpy Cat: TOP = suggestion/request, BOTTOM = grumpy "No" response. Make it about bitter rejection or misanthropic refusal. Format: "request / No" (max 35 chars each)'
+  grumpycat: 'Grumpy Cat: TOP = suggestion/request, BOTTOM = grumpy rejection. Make it MISANTHROPIC and extremely grumpy about bitter rejection or refusal. Use bitter, sarcastic language and be relentlessly negative. Format: "request / grumpy rejection" (max 35 chars each)'
 };
 
 function decodeHtmlEntities(text: string): string {
@@ -58,7 +58,7 @@ export async function formatTextForTemplate(text: string, template: string): Pro
   const { geminiApiKey } = await chrome.storage.local.get(['geminiApiKey']);
   if (!geminiApiKey) return smartSplit(text);
   
-  const prompt = `${templatePrompt}\n\nAdapt this text to match the template format and personality. Keep the CORE TOPIC from the original text but adapt it to fit the template's style.\n\nSTRICT RULES:\n- MUST stay on the same topic/subject as the original text\n- Adapt the text to match the template's personality and format\n- MUST use " / " separator between top and bottom text\n- Each part MAX 35 characters\n- Make it funny while keeping the original topic\n- NO emojis, NO special characters, NO HTML entities\n- NO hashtags, NO asterisks\n\nText: "${text}"\n\nReturn ONLY the formatted text with " / " separator. Nothing else.`;
+  const prompt = `${templatePrompt}\n\nAdapt this text to match the template format and personality. IMPORTANT: Keep the EXACT SAME CORE TOPIC, DETAILS, and MEANING from the original text - do NOT change the subject matter.\n\nSTRICT RULES:\n- MUST stay on the EXACT SAME topic/subject/details as the original text\n- Adapt the text to match the template's personality and format\n- MUST use " / " separator between top and bottom text\n- Each part MAX 35 characters\n- Make it funny while keeping the original topic\n- NO emojis, NO special characters, NO HTML entities\n- NO hashtags, NO asterisks\n\nText: "${text}"\n\nReturn ONLY the formatted text with " / " separator. Nothing else.`;
 
   try {
     const response = await fetch(`${CONFIG.GEMINI_API_URL}?key=${geminiApiKey}`, {
