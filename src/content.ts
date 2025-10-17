@@ -80,7 +80,15 @@ async function getErrorMessage(error: unknown): Promise<string> {
   if (errorStr.includes('Network') || errorStr.includes('fetch') || errorStr.includes('timeout')) {
     return messages.network;
   }
-  if (errorStr.includes('429') || errorStr.includes('rate limit') || errorStr.includes('API exhausted')) {
+  // Check for rate limit errors in any language
+  if (errorStr.includes('429') || 
+      errorStr.includes('rate limit') || 
+      errorStr.includes('API exhausted') ||
+      errorStr.includes('API agotada') ||
+      errorStr.includes('API épuisée') ||
+      errorStr.includes('API erschöpft') ||
+      errorStr.includes('Too many requests') ||
+      errorStr.includes('Too Many Requests')) {
     return messages.rateLimit;
   }
   

@@ -281,8 +281,15 @@ export async function generateMemeImage(template: string, text: string, skipForm
     return { watermarkedUrl, originalUrl: url, formattedText: cleanText };
   } catch (error) {
     logger.error('Meme image generation failed', error);
-    if (error instanceof Error && error.message.includes(await getErrorMessage('tooManyRequests'))) {
-      throw error; // Re-throw rate limit errors to be handled by overlay
+    // Re-throw rate limit errors to be handled by overlay
+    if (error instanceof Error && (error.message.includes('429') ||
+        error.message.includes('API exhausted') ||
+        error.message.includes('API agotada') ||
+        error.message.includes('API épuisée') ||
+        error.message.includes('API erschöpft') ||
+        error.message.includes('Too many requests') ||
+        error.message.includes('Too Many Requests'))) {
+      throw error;
     }
     return { watermarkedUrl: CONFIG.FALLBACK_IMAGE_URL, originalUrl: CONFIG.FALLBACK_IMAGE_URL, formattedText: text };
   }

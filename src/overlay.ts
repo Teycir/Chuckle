@@ -113,7 +113,8 @@ function createDownloadButton(): HTMLDivElement {
   const container = document.createElement('div');
   container.style.cssText = 'display: flex; flex-direction: column; align-items: center; gap: 4px;';
   
-  const downloadBtn = createButton('star-btn', '⬇️', downloadPng);
+  const downloadBtn = createButton('star-btn', '↓', downloadPng);
+  downloadBtn.style.fontWeight = '900';
   downloadBtn.setAttribute('aria-label', getTranslation('downloadPng'));
   downloadBtn.setAttribute('role', 'button');
   

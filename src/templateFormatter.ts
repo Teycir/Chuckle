@@ -140,7 +140,14 @@ Your response (ONLY the formatted text in ${language}):`;
     throw new Error('AI failed to format with separator');
   } catch (error) {
     console.error('[Chuckle] Template formatting error:', error);
-    if (error instanceof Error && (error.message.includes('Too many requests') || error.message.includes('429'))) {
+    // Re-throw rate limit errors directly to preserve the localized message
+    if (error instanceof Error && (error.message.includes('429') || 
+        error.message.includes('API exhausted') ||
+        error.message.includes('API agotada') ||
+        error.message.includes('API épuisée') ||
+        error.message.includes('API erschöpft') ||
+        error.message.includes('Too many requests') ||
+        error.message.includes('Too Many Requests'))) {
       throw error;
     }
     throw new Error(`Failed to format text for ${template}: ${error}`);
