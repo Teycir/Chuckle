@@ -4,28 +4,20 @@
 
 **Chuckle** turns any text on the web into viral memes in seconds. Highlight text, right-click, and let AI create the perfect meme for you.
 
-Think of it as your personal meme generator that lives in your browser. No design skills needed—just highlight, click, and share. Fully open-source and free to use.
+Think of it as your personal meme generator that lives in your browser. No design skills needed—just highlight, click, and share. Everything stays on your computer—no tracking, no data collection, no ads. Fully open-source.
 
 ### ✨ What Can Chuckle Do?
 
-- 🎯 **Instant Memes** - Highlight text, right-click, get a meme in 2-3 seconds
-- 🤖 **AI-Powered** - Gemini 2.5 Flash picks the perfect meme template for your text
-- 🎲 **Regenerate Variants** - Don't like the first meme? Click to try another template instantly
-- 🔒 **Your Privacy is Safe** - Everything stays on your computer, no tracking
-- 🌍 **Speaks Your Language** - Available in English, Spanish, French, and German
-- 🌙 **Dark Mode** - Beautiful animated backgrounds that are easy on your eyes
-- 🚀 **Social Sharing** - Share instantly to Twitter, Reddit, LinkedIn, or Email
-- 📊 **Analytics Dashboard** - Track your meme stats, top templates, and share counts
-- 🔥 **Trending Insights** - See your most-used templates, rising stars, and untried options
-- ✏️ **Edit Meme Text** - Click to edit text directly, no need to regenerate
-- 🎨 **Template Browser** - Discover all 20 available meme templates
-- 📋 **One-Click Copy** - Copy to clipboard instantly
 - 🆓 **Free to Use** - Get 1,500 free memes every day using Google AI Studio's free tier
-- 🏷️ **Smart Organization** - Tag and favorite your memes for easy access
-- 📚 **History Panel** - Browse all your created memes with search and filters
-- ⌨️ **Keyboard Shortcuts** - Alt+M (generate), R (regenerate), F (favorite), C (copy), T (tag), H (history)
-- 🔄 **Undo Support** - Easily revert changes to favorites and tags
-- 📤 **Export Data** - Download all your memes as JSON backup
+- 🔒 **Your Privacy is Safe** - Everything stays on your computer, no tracking
+- ⚡ **Super Fast** - Get a meme in 2-3 seconds, try different templates instantly
+- 🤖 **AI-Powered** - Gemini 2.5 Flash picks the perfect meme template for your text
+- 🌍 **Speaks Your Language** - Available in English, Spanish, French, and German
+- 🎨 **20 Meme Templates** - Drake, Distracted Boyfriend, Woman Yelling at Cat, and 17 more
+- **Social Sharing** - Share instantly to Twitter, LinkedIn, or Email
+- 📊 **Analytics Dashboard** - Track your meme stats, top templates, and share counts
+- ✏️ **Edit Meme Text** - Click to edit text directly, no need to regenerate
+- ⌨️ **Keyboard Shortcuts** - Press `Alt+M` for instant meme generation from selected text
 
 ### Why Use Chuckle?
 
@@ -33,18 +25,27 @@ Think of it as your personal meme generator that lives in your browser. No desig
 - Just highlight text and right-click
 - AI picks the perfect meme template
 - Professional-looking memes in seconds
+- No uploading images or typing captions
 
 **⚡ Super Fast**
 - 1 click from text to meme (Alt+M shortcut)
-- No uploading images or typing captions
-- Share instantly to Twitter, Reddit, LinkedIn, or Email
+- Try different templates instantly
+- Download or share to Twitter, LinkedIn, or Email
+- Edit text directly and regenerate
 
 **🔒 Private & Secure**
 - Your API key stays on your computer
 - No tracking or data collection
 - Open source code you can verify
+- All meme data stored locally in your browser
 
 ### Who Should Use Chuckle?
+
+**🔒 Privacy-Conscious People**
+- All your memes stay on your computer
+- No tracking or data collection
+- Open source code you can verify yourself
+- You control your own API key
 
 **📱 Social Media Enthusiasts**
 - Create viral content quickly
@@ -55,7 +56,6 @@ Think of it as your personal meme generator that lives in your browser. No desig
 - Add humor to your posts
 - Engage your audience with memes
 - Save time on content creation
-
 
 **😄 Anyone Who Loves Memes**
 - Turn any text into a meme
@@ -71,60 +71,59 @@ Think of it as your personal meme generator that lives in your browser. No desig
 4. You'll see the Chuckle icon appear in your browser
 
 **Step 2: Get Your Free AI Key (1 minute)**
-1. Visit [Google AI Studio](https://aistudio.google.com/api-keys)
+
+**Option A: Google AI (Recommended - Easiest)**
+1. Visit [Google AI Studio](https://aistudio.google.com/app/apikey)
 2. Sign in with your Google account
 3. Click "Create API Key"
 4. Copy the key (it looks like: AIza...)
 5. Click the Chuckle icon in Chrome
 6. Paste your key and click "Save Settings"
 
+**Option B: OpenRouter (Alternative - More Models)**
+1. Visit [OpenRouter](https://openrouter.ai/keys)
+2. Sign up for a free account
+3. Create an API key
+4. Click the Chuckle icon in Chrome
+5. Select "OpenRouter" from the dropdown
+6. Paste your key and click "Save Settings"
+
+**Which one should I choose?**
+- Choose Google AI if you want the simplest setup
+- Choose OpenRouter if you want access to different AI models
+- Both give you 1,500 free memes per day
+
 **Step 3: Start Making Memes**
 1. Go to any website
 2. Highlight 6-30 words of text (example: "When you finally understand recursion")
 3. Right-click and select "Remix as a Meme"
 4. Wait 2-3 seconds
-5. Your meme is ready! Add tags, mark as favorite, or save to history
+5. Your meme is ready!
+
+**Quick Tip**: Press `Alt+M` (or `Option+M` on Mac) to generate a meme instantly without right-clicking.
 
 ### How to Use Chuckle Features
 
-**🏷️ Organize with Tags**
-1. After creating a meme, type in the tag input field
-2. Press Enter or select from autocomplete suggestions
-3. Tags help you find memes later
-4. Click the × on any tag to remove it
+**🎨 Try Different Templates**
+- Click the template button to see all 20 available templates
+- Click any template to regenerate your meme with that style
+- Keep trying different templates until you find the perfect fit
 
-**🎲 Regenerate Memes**
-- Press R or click the dice button (🎲) to try a different template
-- Double-click the meme image to regenerate
-- Uses the same text but generates a new variant
-- Keep regenerating until you find the perfect meme
-
-**⭐ Mark Favorites**
-- Click the star button on any meme to favorite it
-- Use the star filter in History to see only favorites
-- Undo with Ctrl+Z if you change your mind
-
-**📚 Browse History**
-- Press H key or click the Chuckle icon to open History
-- Search memes by text or template name
-- Filter by favorites or tags
-- Click any meme to view it again
+**When to try different templates:**
+- The first template doesn't quite fit the vibe
+- You want to try different humor styles
+- You're creating multiple versions for A/B testing
+- You want to see all the creative possibilities
 
 **⌨️ Keyboard Shortcuts**
-- **Alt+M**: Generate meme from selected text (anywhere on any page)
-- **R**: Regenerate meme (when viewing a meme)
-- **F**: Toggle favorite (when viewing a meme)
-- **C**: Copy to clipboard (when viewing a meme)
-- **T**: Focus tag input (when viewing a meme)
-- **H**: Open/close History panel
-- **Ctrl+Z**: Undo last favorite/tag change
+- **Alt+M** (or **Option+M** on Mac): Generate meme from selected text (anywhere on any page)
 - **Esc**: Close any open overlay
 
 **🌍 Change Language**
 1. Click the Chuckle icon
 2. Select your language (English, Spanish, French, or German)
 3. Click "Save Settings"
-4. Now all memes will use your language!
+4. Now all memes will be in your language!
 
 **🌙 Dark Mode**
 1. Click the Chuckle icon
@@ -138,56 +137,39 @@ Think of it as your personal meme generator that lives in your browser. No desig
 - Click outside to save automatically
 - Regenerate uses your edited text
 
-**📋 Copy Your Meme**
-- Click the copy button in the meme popup
-- The meme is copied to your clipboard
-- Paste it anywhere: Twitter, Discord, Slack, emails
+**⬇️ Download a Meme**
+- Click the download button (↓) in the meme popup
+- The meme saves to your Downloads folder
+- Use it anywhere: social media, presentations, messages
 
-**🚀 Share to Social Media**
-- Click the share button (🚀) in the meme popup
-- Choose your platform:
-  - **𝕏 Twitter** - Share publicly with your followers
-  - **🔴 Reddit** - Post to your favorite subreddit
-  - **💼 LinkedIn** - Share professionally with your network
-  - **📧 Email** - Send privately to friends, family, or coworkers
-- Share opens in new tab or email client
+**Share a Meme**
+- Click the share button in the meme popup
+- Choose: X (Twitter), LinkedIn, or Email
+- The meme opens in a new tab or email client
 - Add your caption and post!
 
 **📊 View Your Stats**
-- Click the Chuckle icon in your browser
+- Click the Chuckle icon
 - Click the "📊 Stats" tab
 - See your meme creation statistics:
   - Total memes created
-  - Favorites count and percentage
   - Top 5 most-used templates
-  - Top 5 most-used tags
-  - Share counts (Twitter, Reddit, LinkedIn, Email)
-- Click "📥 Export Data" to download all your memes as JSON
+  - Share counts (Twitter, LinkedIn, Email)
 - Click "🎨 Browse Templates" to see all 20 available templates
 
-**🔥 Discover Your Trending**
-- Click the Chuckle icon
-- Go to the "🔥 Trending" tab
-- See personalized insights:
-  - **Your Top Templates (7 days)** - Which templates you're using most
-  - **Your Most Shared** - Templates you share the most
-  - **Your Rising Stars** - Templates you're using more lately
-  - **Templates to Try** - Templates you haven't used yet
-- All data is local - it's YOUR trending, not global
-
-**⚡ Alt+M Quick Generate**
-- Highlight any text on any webpage
-- Press **Alt+M** (or **Option+M** on Mac)
-- Meme generates instantly
-- No need to right-click!
+**Why check your stats?**
+- See which templates work best for you
+- Track your most popular meme topics
+- Discover templates you haven't tried yet
 
 ### Real-Life Examples
 
 **Example 1: Funny Reaction**
 - Highlight: "404 Error: Sleep Not Found"
-- Right-click → "Remix as a Meme"
+- Press Alt+M
 - Get: Perfect tired programmer meme
 - Share on Twitter → Go viral!
+- Time saved: 5 minutes of manual meme creation
 
 **Example 2: Study Humor**
 - Highlight: "Me pretending to understand the lecture"
@@ -204,9 +186,16 @@ Think of it as your personal meme generator that lives in your browser. No desig
 **Example 4: News Commentary**
 - Reading a funny news headline
 - Highlight the headline
-- Right-click → "Remix as a Meme"
-- Get: Topical meme
+- Press Alt+M
+- Get: Topical meme in 2 seconds
 - Share your hot take on social media
+
+**Example 5: Try Different Templates**
+- Create meme: "When your code works on the first try"
+- First result: Drake template (good, but not perfect)
+- Click template button to see all options
+- Select Success Kid template (perfect!)
+- Download and share with your dev team
 
 ### Language Support
 
@@ -216,26 +205,12 @@ Chuckle works in 4 languages:
 - 🇫🇷 **French** (Français)
 - 🇩🇪 **German** (Deutsch)
 
-### Advanced Features
+**Cool Feature**: All meme text is generated in your selected language!
+- Select Spanish → Get memes in Spanish
+- Select French → Get memes in French
+- Perfect for international audiences and multilingual content
 
-**🔍 Smart Search**
-- Search by meme text or template name
-- Combine search with tag filters
-- Results update in real-time as you type
 
-**🏷️ Tag Autocomplete**
-- Start typing a tag to see suggestions
-- Use arrow keys to navigate suggestions
-- Press Enter to select or create new tag
-
-**🔄 Undo System**
-- Keeps track of your last 20 actions
-- Works for favorites and tag changes
-- Press Ctrl+Z to undo anytime
-
-**⚡ Performance**
-- LRU cache for faster meme generation
-- Lazy loading for optimal performance
 
 ### Common Questions
 
@@ -258,37 +233,28 @@ A: Not yet. Chuckle only works on Chrome browser on computers right now.
 A: Yes! Chuckle works on any website where you can highlight text. Just make sure to select between 6 and 30 words for best results.
 
 **Q: Why do I need my own API key?**
-A: This keeps Chuckle free and private. You connect directly to Google AI, not through our servers.
+A: This keeps Chuckle free and private. You connect directly to Google AI or OpenRouter, not through our servers.
 
 **Q: What meme templates does Chuckle use?**
-A: Chuckle's AI picks from popular meme templates based on your text's context and humor style.
-
-**Q: How do I organize my memes?**
-A: Use tags to categorize memes (e.g., "work", "funny", "relatable"). Mark favorites with the star button. Use History panel to search and filter.
+A: Chuckle has 20 popular templates including Drake, Distracted Boyfriend, Woman Yelling at Cat, Success Kid, and more. The AI picks the best one for your text.
 
 **Q: What are the keyboard shortcuts?**
-A: Alt+M (generate from selection), R (regenerate), F (favorite), C (copy), T (tag), H (history), Ctrl+Z (undo), Esc (close).
+A: Alt+M (generate from selection), Esc (close).
 
 **Q: Can I edit the meme text?**
 A: Yes! Click on the meme text to edit it. Changes save automatically when you click outside.
 
-**Q: How do I share memes?**
-A: Click the 🚀 button in the meme overlay and choose Twitter, Reddit, LinkedIn, or Email.
+**Q: How do I download or share memes?**
+A: Click the ↓ button to download, or click the share button to share on Twitter, LinkedIn, or Email.
 
 **Q: Where can I see my meme statistics?**
 A: Click the Chuckle icon, then click the "📊 Stats" tab to see all your analytics.
-
-**Q: Can I export my memes?**
-A: Yes! Go to the Stats tab and click "📥 Export Data" to download all your memes as JSON.
 
 **Q: What templates are available?**
 A: Click the Chuckle icon, go to Stats tab, and click "🎨 Browse Templates" to see all 20 templates.
 
 **Q: Can I create multiple meme variants?**
-A: Yes! Click the 🎲 button on any meme to instantly regenerate with a different template.
-
-**Q: How does Trending work without a server?**
-A: Trending analyzes YOUR local meme history to show patterns - which templates you use most, which you share most, and which are rising in your usage. It's personalized to your meme style!
+A: Yes! Click the template button to see all 20 templates and choose a different one.
 
 ### Tips for Best Memes
 
@@ -296,12 +262,9 @@ A: Trending analyzes YOUR local meme history to show patterns - which templates 
 - Highlight 6-30 words (required for best results)
 - Use text with clear emotions or situations
 - Try different phrases to see what works
-- Press R or double-click to try different templates
+- Try different templates to find the best fit
 - Use Alt+M shortcut for instant generation
-- Edit text directly if AI gets it wrong
-- Share via Twitter, Reddit, LinkedIn, or Email
 - Check your stats to see what works best
-- Export your memes regularly as backup
 
 **❌ Don't:**
 - Select less than 6 words (too little context)
@@ -320,15 +283,9 @@ A: Trending analyzes YOUR local meme history to show patterns - which templates 
 
 **What Chuckle DOES Do:**
 - ✅ Stores your API key only in your browser
+- ✅ Saves memes only on your computer
 - ✅ Connects directly to Google AI for total privacy
 - ✅ Works completely privately
-- ✅ All meme data stored locally in your browser
-
-**Security Features:**
-- ✅ XSS protection with input sanitization
-- ✅ API error handling and validation
-- ✅ Secure DOM manipulation (no innerHTML)
-- ✅ Input length limits to prevent abuse
 
 **Open Source**: All our code is public on GitHub. Anyone can check what Chuckle does.
 
@@ -352,14 +309,8 @@ A: Trending analyzes YOUR local meme history to show patterns - which templates 
 **Problem: "API error"**
 - Solution: Check your API key is correct. You might have hit the daily limit (1,500 requests).
 
-**Problem: Tags not saving**
-- Solution: Make sure you press Enter after typing a tag. Tags are saved automatically.
-
-**Problem: History panel not showing memes**
-- Solution: Create some memes first! The history panel shows all your generated memes.
-
 **Problem: Keyboard shortcuts not working**
-- Solution: Make sure a meme overlay is open. Shortcuts only work when viewing memes.
+- Solution: Alt+M works anywhere on any webpage when you have text selected.
 
 ### Get Help
 
@@ -378,7 +329,7 @@ A: Trending analyzes YOUR local meme history to show patterns - which templates 
 
 **Ready to make the internet funnier?** Install Chuckle today and turn any text into viral memes!
 
-**Made with ❤️ by [Teycir](https://teycirbensoltane.tn/)**
+**Made with ❤️ for people who love memes**
 
 ---
 
@@ -393,13 +344,11 @@ A: Trending analyzes YOUR local meme history to show patterns - which templates 
 
 ### Key Features
 - **Social Sharing** - Twitter, Reddit, LinkedIn, Email integration
-- **Analytics Dashboard** - Track stats, export data
-- **Trending Insights** - Personal analytics on template usage
+- **Analytics Dashboard** - Track stats
 - **Editable Text** - Click to edit meme text inline
 - **Template Browser** - Discover 20 meme templates
 - **Keyboard Shortcuts** - Alt+M for instant generation
 - **LRU Cache** - 1-hour TTL for API responses
-- **Lazy Loading** - Tags module loaded on demand
 - **Security** - XSS protection, input sanitization
 - **Performance** - Debounced inputs, optimized rendering
 
