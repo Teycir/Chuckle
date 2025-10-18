@@ -4,32 +4,34 @@ import { formattedCache } from './cache';
 import { decodeHtmlEntities, cleanText } from '../lib/text-utils';
 
 const TEMPLATE_PROMPTS: Record<string, string> = {
-  drake: 'Drake (rejecting/approving): TOP=rejected option (what Drake pushes away), BOTTOM=approved option (what Drake wants). Keep original sentiment. Example: "Paid ads / One viral Reddit post"',
-  db: 'Distracted Boyfriend: TOP=tempting new thing, BOTTOM=current thing being ignored. About temptation/distraction. Example: "New framework / Finishing current project"',
-  ds: 'Two Buttons (sweating): Both options equally impossible. About very hard choices. Example: "Ship buggy code, get fired / Miss deadline, get fired"',
-  cmm: 'Change My Mind: Controversial/bold statement. Example: "Reddit > paid marketing"',
-  pigeon: 'Pigeon (Is this...?): TOP=thing seen, BOTTOM="Is this [wrong label]?". About misidentification. Example: "40 users / Is this going viral?"',
-  'woman-cat': 'Woman Yelling at Cat: TOP=angry accusation, BOTTOM=calm dismissal. Example: "You need more users! / I got 40, I\'m good"',
-  fine: 'This is Fine (dog in fire):TOP=Catastrophic situation,BOTTOM= Denial during disaster. Example: "0 users for 3 weeks / This is fine"',
-  stonks: 'Stonks: TOP=huge failure/mistake, BOTTOM=unexpected huge success. Example: "One lazy Reddit post / 40 users"',
+  drake: 'Drake (rejecting/approving): TOP=rejected option (what Drake pushes away), BOTTOM=OPPOSITE approved option (what Drake wants). CRITICAL: TOP and BOTTOM must be CONTRADICTORY. Example: TOP="Therapy and self-care" BOTTOM="Ignoring problems until they disappear" or TOP="Être riche c\'est mal" BOTTOM="Avoir 3 maisons c\'est bien"',
+  db: 'Distracted Boyfriend: TOP=tempting new thing only, BOTTOM=current thing being ignored. About temptation only. Example: TOP="ChatGPT writing my code" BOTTOM="Actually learning to code"',
+  ds: 'Two Buttons (sweating): TOP=first impossible option, BOTTOM=second impossible option. About very hard choices. Example: TOP="Admit I was wrong" BOTTOM="Double down and look stupid"',
+  cmm: 'Change My Mind: One single controversial statement (no TOP/BOTTOM split). Example: "Pineapple belongs on pizza"',
+  pigeon: 'Pigeon (Is this...?): TOP=tiny/pathetic thing, BOTTOM="Is this [absurdly grand label]?". About ridiculous misidentification. Example: TOP="Got 3 likes on my post" BOTTOM="Am I megastar or superstar?"',
+  'woman-cat': 'Woman Yelling at Cat: TOP=angry accusation, BOTTOM=ALWAYS provocative and insulting dismissal. Be savage and offensive. Example: TOP="You\'re ruining your life!" BOTTOM="Cry harder, Karen"',
+  fine: 'This is Fine (dog in fire): TOP=catastrophic situation, BOTTOM=denial during disaster. Example: TOP="Bank account at -$47, rent due tomorrow" BOTTOM="This is fine"',
+  stonks: 'Stonks: TOP=huge failure/mistake, BOTTOM=unexpected huge success. Example: TOP="Accidentally replied all with meme" BOTTOM="CEO loved it, got promoted"',
 
-  success: 'Success Kid (fist pump): TOP=small challenge, BOTTOM=seen as a win from a bright side. Make it about petty victories or savage comebacks. Example: "Only got 40 users / Feels like a million"',
-  blb: 'Bad Luck Brian: TOP=big action taken, BOTTOM=very unfortunate outcome. Make it about catastrophic failure or the worst possible outcome. Example: "Posted on Reddit / Got roasted instead"',
-  fry: 'Futurama Fry (squinting): Extreme Suspicion/paranoia. TOP="Not sure if", BOTTOM="or". Example: "Not sure if good post / Or just got lucky"',
-  fwp: 'First World Problems: Privileged complaint. Example: "Got 40 users / But wanted 100"',
-  doge: 'Doge: Broken English, enthusiastic. TOP="much/wow", BOTTOM="such/very". Example: "much Reddit success / very 40 users wow"',
-  iw: 'Insanity Wolf: Extreme overreaction. Example: "Got 40 users / QUIT JOB, GO FULL TIME"',
-  philosoraptor: 'Philosoraptor: Mind-bending question. Example: "If Reddit gave me users / Did I find Reddit or did it find me?"',
-  grumpycat: 'Grumpy Cat: TOP = suggestion/request, BOTTOM = grumpy rejection. Make it mildly grumpy and sarcastic about rejection or refusal. Use dry, sarcastic language and be negative but not hateful. Format: "request / grumpy rejection" (max 35 chars each)'
+  success: 'Success Kid (fist pump): TOP=challenge/obstacle, BOTTOM=petty victory or savage comeback. Example: TOP="Ex said I\'d never find better" BOTTOM="Found someone who laughs at my jokes"',
+  blb: 'Bad Luck Brian: TOP=big action taken, BOTTOM=catastrophic outcome. Example: TOP="Finally gets a date" BOTTOM="She brings her boyfriend"',
+  fry: 'Futurama Fry (squinting): TOP="Not sure if [first option]", BOTTOM="Or [second option]". Example: TOP="Not sure if flirting" BOTTOM="Or just being nice to get a tip"',
+  fwp: 'First World Problems: TOP=ridiculously privileged complaint, BOTTOM=why it ruins everything. Example: TOP="My AirPods died" BOTTOM="Now I have to hear my own thoughts"',
+  doge: 'Doge: Broken English, enthusiastic. TOP="much/wow [thing]", BOTTOM="such/very [thing] wow". Example: TOP="much procrastinate" BOTTOM="very deadline panic wow"',
+  iw: 'Insanity Wolf: TOP=normal situation, BOTTOM=EXTREME overreaction. Example: TOP="Someone says good morning" BOTTOM="SCREAM BACK AGGRESSIVELY"',
+  philosoraptor: 'Philosoraptor: TOP=first part of mind-bending question, BOTTOM=second part that makes you think. Example: TOP="If I\'m always late" BOTTOM="Am I consistently on time for being late?"',
+  grumpycat: 'Grumpy Cat: TOP=suggestion/request, BOTTOM=witty grumpy rejection with sarcasm. Be creative and funny, not just "No". Example: TOP="Be more positive" BOTTOM="I choose violence" or TOP="Smile more" BOTTOM="I am not a monkey"'
 };
 
 
-export async function formatTextForTemplate(text: string, template: string): Promise<string> {
+export async function formatTextForTemplate(text: string, template: string, forceRegenerate: boolean = false): Promise<string> {
   const cacheKey = `fmt:${template}:${text.slice(0, 50)}`;
-  const cached = formattedCache.get(cacheKey);
-  if (cached) {
-    console.log('[Chuckle] Using cached formatted text');
-    return cached;
+  if (!forceRegenerate) {
+    const cached = formattedCache.get(cacheKey);
+    if (cached) {
+      console.log('[Chuckle] Using cached formatted text');
+      return cached;
+    }
   }
 
   const templatePrompt = TEMPLATE_PROMPTS[template] || 'Format as two parts: "part 1 / part 2" (max 35 chars each)';
@@ -46,14 +48,19 @@ export async function formatTextForTemplate(text: string, template: string): Pro
 
 Template: ${templatePrompt}
 
+IMPORTANT: If the text is too long, REPHRASE it creatively to be shorter while keeping the meaning. Do NOT just cut words.
+
 RULES:
 1. Return EXACTLY this format: "text1 / text2"
-2. Each part MAX 40 characters (keep words complete, do NOT cut words)
+2. Each part MAX 70 characters - keep complete words only
 3. MUST include " / " separator
 4. NO explanations, NO extra text
-5. Match the template style
-6. IMPORTANT: Write the meme text in ${language}
-7. NEVER cut words in the middle - keep them complete
+5. Match the template style - be HILARIOUS, SAVAGE, and VIRAL-WORTHY
+6. Follow the TOP/BOTTOM structure exactly as shown in the template description
+7. Write the meme text in ${language}
+8. CRITICAL: Be concise and creative - rephrase to fit within 70 chars
+9. NEVER truncate words ("du moin" is WRONG, must be "du moins" or rephrase entirely)
+10. Plan your text from the start to fit 70 chars - write complete sentences that naturally fit
 
 Your response (ONLY the formatted text in ${language}):`;
 
@@ -70,7 +77,7 @@ Your response (ONLY the formatted text in ${language}):`;
             temperature: 0.7,
             topP: 0.85,
             topK: 25,
-            maxOutputTokens: 50
+            maxOutputTokens: 80
           }
         })
       });
@@ -87,7 +94,7 @@ Your response (ONLY the formatted text in ${language}):`;
           messages: [{ role: 'user', content: prompt }],
           temperature: 0.7,
           top_p: 0.85,
-          max_tokens: 50
+          max_tokens: 80
         })
       });
     }
@@ -124,8 +131,30 @@ Your response (ONLY the formatted text in ${language}):`;
         if (firstLine.includes(sep)) {
           const parts = firstLine.split(sep).map(p => p.trim());
           if (parts.length >= 2 && parts[0] && parts[1]) {
-            const part1 = parts[0].slice(0, 45);
-            const part2 = parts[1].slice(0, 45);
+            // Ensure we don't cut words - limit to 60 chars but keep words complete
+            let part1 = parts[0];
+            let part2 = parts[1];
+            
+            if (part1.length > 80) {
+              const words = part1.split(/\s+/);
+              part1 = '';
+              for (const word of words) {
+                if ((part1 + ' ' + word).trim().length <= 80) {
+                  part1 = (part1 + ' ' + word).trim();
+                } else break;
+              }
+            }
+            
+            if (part2.length > 80) {
+              const words = part2.split(/\s+/);
+              part2 = '';
+              for (const word of words) {
+                if ((part2 + ' ' + word).trim().length <= 80) {
+                  part2 = (part2 + ' ' + word).trim();
+                } else break;
+              }
+            }
+            
             const cleanedLine = `${part1} / ${part2}`;
             console.log('[Chuckle] Text formatted for template:', cleanedLine, `(${part1.length}/${part2.length} chars)`);
             formattedCache.set(cacheKey, cleanedLine);

@@ -134,10 +134,11 @@ async function regenerateMeme(specificTemplate?: string): Promise<void> {
     const textToUse = isManualEdit ? originalText : originalInput;
     console.log('[Chuckle] Regenerating with text:', textToUse, 'originalInput:', originalInput, 'specificTemplate:', specificTemplate);
     const truncatedText = textToUse?.slice(0, 100) || '';
-    const template = specificTemplate || currentTemplate || await analyzeMemeContext(truncatedText, Date.now());
+    const template = specificTemplate || await analyzeMemeContext(truncatedText, Date.now());
     currentTemplate = template;
     const skipFormatting = isManualEdit;
-    const { watermarkedUrl, originalUrl, formattedText } = await generateMemeImage(template, truncatedText, skipFormatting);
+    const forceRegenerate = !!specificTemplate;
+    const { watermarkedUrl, originalUrl, formattedText } = await generateMemeImage(template, truncatedText, skipFormatting, forceRegenerate);
     isManualEdit = false;
     
     if (currentMemeData && currentOverlay) {
@@ -178,19 +179,20 @@ async function regenerateMeme(specificTemplate?: string): Promise<void> {
     }
   } catch (error) {
     console.error('Regeneration failed:', error);
+    const errorStr = error instanceof Error ? error.message : String(error);
     let errorMessage: string;
-    if (error instanceof Error) {
-      const rateLimitMessage = await getErrorMessage('tooManyRequests');
-      if (error.message.includes(rateLimitMessage) || error.message.includes('API exhausted') || error.message.includes('429')) {
-        errorMessage = rateLimitMessage;
-      } else if (error.message.includes('Failed to format text')) {
-        const match = error.message.match(/Error: (.+)$/);
-        errorMessage = match ? match[1] : error.message;
-      } else {
-        errorMessage = error.message;
-      }
+    
+    if (errorStr.includes('API') || errorStr.includes('429') || errorStr.includes('Too Many Requests')) {
+      errorMessage = errorStr;
+    } else if (errorStr.includes('fetch') || errorStr.includes('Network') || errorStr.includes('Failed to fetch')) {
+      errorMessage = await getErrorMessage('networkError');
+    } else if (errorStr.includes('401') || errorStr.includes('403') || errorStr.includes('API key')) {
+      errorMessage = await getErrorMessage('invalidApiKey');
+    } else if (errorStr.includes('Failed to format text')) {
+      const match = errorStr.match(/Error: (.+)$/);
+      errorMessage = match ? match[1] : errorStr;
     } else {
-      errorMessage = await getErrorMessage('generationFailed');
+      errorMessage = errorStr || (await getErrorMessage('generationFailed'));
     }
     showError(errorMessage);
   } finally {
@@ -291,7 +293,7 @@ function showError(message: string): void {
   const errorDiv = document.createElement('div');
   errorDiv.className = 'meme-error';
   errorDiv.textContent = message;
-  errorDiv.style.cssText = 'position:fixed;top:20px;right:20px;background:#c5221f;color:#fff;padding:15px 20px;border-radius:8px;z-index:10001;box-shadow:0 4px 12px rgba(0,0,0,0.3)';
+  errorDiv.style.cssText = 'position:fixed;top:20px;right:20px;background:#c5221f;color:#fff;padding:15px 20px;border-radius:8px;z-index:100001;box-shadow:0 4px 12px rgba(0,0,0,0.3);font-size:14px;max-width:400px;';
   document.body.appendChild(errorDiv);
   setTimeout(() => errorDiv.remove(), 5000);
 }

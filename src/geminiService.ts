@@ -253,31 +253,26 @@ async function summarizeText(text: string): Promise<string> {
   }
 }
 
-// Normalize text for URL compatibility across French, Spanish, German, Italian
-// Handles: é→e, ñ→n, ü→u, à→a, ö→o, ç→c, €→removed, etc.
-// Also URL-encodes special characters like ?, &, etc.
-// For Grumpy Cat, we need to be more careful with question marks and other special chars
+// Normalize text for URL compatibility while preserving accented characters
+// Keeps: é, è, ê, à, ù, ô, ñ, ü, ö, ä, ç, etc. (French, Spanish, German, Italian)
+// URL-encodes special characters for safety
 function normalizeText(text: string): string {
-  // First clean the text of unicode characters
+  // Remove only truly problematic characters, keep accented letters
   let cleaned = text
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-zA-Z0-9\s$€£¥!?.,;:'-]/g, '');
+    .replace(/[<>"{}|\\^`\[\]]/g, '') // Remove URL-unsafe chars
+    .replace(/\s+/g, '_'); // Spaces to underscores
 
-  // Convert spaces to underscores for URL compatibility
-  cleaned = cleaned.replace(/\s+/g, '_');
-
-  // URL encode to handle special characters like ?, &, etc.
+  // URL encode to safely handle accents and special chars
   return encodeURIComponent(cleaned);
 }
 
-export async function generateMemeImage(template: string, text: string, skipFormatting: boolean = false): Promise<{ watermarkedUrl: string; originalUrl: string; formattedText: string }> {
+export async function generateMemeImage(template: string, text: string, skipFormatting: boolean = false, forceRegenerate: boolean = false): Promise<{ watermarkedUrl: string; originalUrl: string; formattedText: string }> {
   try {
     const formattedTemplate = template.trim().toLowerCase().replace(/\s+/g, '_');
     let processedText = text;
     
     processedText = text;
-    const formattedText = (skipFormatting && text.includes(' / ')) ? processedText : await formatTextForTemplate(processedText, formattedTemplate);
+    const formattedText = (skipFormatting && text.includes(' / ')) ? processedText : await formatTextForTemplate(processedText, formattedTemplate, forceRegenerate);
     const cleanText = formattedText.replace(/['']/g, "'").replace(/…/g, '...');
     
     const parts = cleanText.split(' / ').map(p => p.trim()).filter(p => p.length > 0);
