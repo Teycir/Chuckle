@@ -21,6 +21,55 @@ async function fetchWithTimeout(url: string, options: RequestInit, timeoutMs: nu
   }
 }
 
+async function extractTopic(text: string, provider: string, apiKey: string, model?: string): Promise<string> {
+  const prompt = `Extract the main topic/theme from this text in 1-3 words: "${text}". Return ONLY the topic words (e.g., "choice", "failure", "confusion"). No explanation.`;
+  
+  try {
+    let response: Response;
+    if (provider === 'google') {
+      response = await fetchWithTimeout(
+        `${CONFIG.GEMINI_API_URL}?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: { temperature: 0.3, topP: 0.8, topK: 20, maxOutputTokens: 10 }
+          })
+        },
+        5000
+      );
+    } else {
+      response = await fetchWithTimeout(
+        'https://openrouter.ai/api/v1/chat/completions',
+        {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: model || 'meta-llama/llama-3.2-3b-instruct:free',
+            messages: [{ role: 'user', content: prompt }],
+            temperature: 0.3,
+            top_p: 0.8,
+            max_tokens: 10
+          })
+        },
+        5000
+      );
+    }
+    
+    if (!response.ok) return '';
+    const data: any = await response.json();
+    const topic = provider === 'google' 
+      ? data.candidates?.[0]?.content?.parts?.[0]?.text?.trim().toLowerCase()
+      : data.choices?.[0]?.message?.content?.trim().toLowerCase();
+    console.log('[Chuckle] Extracted topic:', topic);
+    return topic || '';
+  } catch (error) {
+    console.log('[Chuckle] Topic extraction failed, continuing without topic');
+    return '';
+  }
+}
+
 export async function analyzeMemeContext(text: string, variant: number = 0): Promise<string> {
   const isRegenerate = variant > 0;
   const cacheKey = `gemini:${text}${isRegenerate ? `:v${variant}` : ''}`;
@@ -46,6 +95,8 @@ export async function analyzeMemeContext(text: string, variant: number = 0): Pro
     if (!openrouterApiKey) throw new Error(await getErrorMessage('noApiKey'));
   }
 
+  const topic = !isRegenerate ? await extractTopic(text, provider, provider === 'google' ? geminiApiKey : openrouterApiKey, model) : '';
+
   try {
       let response: Response;
       
@@ -60,7 +111,7 @@ export async function analyzeMemeContext(text: string, variant: number = 0): Pro
                 parts: [{
                   text: isRegenerate
                     ? `${GEMINI_PROMPT_TEMPLATE(text)}\n\nIMPORTANT: Provide a DIFFERENT template than you might have suggested before for this text. Choose an alternative that fits the context.`
-                    : GEMINI_PROMPT_TEMPLATE(text)
+                    : GEMINI_PROMPT_TEMPLATE(text, topic)
                 }]
               }],
               generationConfig: isRegenerate ? {
@@ -68,9 +119,9 @@ export async function analyzeMemeContext(text: string, variant: number = 0): Pro
                 topP: 0.98,
                 topK: 64
               } : {
-                temperature: 1.0,
-                topP: 0.95,
-                topK: 40
+                temperature: 0.7,
+                topP: 0.9,
+                topK: 30
               }
             })
           },
@@ -91,10 +142,10 @@ export async function analyzeMemeContext(text: string, variant: number = 0): Pro
                 role: 'user',
                 content: isRegenerate
                   ? `${GEMINI_PROMPT_TEMPLATE(text)}\n\nIMPORTANT: Provide a DIFFERENT template than you might have suggested before for this text. Choose an alternative that fits the context.`
-                  : GEMINI_PROMPT_TEMPLATE(text)
+                  : GEMINI_PROMPT_TEMPLATE(text, topic)
               }],
-              temperature: isRegenerate ? 1.3 : 1.0,
-              top_p: isRegenerate ? 0.98 : 0.95
+              temperature: isRegenerate ? 1.3 : 0.7,
+              top_p: isRegenerate ? 0.98 : 0.9
             })
           },
           10000

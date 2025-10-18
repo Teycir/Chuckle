@@ -9,9 +9,9 @@ describe('Content Script', () => {
           set: jest.fn(),
           get: jest.fn((keys, callback) => {
             if (callback) {
-              callback({ geminiApiKey: testApiKey });
+              callback({ geminiApiKey: testApiKey, aiProvider: 'google' });
             }
-            return Promise.resolve({ geminiApiKey: testApiKey, language: 'English' });
+            return Promise.resolve({ geminiApiKey: testApiKey, language: 'English', aiProvider: 'google' });
           })
         } 
       },
@@ -20,13 +20,21 @@ describe('Content Script', () => {
   });
 
   test('generates meme from text', async () => {
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
-      ok: true,
-      status: 200,
-      json: async () => ({
-        candidates: [{ content: { parts: [{ text: 'drake' }] } }]
+    (global.fetch as jest.Mock)
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          candidates: [{ content: { parts: [{ text: 'choice' }] } }]
+        })
       })
-    });
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          candidates: [{ content: { parts: [{ text: 'drake' }] } }]
+        })
+      });
 
     const { analyzeMemeContext } = require('../src/geminiService');
     const result = await analyzeMemeContext('test text');

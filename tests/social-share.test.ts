@@ -17,7 +17,7 @@ describe('Social Share', () => {
     const container = createShareButton('https://example.com/meme.jpg', 'Test meme');
     const btn = container.querySelector('.share-btn');
     expect(btn).toBeTruthy();
-    expect(container.querySelector('div')?.textContent).toContain('Share');
+    expect(btn?.getAttribute('aria-label')).toContain('Share');
   });
 
   test('opens share menu on click', () => {

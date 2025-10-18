@@ -48,11 +48,12 @@ Template: ${templatePrompt}
 
 RULES:
 1. Return EXACTLY this format: "text1 / text2"
-2. Each part MAX 30 characters
+2. Each part MAX 40 characters (keep words complete, do NOT cut words)
 3. MUST include " / " separator
 4. NO explanations, NO extra text
 5. Match the template style
 6. IMPORTANT: Write the meme text in ${language}
+7. NEVER cut words in the middle - keep them complete
 
 Your response (ONLY the formatted text in ${language}):`;
 
@@ -123,8 +124,8 @@ Your response (ONLY the formatted text in ${language}):`;
         if (firstLine.includes(sep)) {
           const parts = firstLine.split(sep).map(p => p.trim());
           if (parts.length >= 2 && parts[0] && parts[1]) {
-            const part1 = parts[0].slice(0, 35);
-            const part2 = parts[1].slice(0, 35);
+            const part1 = parts[0].slice(0, 45);
+            const part2 = parts[1].slice(0, 45);
             const cleanedLine = `${part1} / ${part2}`;
             console.log('[Chuckle] Text formatted for template:', cleanedLine, `(${part1.length}/${part2.length} chars)`);
             formattedCache.set(cacheKey, cleanedLine);
