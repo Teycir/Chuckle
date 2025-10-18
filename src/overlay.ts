@@ -308,7 +308,7 @@ export async function createOverlay(memeData: MemeData): Promise<void> {
   if (currentOverlay) closeOverlay();
 
   await loadLanguage();
-  const { darkMode } = await chrome.storage.local.get(['darkMode']);
+  const { darkMode, offlineMode } = await chrome.storage.local.get(['darkMode', 'offlineMode']);
   const isDark = darkMode !== undefined ? darkMode : true;
 
   const overlay = document.createElement('div');
@@ -340,6 +340,14 @@ export async function createOverlay(memeData: MemeData): Promise<void> {
   actionsContainer.appendChild(createDownloadButton());
   actionsContainer.appendChild(createShareButton(memeData.originalUrl || memeData.imageUrl, memeData.text, currentLanguage));
   actionsContainer.appendChild(createCloseButton());
+  
+  if (offlineMode) {
+    const offlineIndicator = document.createElement('div');
+    offlineIndicator.textContent = '📴';
+    offlineIndicator.style.cssText = 'font-size: 20px; opacity: 0.7; margin-top: 8px;';
+    actionsContainer.appendChild(offlineIndicator);
+  }
+  
   imgWrapper.appendChild(actionsContainer);
   
   content.appendChild(imgWrapper);

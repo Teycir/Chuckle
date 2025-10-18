@@ -71,6 +71,13 @@ async function extractTopic(text: string, provider: string, apiKey: string, mode
 }
 
 export async function analyzeMemeContext(text: string, variant: number = 0): Promise<string> {
+  const { offlineMode } = await chrome.storage.local.get(['offlineMode']);
+  
+  if (offlineMode) {
+    console.log('[Chuckle] Offline mode: using default template');
+    return 'drake';
+  }
+  
   const isRegenerate = variant > 0;
   const cacheKey = `gemini:${text}${isRegenerate ? `:v${variant}` : ''}`;
 

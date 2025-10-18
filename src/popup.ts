@@ -201,6 +201,7 @@ const translations = {
     openrouterKeyLabel: '🔑 OpenRouter Key',
     languageLabel: '🌐 Language',
     darkModeLabel: '🌙 Dark Mode',
+    offlineModeLabel: '📴 Offline Mode',
     saveButton: '💾 Save Settings',
     saved: 'Saved!',
     getKeyInfo: 'Get key from',
@@ -222,6 +223,7 @@ const translations = {
     openrouterKeyLabel: '🔑 Clave OpenRouter',
     languageLabel: '🌐 Idioma',
     darkModeLabel: '🌙 Modo Oscuro',
+    offlineModeLabel: '📴 Modo Sin Conexión',
     saveButton: '💾 Guardar Configuración',
     saved: '¡Guardado!',
     getKeyInfo: 'Obtener clave de',
@@ -243,6 +245,7 @@ const translations = {
     openrouterKeyLabel: '🔑 Clé OpenRouter',
     languageLabel: '🌐 Langue',
     darkModeLabel: '🌙 Mode Sombre',
+    offlineModeLabel: '📴 Mode Hors Ligne',
     saveButton: '💾 Enregistrer',
     saved: 'Enregistré!',
     getKeyInfo: 'Obtenir la clé de',
@@ -264,6 +267,7 @@ const translations = {
     openrouterKeyLabel: '🔑 OpenRouter-Schlüssel',
     languageLabel: '🌐 Sprache',
     darkModeLabel: '🌙 Dunkler Modus',
+    offlineModeLabel: '📴 Offline-Modus',
     saveButton: '💾 Speichern',
     saved: 'Gespeichert!',
     getKeyInfo: 'Schlüssel erhalten von',
@@ -306,6 +310,9 @@ function updateUILanguage(lang: string) {
   const darkModeLabel = document.querySelector('label[for="darkMode"]');
   if (darkModeLabel) darkModeLabel.textContent = t.darkModeLabel;
   
+  const offlineModeLabel = document.querySelector('label[for="offlineMode"]');
+  if (offlineModeLabel) offlineModeLabel.textContent = t.offlineModeLabel;
+  
   const saveBtn = document.getElementById('saveKey');
   if (saveBtn) saveBtn.textContent = t.saveButton;
   
@@ -339,7 +346,7 @@ document.getElementById('providerSelect')?.addEventListener('change', (e) => {
 });
 
 document.addEventListener('DOMContentLoaded', async () => {
-  const data = await chrome.storage.local.get(['aiProvider', 'geminiApiKey', 'openrouterApiKey', 'selectedLanguage', 'darkMode']);
+  const data = await chrome.storage.local.get(['aiProvider', 'geminiApiKey', 'openrouterApiKey', 'selectedLanguage', 'darkMode', 'offlineMode']);
   const { providerSelect, geminiApiKey: geminiInput, openrouterApiKey: openrouterInput, languageSelect: langSelect, darkMode: darkModeCheckbox } = getElements();
   
   if (providerSelect) {
@@ -373,6 +380,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (darkModeCheckbox) {
     darkModeCheckbox.checked = data.darkMode !== undefined ? data.darkMode : true;
     if (darkModeCheckbox.checked) document.body.classList.add('dark');
+  }
+  
+  const offlineModeCheckbox = document.getElementById('offlineMode') as HTMLInputElement;
+  if (offlineModeCheckbox) {
+    offlineModeCheckbox.checked = data.offlineMode || false;
   }
   
   const { primaryModel, openrouterPrimaryModel } = await chrome.storage.local.get(['primaryModel', 'openrouterPrimaryModel']);
@@ -448,6 +460,11 @@ document.getElementById('darkMode')?.addEventListener('change', (e) => {
   chrome.storage.local.set({ darkMode: checked });
 });
 
+document.getElementById('offlineMode')?.addEventListener('change', (e) => {
+  const checked = (e.target as HTMLInputElement).checked;
+  chrome.storage.local.set({ offlineMode: checked });
+});
+
 document.getElementById('geminiApiKey')?.addEventListener('input', (e) => {
   const key = (e.target as HTMLInputElement).value.trim();
   const input = e.target as HTMLInputElement;
@@ -517,11 +534,15 @@ document.getElementById('saveKey')?.addEventListener('click', async () => {
       fallbacks = openrouterFallbackModels;
     }
     
+    const offlineModeCheckbox = document.getElementById('offlineMode') as HTMLInputElement;
+    const offlineMode = offlineModeCheckbox?.checked || false;
+    
     const storageData: any = { 
       aiProvider: provider,
       geminiApiKey: geminiKey,
       openrouterApiKey: openrouterKey,
-      selectedLanguage: lang
+      selectedLanguage: lang,
+      offlineMode
     };
     
     if (provider === 'google') {

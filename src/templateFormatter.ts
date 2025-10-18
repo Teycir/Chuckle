@@ -25,6 +25,17 @@ const TEMPLATE_PROMPTS: Record<string, string> = {
 
 
 export async function formatTextForTemplate(text: string, template: string, forceRegenerate: boolean = false): Promise<string> {
+  const { offlineMode } = await chrome.storage.local.get(['offlineMode']);
+  
+  if (offlineMode) {
+    console.log('[Chuckle] Offline mode: splitting text in half');
+    const words = text.trim().split(/\s+/);
+    const mid = Math.ceil(words.length / 2);
+    const part1 = words.slice(0, mid).join(' ');
+    const part2 = words.slice(mid).join(' ');
+    return `${part1} / ${part2}`;
+  }
+  
   const cacheKey = `fmt:${template}:${text.slice(0, 50)}`;
   if (!forceRegenerate) {
     const cached = formattedCache.get(cacheKey);
