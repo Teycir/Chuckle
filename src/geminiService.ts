@@ -337,14 +337,17 @@ export async function generateMemeImage(template: string, text: string, skipForm
     return { watermarkedUrl, originalUrl: url, formattedText: cleanText };
   } catch (error) {
     logger.error('Meme image generation failed', error);
-    // Re-throw rate limit errors to be handled by overlay
+    // Re-throw critical errors that user needs to see
     if (error instanceof Error && (error.message.includes('429') ||
         error.message.includes('API exhausted') ||
         error.message.includes('API agotada') ||
         error.message.includes('API épuisée') ||
         error.message.includes('API erschöpft') ||
         error.message.includes('Too many requests') ||
-        error.message.includes('Too Many Requests'))) {
+        error.message.includes('Too Many Requests') ||
+        error.message.includes('authentication failed') ||
+        error.message.includes('403') ||
+        error.message.includes('401'))) {
       throw error;
     }
     return { watermarkedUrl: CONFIG.FALLBACK_IMAGE_URL, originalUrl: CONFIG.FALLBACK_IMAGE_URL, formattedText: text };

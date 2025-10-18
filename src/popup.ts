@@ -213,7 +213,10 @@ const translations = {
     totalMemes: 'Total Memes',
     topTemplates: '🏆 Top Templates',
     sharesLabel: '📤 Shares',
-    exportData: '📥 Export Data'
+    exportData: '📥 Export Data',
+    invalidKeyFormat: 'Invalid API key format',
+    cannotLoadModels: 'Cannot load models - API key may be invalid',
+    noModelsFound: 'No compatible models found'
   },
   Spanish: {
     title: '🎭 Configuración de Chuckle',
@@ -235,7 +238,10 @@ const translations = {
     totalMemes: 'Memes Totales',
     topTemplates: '🏆 Mejores Plantillas',
     sharesLabel: '📤 Compartidos',
-    exportData: '📥 Exportar Datos'
+    exportData: '📥 Exportar Datos',
+    invalidKeyFormat: 'Formato de clave API inválido',
+    cannotLoadModels: 'No se pueden cargar modelos - la clave API puede ser inválida',
+    noModelsFound: 'No se encontraron modelos compatibles'
   },
   French: {
     title: '🎭 Paramètres Chuckle',
@@ -257,7 +263,10 @@ const translations = {
     totalMemes: 'Memes Totaux',
     topTemplates: '🏆 Meilleurs Modèles',
     sharesLabel: '📤 Partages',
-    exportData: '📥 Exporter les Données'
+    exportData: '📥 Exporter les Données',
+    invalidKeyFormat: 'Format de clé API invalide',
+    cannotLoadModels: 'Impossible de charger les modèles - la clé API peut être invalide',
+    noModelsFound: 'Aucun modèle compatible trouvé'
   },
   German: {
     title: '🎭 Chuckle Einstellungen',
@@ -279,7 +288,10 @@ const translations = {
     totalMemes: 'Memes Gesamt',
     topTemplates: '🏆 Top-Vorlagen',
     sharesLabel: '📤 Teilungen',
-    exportData: '📥 Daten Exportieren'
+    exportData: '📥 Daten Exportieren',
+    invalidKeyFormat: 'Ungültiges API-Schlüsselformat',
+    cannotLoadModels: 'Modelle können nicht geladen werden - API-Schlüssel möglicherweise ungültig',
+    noModelsFound: 'Keine kompatiblen Modelle gefunden'
   }
 };
 
@@ -495,43 +507,48 @@ document.getElementById('saveKey')?.addEventListener('click', async () => {
   const geminiKey = geminiInput.value.trim();
   const openrouterKey = openrouterInput.value.trim();
   const lang = langSelect.value;
+  const t = translations[lang as keyof typeof translations] || translations.English;
   
   if (provider === 'google') {
-    if (!geminiKey || geminiKey.length < 39 || !/^AIza[0-9A-Za-z_-]{35}$/.test(geminiKey)) {
-      statusMsg.textContent = '⚠️ Please enter a valid Google AI API key';
+    if (!geminiKey || !/^AIza[0-9A-Za-z_-]{35}$/.test(geminiKey)) {
+      statusMsg.textContent = `⚠️ ${t.invalidKeyFormat}`;
       statusMsg.className = 'status-msg error';
       geminiInput.style.borderColor = '#c5221f';
-      setTimeout(() => { statusMsg.textContent = ''; statusMsg.className = 'status-msg'; }, 3000);
+      setTimeout(() => { statusMsg.textContent = ''; statusMsg.className = 'status-msg'; geminiInput.style.borderColor = ''; }, 4000);
       return;
     }
   } else {
-    if (!openrouterKey || openrouterKey.length < 20) {
-      statusMsg.textContent = '⚠️ Please enter a valid OpenRouter API key';
+    if (!openrouterKey || !/^sk-or-v1-[a-f0-9]{64}$/.test(openrouterKey)) {
+      statusMsg.textContent = `⚠️ ${t.invalidKeyFormat}`;
       statusMsg.className = 'status-msg error';
       openrouterInput.style.borderColor = '#c5221f';
-      setTimeout(() => { statusMsg.textContent = ''; statusMsg.className = 'status-msg'; }, 3000);
+      setTimeout(() => { statusMsg.textContent = ''; statusMsg.className = 'status-msg'; openrouterInput.style.borderColor = ''; }, 4000);
       return;
     }
   }
 
   try {
     if (saveBtn) saveBtn.disabled = true;
-    statusMsg.textContent = 'Saving...';
+    statusMsg.textContent = 'Testing API key...';
     statusMsg.className = 'status-msg';
     
     await chrome.storage.local.remove(['primaryModel', 'fallbackModels', 'openrouterPrimaryModel', 'openrouterFallbackModels']);
     
     let primary, fallbacks;
     if (provider === 'google') {
-      await loadModels(geminiKey);
+      const models = await loadModels(geminiKey);
+      if (models.length === 0) throw new Error(t.cannotLoadModels);
       const { primaryModel, fallbackModels } = await chrome.storage.local.get(['primaryModel', 'fallbackModels']);
       primary = primaryModel;
       fallbacks = fallbackModels;
+      if (!primary) throw new Error(t.noModelsFound);
     } else {
-      await loadOpenRouterModels(openrouterKey);
+      const models = await loadOpenRouterModels(openrouterKey);
+      if (models.length === 0) throw new Error(t.cannotLoadModels);
       const { openrouterPrimaryModel, openrouterFallbackModels } = await chrome.storage.local.get(['openrouterPrimaryModel', 'openrouterFallbackModels']);
       primary = openrouterPrimaryModel;
       fallbacks = openrouterFallbackModels;
+      if (!primary) throw new Error(t.noModelsFound);
     }
     
     const offlineModeCheckbox = document.getElementById('offlineMode') as HTMLInputElement;
@@ -583,8 +600,20 @@ document.getElementById('saveKey')?.addEventListener('click', async () => {
       statusMsg.className = 'status-msg';
     }, 2000);
   } catch (error) {
-    statusMsg.textContent = '⚠️ Failed to save settings';
+    const errorMsg = error instanceof Error ? error.message : 'Failed to save settings';
+    statusMsg.textContent = `⚠️ ${errorMsg}`;
     statusMsg.className = 'status-msg error';
+    if (provider === 'google') {
+      geminiInput.style.borderColor = '#c5221f';
+    } else {
+      openrouterInput.style.borderColor = '#c5221f';
+    }
+    setTimeout(() => { 
+      statusMsg.textContent = ''; 
+      statusMsg.className = 'status-msg';
+      geminiInput.style.borderColor = '';
+      openrouterInput.style.borderColor = '';
+    }, 5000);
   } finally {
     if (saveBtn) saveBtn.disabled = false;
   }

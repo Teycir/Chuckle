@@ -10,9 +10,10 @@ function showError(message: string): void {
   const errorDiv = document.createElement('div');
   errorDiv.className = 'meme-error';
   errorDiv.textContent = message;
-  errorDiv.style.cssText = 'position:fixed;top:20px;right:20px;background:#c5221f;color:#fff;padding:15px 20px;border-radius:8px;z-index:10001;box-shadow:0 4px 12px rgba(0,0,0,0.3)';
+  errorDiv.style.cssText = 'position:fixed;top:20px;right:20px;background:#c5221f;color:#fff;padding:15px 20px;border-radius:8px;z-index:100001;box-shadow:0 4px 12px rgba(0,0,0,0.3);font-size:14px;max-width:400px;word-wrap:break-word;';
   document.body.appendChild(errorDiv);
-  setTimeout(() => errorDiv.remove(), 3000);
+  console.log('[Chuckle] Showing error to user:', message);
+  setTimeout(() => errorDiv.remove(), 5000);
 }
 
 chrome.runtime.onMessage.addListener((message) => {
@@ -70,26 +71,30 @@ async function getErrorMessage(error: unknown): Promise<string> {
   const messages = errorMessages[lang] || errorMessages.English;
   
   const errorStr = error instanceof Error ? error.message : String(error);
+  const lowerError = errorStr.toLowerCase();
   
-  if (errorStr.includes('quota') || errorStr.includes('QuotaBytes')) {
+  // Check for specific errors first (most specific to least specific)
+  if (lowerError.includes('quota') || lowerError.includes('quotabytes')) {
     return messages.storageFull;
   }
-  if (errorStr.includes('API key') || errorStr.includes('401') || errorStr.includes('403')) {
+  if (lowerError.includes('429') || lowerError.includes('too many requests') || 
+      lowerError.includes('rate limit') || lowerError.includes('exhausted') ||
+      lowerError.includes('agotada') || lowerError.includes('épuisée') || lowerError.includes('erschöpft')) {
+    return messages.rateLimit;
+  }
+  if (lowerError.includes('403') || lowerError.includes('401') || 
+      lowerError.includes('authentication failed') || lowerError.includes('forbidden') ||
+      lowerError.includes('unauthorized')) {
     return messages.apiKey;
   }
-  if (errorStr.includes('Network') || errorStr.includes('fetch') || errorStr.includes('timeout')) {
+  if (lowerError.includes('network') || lowerError.includes('fetch') || 
+      lowerError.includes('timeout') || lowerError.includes('connection')) {
     return messages.network;
   }
-  // Check for rate limit errors in any language
-  if (errorStr.includes('429') || 
-      errorStr.includes('rate limit') || 
-      errorStr.includes('API exhausted') ||
-      errorStr.includes('API agotada') ||
-      errorStr.includes('API épuisée') ||
-      errorStr.includes('API erschöpft') ||
-      errorStr.includes('Too many requests') ||
-      errorStr.includes('Too Many Requests')) {
-    return messages.rateLimit;
+  
+  // If no specific match, return the actual error message if it's meaningful
+  if (errorStr.length > 0 && errorStr.length < 200) {
+    return errorStr;
   }
   
   return messages.generic;
@@ -147,6 +152,8 @@ export async function generateMeme(text: string): Promise<void> {
     hideLoading();
     logger.error('Meme generation failed', error);
     const errorMsg = await getErrorMessage(error);
+    console.log('[Chuckle] Error caught in generateMeme:', error);
+    console.log('[Chuckle] Error message to display:', errorMsg);
     showError(errorMsg);
   }
 }

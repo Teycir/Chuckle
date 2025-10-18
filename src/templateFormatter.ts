@@ -9,9 +9,9 @@ const TEMPLATE_PROMPTS: Record<string, string> = {
   ds: 'Daily struggle (sweating): TOP=first equally horrible option, BOTTOM=second equally horrible option. CRITICAL: Both choices must be EQUALLY BAD/TERRIBLE - no good option exists. Example: TOP="Admit I was wrong" BOTTOM="Get fired". Photo: Man in suit sweating nervously, hand hovering over two red buttons, unable to choose.',
   cmm: 'Change My Mind: One single controversial statement (no TOP/BOTTOM split). Example: "Pineapple belongs on pizza". Photo: Man sitting at table with sign that says "Change My Mind", ready to debate.',
   pigeon: 'Pigeon (Is this...?): TOP=tiny/pathetic thing, BOTTOM="Is this [absurdly grand label]?". About ridiculous misidentification. Example: TOP="Got 3 likes on my post" BOTTOM="Am I megastar or superstar?". Photo: Pigeon looking at butterfly, confused about what it is.',
-  'woman-cat': 'Woman Yelling at Cat: TOP=angry blonde woman yelling accusation, BOTTOM=cat\'s INSULTING and DISMISSIVE response. CRITICAL: Cat MUST insult/mock the woman directly - you can use words like "Karen", "cope", "cry", or similar provocative dismissals. Example: TOP="You\'re ruining your life!" BOTTOM="Cry harder, Karen". Photo: Blonde woman pointing and yelling angrily (left), white cat sitting at dinner table looking smug and unbothered (right).',
+  'woman-cat': 'Woman Yelling at Cat: TOP=angry woman yelling accusation, BOTTOM=cat dismissive response. Cat must mock/insult woman. Example: TOP="You are ruining your life!" BOTTOM="Cry harder, Karen". Photo: Woman yelling (left), cat at table unbothered (right).',
   fine: 'This is Fine (dog in fire): TOP=catastrophic situation, BOTTOM=denial during disaster. Example: TOP="Bank account at -$47, rent due tomorrow" BOTTOM="This is fine". Photo: Dog sitting at table drinking coffee while room is on fire around him, smiling calmly.',
-  stonks: 'Stonks: TOP=huge failure/mistake, BOTTOM=unexpected huge success. Example: TOP="Accidentally replied all with meme" BOTTOM="CEO loved it, got promoted". Photo: Orange meme man in suit with rising stock chart arrow behind him, looking confident.',
+  stonks: 'Stonks: TOP=huge failure/mistake, BOTTOM=unexpected huge success DESPITE the failure. CRITICAL: BOTTOM must be POSITIVE/WIN/SUCCESS, not another failure. Example: TOP="Accidentally replied all with meme" BOTTOM="CEO loved it, got promoted". Photo: Orange meme man in suit with rising stock chart arrow behind him, looking confident.',
 
   success: 'Success Kid (fist pump): TOP=challenge/obstacle, BOTTOM=petty victory or savage comeback. Example: TOP="Ex said I\'d never find better" BOTTOM="Now married to a top model". Photo: Baby on beach with determined expression, fist clenched in victory pose.',
   blb: 'Bad Luck Brian: TOP=big action taken, BOTTOM=catastrophic outcome. Example: TOP="Finally gets a date" BOTTOM="She brings her boyfriend". Photo: Awkward teen with braces, red plaid vest, terrible school photo smile.',
@@ -55,26 +55,34 @@ export async function formatTextForTemplate(text: string, template: string, forc
   if (provider === 'google' && !geminiApiKey) throw new Error('No API key');
   if (provider === 'openrouter' && !openrouterApiKey) throw new Error('No API key');
   
-  const prompt = `Format this text for a meme: "${text}"
+  const prompt = `Format: "${text}"
 
 Template: ${templatePrompt}
 
-IMPORTANT: If the text is too long, REPHRASE it creatively to be shorter while keeping the meaning. Do NOT just cut words. Consider the photo context when creating the meme text.
-
 RULES:
-1. Return EXACTLY this format: "text1 / text2"
-2. Each part MAX 70 characters - keep complete words only
-3. MUST include " / " separator
-4. NO explanations, NO extra text
-5. Match the template style - be HILARIOUS, SAVAGE, and VIRAL-WORTHY
-6. Follow the TOP/BOTTOM structure exactly as shown in the template description
-7. Write the meme text in ${language}
-8. CRITICAL: Be concise and creative - rephrase to fit within 70 chars
-9. NEVER truncate words ("du moin" is WRONG, must be "du moins" or rephrase entirely)
-10. Plan your text from the start to fit 70 chars - write complete sentences that naturally fit
-11. PREFER 3-4 words max in part 1 and part 2 IF POSSIBLE - shorter is punchier and more viral
+1. Return ONLY: "text1 / text2"
+2. Each part MAX 70 chars
+3. Language: ${language}
+4. Be concise and viral
+5. CRITICAL: Be concise and creative - rephrase to fit within 70 chars
+6. NEVER truncate words ("du moin" is WRONG, must be "du moins" or rephrase entirely)
+7. Plan your text from the start to fit 70 chars - write complete sentences that naturally fit
+8. PREFER 3-4 words max in part 1 and part 2 IF POSSIBLE - shorter is punchier and more viral
 
-Your response (ONLY the formatted text in ${language}):`;
+CRITICAL - Choose ONE definitive answer:
+- NO alternatives ("OR", "Alternatively", "could be")
+- NO thinking process or commentary
+- NO multiple options
+- Just return the FINAL result
+
+FORBIDDEN - DO NOT INCLUDE:
+- Your thoughts
+- Explanations
+- Commentary
+- "Let me", "Here is", "according to", "I will"
+- ANY text outside the 2 parts
+
+Response (ONLY the 2 parts):`;
 
   try {
     let response: Response;
@@ -117,10 +125,9 @@ Your response (ONLY the formatted text in ${language}):`;
         throw new Error(errorMsg);
       }
       if (response.status === 403 || response.status === 401) {
-        const errorMsg = await getErrorMessage('invalidApiKey');
-        throw new Error(errorMsg);
+        throw new Error(`API authentication failed (${response.status})`);
       }
-      throw new Error(`Template formatting failed: ${response.status}`);
+      throw new Error(`API error: ${response.status}`);
     }
     
     const data: any = await response.json();
@@ -138,6 +145,19 @@ Your response (ONLY the formatted text in ${language}):`;
       formatted = formatted.replace(/^["']|["']$/g, '').trim();
       formatted = decodeHtmlEntities(formatted);
       formatted = cleanText(formatted);
+      
+      // Remove any explanations after the formatted text
+      const explanationMarkers = [' is not valid', ' due to', 'A valid', 'rephrased version', 'Let me', 'according to', 'Here is', 'I will', 'The formatted'];
+      for (const marker of explanationMarkers) {
+        const idx = formatted.toLowerCase().indexOf(marker.toLowerCase());
+        if (idx > 0) {
+          formatted = formatted.substring(0, idx).trim();
+        }
+      }
+      
+      // Remove trailing quotes that might be left
+      formatted = formatted.replace(/["']+$/g, '').trim();
+      
       const lines = formatted.split('\n').filter(l => l.trim().length > 0);
       const firstLine = lines[0] || formatted;
       

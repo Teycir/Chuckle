@@ -183,21 +183,7 @@ async function regenerateMeme(specificTemplate?: string): Promise<void> {
     }
   } catch (error) {
     console.error('Regeneration failed:', error);
-    const errorStr = error instanceof Error ? error.message : String(error);
-    let errorMessage: string;
-    
-    if (errorStr.includes('429') || errorStr.includes('Too Many Requests') || 
-        errorStr.includes('API')) {
-      errorMessage = errorStr;
-    } else if (errorStr.includes('400')) {
-      errorMessage = getTranslation('invalidRequest');
-    } else if (errorStr.includes('fetch') || errorStr.includes('Network') || errorStr.includes('Failed to fetch')) {
-      errorMessage = await getErrorMessage('networkError');
-    } else if (errorStr.includes('401') || errorStr.includes('403') || errorStr.includes('API key')) {
-      errorMessage = await getErrorMessage('invalidApiKey');
-    } else {
-      errorMessage = errorStr || (await getErrorMessage('generationFailed'));
-    }
+    const errorMessage = error instanceof Error ? error.message : String(error);
     showError(errorMessage);
   } finally {
     hideLoading();
@@ -294,12 +280,17 @@ function showToast(message: string): void {
 }
 
 function showError(message: string): void {
+  console.log('[Chuckle] showError called with:', message);
   const errorDiv = document.createElement('div');
   errorDiv.className = 'meme-error';
   errorDiv.textContent = message;
-  errorDiv.style.cssText = 'position:fixed;top:20px;right:20px;background:#c5221f;color:#fff;padding:15px 20px;border-radius:8px;z-index:100001;box-shadow:0 4px 12px rgba(0,0,0,0.3);font-size:14px;max-width:400px;';
+  errorDiv.style.cssText = 'position:fixed;top:20px;right:20px;background:#c5221f;color:#fff;padding:15px 20px;border-radius:8px;z-index:2147483647;box-shadow:0 4px 12px rgba(0,0,0,0.3);font-size:14px;max-width:400px;word-wrap:break-word;';
   document.body.appendChild(errorDiv);
-  setTimeout(() => errorDiv.remove(), 5000);
+  console.log('[Chuckle] Error div appended to body');
+  setTimeout(() => {
+    errorDiv.remove();
+    console.log('[Chuckle] Error div removed');
+  }, 5000);
 }
 
 export async function createOverlay(memeData: MemeData): Promise<void> {
