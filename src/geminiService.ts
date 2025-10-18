@@ -293,7 +293,7 @@ export async function generateMemeImage(template: string, text: string, skipForm
     
     if (formattedTemplate === 'cmm') {
       topText = '~';
-      bottomText = normalizeText(parts.join(', '));
+      bottomText = normalizeText(parts.join('  '));
     } else if (parts.length >= 2) {
       const bottomParts = parts.slice(1);
       const bottomJoined = bottomParts.join(' ');
