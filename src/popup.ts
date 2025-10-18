@@ -371,8 +371,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
   
   if (darkModeCheckbox) {
-    darkModeCheckbox.checked = data.darkMode || false;
-    if (data.darkMode) document.body.classList.add('dark');
+    darkModeCheckbox.checked = data.darkMode !== undefined ? data.darkMode : true;
+    if (darkModeCheckbox.checked) document.body.classList.add('dark');
   }
   
   const { primaryModel, openrouterPrimaryModel } = await chrome.storage.local.get(['primaryModel', 'openrouterPrimaryModel']);

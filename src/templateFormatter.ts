@@ -9,7 +9,7 @@ const TEMPLATE_PROMPTS: Record<string, string> = {
   ds: 'Two Buttons (sweating): TOP=first impossible option, BOTTOM=second impossible option. About very hard choices. Example: TOP="Admit I was wrong" BOTTOM="Double down and look stupid". Photo: Man in suit sweating nervously, hand hovering over two red buttons, unable to choose.',
   cmm: 'Change My Mind: One single controversial statement (no TOP/BOTTOM split). Example: "Pineapple belongs on pizza". Photo: Man sitting at table with sign that says "Change My Mind", ready to debate.',
   pigeon: 'Pigeon (Is this...?): TOP=tiny/pathetic thing, BOTTOM="Is this [absurdly grand label]?". About ridiculous misidentification. Example: TOP="Got 3 likes on my post" BOTTOM="Am I megastar or superstar?". Photo: Pigeon looking at butterfly, confused about what it is.',
-  'woman-cat': 'Woman Yelling at Cat: TOP=angry blonde woman yelling accusation, BOTTOM=cat\'s ALWAYS provocative and insulting dismissal to the woman. The cat responds to HER, not to a man. Be savage and offensive. Example: TOP="You\'re ruining your life!" BOTTOM="Cry harder, Karen". Photo: Blonde woman pointing and yelling angrily (left), white cat sitting at dinner table looking smug and unbothered (right).',
+  'woman-cat': 'Woman Yelling at Cat: TOP=angry blonde woman yelling accusation, BOTTOM=cat\'s INSULTING and DISMISSIVE response. CRITICAL: Cat MUST insult/mock the woman directly - you can use words like "Karen", "cope", "cry", or similar provocative dismissals. Example: TOP="You\'re ruining your life!" BOTTOM="Cry harder, Karen". Photo: Blonde woman pointing and yelling angrily (left), white cat sitting at dinner table looking smug and unbothered (right).',
   fine: 'This is Fine (dog in fire): TOP=catastrophic situation, BOTTOM=denial during disaster. Example: TOP="Bank account at -$47, rent due tomorrow" BOTTOM="This is fine". Photo: Dog sitting at table drinking coffee while room is on fire around him, smiling calmly.',
   stonks: 'Stonks: TOP=huge failure/mistake, BOTTOM=unexpected huge success. Example: TOP="Accidentally replied all with meme" BOTTOM="CEO loved it, got promoted". Photo: Orange meme man in suit with rising stock chart arrow behind him, looking confident.',
 
@@ -61,6 +61,7 @@ RULES:
 8. CRITICAL: Be concise and creative - rephrase to fit within 70 chars
 9. NEVER truncate words ("du moin" is WRONG, must be "du moins" or rephrase entirely)
 10. Plan your text from the start to fit 70 chars - write complete sentences that naturally fit
+11. PREFER 3-4 words max in part 1 and part 2 IF POSSIBLE - shorter is punchier and more viral
 
 Your response (ONLY the formatted text in ${language}):`;
 

@@ -18,11 +18,12 @@ export async function createHistoryPanel(): Promise<void> {
   }
 
   const { darkMode } = await chrome.storage.local.get(['darkMode']);
+  const isDark = darkMode !== undefined ? darkMode : true;
   allMemes = await getAllMemes();
 
   const panel = document.createElement('div');
   panel.className = 'history-panel';
-  if (darkMode) panel.classList.add('dark');
+  if (isDark) panel.classList.add('dark');
 
   Object.assign(panel.style, {
     position: 'fixed',
@@ -30,7 +31,7 @@ export async function createHistoryPanel(): Promise<void> {
     right: '20px',
     width: '300px',
     maxHeight: '80vh',
-    backgroundColor: darkMode ? '#1a1a2e' : '#fff',
+    backgroundColor: isDark ? '#1a1a2e' : '#fff',
     borderRadius: '12px',
     padding: '20px',
     boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
@@ -51,7 +52,7 @@ export async function createHistoryPanel(): Promise<void> {
   Object.assign(title.style, {
     margin: '0',
     fontSize: '18px',
-    color: darkMode ? '#fff' : '#333'
+    color: isDark ? '#fff' : '#333'
   });
 
   const closeBtn = document.createElement('button');
@@ -63,7 +64,7 @@ export async function createHistoryPanel(): Promise<void> {
     border: 'none',
     fontSize: '24px',
     cursor: 'pointer',
-    color: darkMode ? '#fff' : '#333'
+    color: isDark ? '#fff' : '#333'
   });
 
   header.appendChild(title);
@@ -87,9 +88,9 @@ export async function createHistoryPanel(): Promise<void> {
     flex: '1',
     padding: '8px',
     borderRadius: '6px',
-    border: `1px solid ${darkMode ? '#444' : '#ddd'}`,
-    backgroundColor: darkMode ? '#2a2a3e' : '#fff',
-    color: darkMode ? '#fff' : '#333',
+    border: `1px solid ${isDark ? '#444' : '#ddd'}`,
+    backgroundColor: isDark ? '#2a2a3e' : '#fff',
+    color: isDark ? '#fff' : '#333',
     fontSize: '14px'
   });
 
@@ -108,7 +109,7 @@ export async function createHistoryPanel(): Promise<void> {
     padding: '8px 12px',
     borderRadius: '6px',
     border: 'none',
-    backgroundColor: darkMode ? '#2a2a3e' : '#f5f5f5',
+    backgroundColor: isDark ? '#2a2a3e' : '#f5f5f5',
     cursor: 'pointer',
     fontSize: '16px',
     opacity: recentFilterActive ? '1' : '0.5'
@@ -125,7 +126,7 @@ export async function createHistoryPanel(): Promise<void> {
   noResults.textContent = 'No results found';
   Object.assign(noResults.style, {
     textAlign: 'center',
-    color: darkMode ? '#999' : '#666',
+    color: isDark ? '#999' : '#666',
     padding: '20px',
     display: 'none'
   });
@@ -139,7 +140,7 @@ export async function createHistoryPanel(): Promise<void> {
     empty.textContent = 'No memes yet';
     Object.assign(empty.style, {
       textAlign: 'center',
-      color: darkMode ? '#999' : '#666',
+      color: isDark ? '#999' : '#666',
       padding: '20px'
     });
     panel.appendChild(empty);
@@ -155,7 +156,7 @@ export async function createHistoryPanel(): Promise<void> {
         padding: '10px',
         borderRadius: '8px',
         cursor: 'pointer',
-        backgroundColor: darkMode ? '#2a2a3e' : '#f5f5f5',
+        backgroundColor: isDark ? '#2a2a3e' : '#f5f5f5',
         transition: 'transform 0.2s'
       });
 
@@ -177,7 +178,7 @@ export async function createHistoryPanel(): Promise<void> {
       text.innerHTML = displayText;
       Object.assign(text.style, {
         fontSize: '12px',
-        color: darkMode ? '#ccc' : '#555',
+        color: isDark ? '#ccc' : '#555',
         marginBottom: '5px'
       });
 

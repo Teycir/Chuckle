@@ -309,9 +309,10 @@ export async function createOverlay(memeData: MemeData): Promise<void> {
 
   await loadLanguage();
   const { darkMode } = await chrome.storage.local.get(['darkMode']);
+  const isDark = darkMode !== undefined ? darkMode : true;
 
   const overlay = document.createElement('div');
-  overlay.className = `meme-overlay${darkMode ? ' dark' : ''}`;
+  overlay.className = `meme-overlay${isDark ? ' dark' : ''}`;
   overlay.setAttribute('role', 'dialog');
   overlay.setAttribute('aria-modal', 'true');
 
