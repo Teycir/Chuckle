@@ -4,11 +4,16 @@
 
 **Chuckle** turns any text on the web into viral memes in seconds. Highlight text, right-click, and let AI create the perfect meme for you.
 
-Think of it as your personal meme generator that lives in your browser. No design skills needed—just highlight, click, and share. Everything stays on your computer—no tracking, no data collection, no ads. Fully open-source.
+Think of it as your personal meme generator that lives in your browser. No design skills needed—just highlight, click, and share or save to disk. When API credits are exhausted you can continue manually offline.
+Everything stays on your computer—no tracking, no data collection, no ads. Fully open-source.
+
+<p align="center">
+  <img src="chuckleAdmin.png" alt="Chuckle Admin">
+</p>
 
 ### ✨ What Can Chuckle Do?
 
-- 🆓 **Free to Use** - Get 1,500 free memes every day using Google AI Studio's free tier
+- 🆓 **Free to Use** - Get 1,500 free memes every day using Google AI Studio's free tier, fallback use with OpenRouter
 - 🔒 **Your Privacy is Safe** - Everything stays on your computer, no tracking
 - ⚡ **Super Fast** - Get a meme in 2-3 seconds, try different templates instantly
 - 🤖 **AI-Powered** - Gemini 2.5 Flash picks the perfect meme template for your text
@@ -16,7 +21,7 @@ Think of it as your personal meme generator that lives in your browser. No desig
 - 🎨 **20 Meme Templates** - Drake, Distracted Boyfriend, Woman Yelling at Cat, and 17 more
 - **Social Sharing** - Share instantly to Twitter, LinkedIn, or Email
 - 📊 **Analytics Dashboard** - Track your meme stats, top templates, and share counts
-- ✏️ **Edit Meme Text** - Click to edit text directly, no need to regenerate
+- ✏️ **Edit Meme Text** - Click to edit text directly and manually then hit enter to regenerate
 - ⌨️ **Keyboard Shortcuts** - Press `Alt+M` for instant meme generation from selected text
 
 ### Why Use Chuckle?
@@ -67,7 +72,7 @@ Think of it as your personal meme generator that lives in your browser. No desig
 **Step 1: Install Chuckle (2 minutes)**
 1. Open Chrome and go to `chrome://extensions/`
 2. Turn on "Developer mode" (top right corner)
-3. Click "Load unpacked" and select the Chuckle folder
+3. Click "Load unpacked" and select under the Chuckle folder the folder dist
 4. You'll see the Chuckle icon appear in your browser
 
 **Step 2: Get Your Free AI Key (1 minute)**
