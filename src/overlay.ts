@@ -186,7 +186,8 @@ async function regenerateMeme(specificTemplate?: string): Promise<void> {
     const errorStr = error instanceof Error ? error.message : String(error);
     let errorMessage: string;
     
-    if (errorStr.includes('API') || errorStr.includes('429') || errorStr.includes('Too Many Requests')) {
+    if (errorStr.includes('429') || errorStr.includes('Too Many Requests') || 
+        errorStr.includes('API')) {
       errorMessage = errorStr;
     } else if (errorStr.includes('400')) {
       errorMessage = getTranslation('invalidRequest');
@@ -194,9 +195,6 @@ async function regenerateMeme(specificTemplate?: string): Promise<void> {
       errorMessage = await getErrorMessage('networkError');
     } else if (errorStr.includes('401') || errorStr.includes('403') || errorStr.includes('API key')) {
       errorMessage = await getErrorMessage('invalidApiKey');
-    } else if (errorStr.includes('Failed to format text')) {
-      const match = errorStr.match(/Error: (.+)$/);
-      errorMessage = match ? match[1] : errorStr;
     } else {
       errorMessage = errorStr || (await getErrorMessage('generationFailed'));
     }
