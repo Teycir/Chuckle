@@ -4,23 +4,23 @@ import { formattedCache } from './cache';
 import { decodeHtmlEntities, cleanText } from '../lib/text-utils';
 
 const TEMPLATE_PROMPTS: Record<string, string> = {
-  drake: 'Drake (rejecting/approving): TOP=rejected option (what Drake pushes away), BOTTOM=OPPOSITE approved option (what Drake wants). CRITICAL: TOP and BOTTOM must be CONTRADICTORY. Example: TOP="Therapy and self-care" BOTTOM="Ignoring problems until they disappear" or TOP="Être riche c\'est mal" BOTTOM="Avoir 3 maisons c\'est bien"',
-  db: 'Distracted Boyfriend: TOP=tempting new thing only, BOTTOM=current thing being ignored. About temptation only. Example: TOP="ChatGPT writing my code" BOTTOM="Actually learning to code"',
-  ds: 'Two Buttons (sweating): TOP=first impossible option, BOTTOM=second impossible option. About very hard choices. Example: TOP="Admit I was wrong" BOTTOM="Double down and look stupid"',
-  cmm: 'Change My Mind: One single controversial statement (no TOP/BOTTOM split). Example: "Pineapple belongs on pizza"',
-  pigeon: 'Pigeon (Is this...?): TOP=tiny/pathetic thing, BOTTOM="Is this [absurdly grand label]?". About ridiculous misidentification. Example: TOP="Got 3 likes on my post" BOTTOM="Am I megastar or superstar?"',
-  'woman-cat': 'Woman Yelling at Cat: TOP=angry accusation, BOTTOM=ALWAYS provocative and insulting dismissal. Be savage and offensive. Example: TOP="You\'re ruining your life!" BOTTOM="Cry harder, Karen"',
-  fine: 'This is Fine (dog in fire): TOP=catastrophic situation, BOTTOM=denial during disaster. Example: TOP="Bank account at -$47, rent due tomorrow" BOTTOM="This is fine"',
-  stonks: 'Stonks: TOP=huge failure/mistake, BOTTOM=unexpected huge success. Example: TOP="Accidentally replied all with meme" BOTTOM="CEO loved it, got promoted"',
+  drake: 'Drake (rejecting/approving): TOP=rejected option (what Drake pushes away), BOTTOM=OPPOSITE approved option (what Drake wants). CRITICAL: TOP and BOTTOM must be CONTRADICTORY. Example: TOP="Therapy and self-care" BOTTOM="Ignoring problems until they disappear". Photo: Drake rapper in red jacket, top panel shows him turning away disgusted, bottom panel shows him pointing and smiling approvingly.',
+  db: 'Distracted Boyfriend: TOP=tempting new thing only, BOTTOM=current thing being ignored. About temptation only. Example: TOP="ChatGPT writing my code" BOTTOM="Actually learning to code". Photo: Man walking with girlfriend, turns to check out another woman passing by, girlfriend looks angry.',
+  ds: 'Two Buttons (sweating): TOP=first impossible option, BOTTOM=second impossible option. About very hard choices. Example: TOP="Admit I was wrong" BOTTOM="Double down and look stupid". Photo: Man in suit sweating nervously, hand hovering over two red buttons, unable to choose.',
+  cmm: 'Change My Mind: One single controversial statement (no TOP/BOTTOM split). Example: "Pineapple belongs on pizza". Photo: Man sitting at table with sign that says "Change My Mind", ready to debate.',
+  pigeon: 'Pigeon (Is this...?): TOP=tiny/pathetic thing, BOTTOM="Is this [absurdly grand label]?". About ridiculous misidentification. Example: TOP="Got 3 likes on my post" BOTTOM="Am I megastar or superstar?". Photo: Pigeon looking at butterfly, confused about what it is.',
+  'woman-cat': 'Woman Yelling at Cat: TOP=angry blonde woman yelling accusation, BOTTOM=cat\'s ALWAYS provocative and insulting dismissal to the woman. The cat responds to HER, not to a man. Be savage and offensive. Example: TOP="You\'re ruining your life!" BOTTOM="Cry harder, Karen". Photo: Blonde woman pointing and yelling angrily (left), white cat sitting at dinner table looking smug and unbothered (right).',
+  fine: 'This is Fine (dog in fire): TOP=catastrophic situation, BOTTOM=denial during disaster. Example: TOP="Bank account at -$47, rent due tomorrow" BOTTOM="This is fine". Photo: Dog sitting at table drinking coffee while room is on fire around him, smiling calmly.',
+  stonks: 'Stonks: TOP=huge failure/mistake, BOTTOM=unexpected huge success. Example: TOP="Accidentally replied all with meme" BOTTOM="CEO loved it, got promoted". Photo: Orange meme man in suit with rising stock chart arrow behind him, looking confident.',
 
-  success: 'Success Kid (fist pump): TOP=challenge/obstacle, BOTTOM=petty victory or savage comeback. Example: TOP="Ex said I\'d never find better" BOTTOM="Found someone who laughs at my jokes"',
-  blb: 'Bad Luck Brian: TOP=big action taken, BOTTOM=catastrophic outcome. Example: TOP="Finally gets a date" BOTTOM="She brings her boyfriend"',
-  fry: 'Futurama Fry (squinting): TOP="Not sure if [first option]", BOTTOM="Or [second option]". Example: TOP="Not sure if flirting" BOTTOM="Or just being nice to get a tip"',
-  fwp: 'First World Problems: TOP=ridiculously privileged complaint, BOTTOM=why it ruins everything. Example: TOP="My AirPods died" BOTTOM="Now I have to hear my own thoughts"',
-  doge: 'Doge: Broken English, enthusiastic. TOP="much/wow [thing]", BOTTOM="such/very [thing] wow". Example: TOP="much procrastinate" BOTTOM="very deadline panic wow"',
-  iw: 'Insanity Wolf: TOP=normal situation, BOTTOM=EXTREME overreaction. Example: TOP="Someone says good morning" BOTTOM="SCREAM BACK AGGRESSIVELY"',
-  philosoraptor: 'Philosoraptor: TOP=first part of mind-bending question, BOTTOM=second part that makes you think. Example: TOP="If I\'m always late" BOTTOM="Am I consistently on time for being late?"',
-  grumpycat: 'Grumpy Cat: TOP=suggestion/request, BOTTOM=witty grumpy rejection with sarcasm. Be creative and funny, not just "No". Example: TOP="Be more positive" BOTTOM="I choose violence" or TOP="Smile more" BOTTOM="I am not a monkey"'
+  success: 'Success Kid (fist pump): TOP=challenge/obstacle, BOTTOM=petty victory or savage comeback. Example: TOP="Ex said I\'d never find better" BOTTOM="Found someone who laughs at my jokes". Photo: Baby on beach with determined expression, fist clenched in victory pose.',
+  blb: 'Bad Luck Brian: TOP=big action taken, BOTTOM=catastrophic outcome. Example: TOP="Finally gets a date" BOTTOM="She brings her boyfriend". Photo: Awkward teen with braces, red plaid vest, terrible school photo smile.',
+  fry: 'Futurama Fry (squinting): TOP="Not sure if [first option]", BOTTOM="Or [second option]". Example: TOP="Not sure if flirting" BOTTOM="Or just being nice to get a tip". Photo: Fry from Futurama squinting suspiciously, orange hair, red jacket.',
+  fwp: 'First World Problems: TOP=ridiculously privileged complaint, BOTTOM=why it ruins everything. Example: TOP="My AirPods died" BOTTOM="Now I have to hear my own thoughts". Photo: Woman crying while holding phone, looking devastated over trivial problem.',
+  doge: 'Doge: Broken English, enthusiastic. TOP="much/wow [thing]", BOTTOM="such/very [thing] wow". Example: TOP="much procrastinate" BOTTOM="very deadline panic wow". Photo: Shiba Inu dog with raised eyebrows, looking sideways with comic sans text.',
+  iw: 'Insanity Wolf: TOP=normal situation, BOTTOM=EXTREME overreaction. Example: TOP="Someone says good morning" BOTTOM="SCREAM BACK AGGRESSIVELY". Photo: Wolf with crazy eyes, teeth bared, insane aggressive expression.',
+  philosoraptor: 'Philosoraptor: TOP=first part of mind-bending question, BOTTOM=second part that makes you think. Example: TOP="If I\'m always late" BOTTOM="Am I consistently on time for being late?". Photo: Velociraptor in thinking pose, claw on chin, contemplating deeply.',
+  grumpycat: 'Grumpy Cat: TOP=suggestion/request, BOTTOM=witty grumpy rejection with sarcasm. Be creative and funny, not just "No". Example: TOP="Be more positive" BOTTOM="I choose violence". Photo: Grumpy white cat with permanently angry/frowning face, looking extremely displeased.'
 };
 
 
@@ -48,7 +48,7 @@ export async function formatTextForTemplate(text: string, template: string, forc
 
 Template: ${templatePrompt}
 
-IMPORTANT: If the text is too long, REPHRASE it creatively to be shorter while keeping the meaning. Do NOT just cut words.
+IMPORTANT: If the text is too long, REPHRASE it creatively to be shorter while keeping the meaning. Do NOT just cut words. Consider the photo context when creating the meme text.
 
 RULES:
 1. Return EXACTLY this format: "text1 / text2"
@@ -102,6 +102,10 @@ Your response (ONLY the formatted text in ${language}):`;
     if (!response.ok) {
       if (response.status === 429) {
         const errorMsg = await getErrorMessage('tooManyRequests');
+        throw new Error(errorMsg);
+      }
+      if (response.status === 403 || response.status === 401) {
+        const errorMsg = await getErrorMessage('invalidApiKey');
         throw new Error(errorMsg);
       }
       throw new Error(`Template formatting failed: ${response.status}`);

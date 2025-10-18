@@ -18,7 +18,8 @@ const overlayTranslations = {
     downloadFailed: 'Download failed',
     textboxTooltip: 'You can change text and press Enter to update it on meme',
     templateTooltip: 'Click to generate',
-    textboxPlaceholder: 'Change text then press Enter'
+    textboxPlaceholder: 'Change text then press Enter',
+    invalidRequest: 'Invalid request. Text may be too long or contain invalid characters.'
   },
   Spanish: {
     downloadPng: 'Descargar',
@@ -30,7 +31,8 @@ const overlayTranslations = {
     downloadFailed: 'Descarga fallida',
     textboxTooltip: 'Puedes cambiar el texto y presionar Enter para actualizarlo en el meme',
     templateTooltip: 'Haz clic para generar',
-    textboxPlaceholder: 'Cambia el texto y presiona Enter'
+    textboxPlaceholder: 'Cambia el texto y presiona Enter',
+    invalidRequest: 'Solicitud inválida. El texto puede ser demasiado largo o contener caracteres inválidos.'
   },
   French: {
     downloadPng: 'Télécharger',
@@ -42,7 +44,8 @@ const overlayTranslations = {
     downloadFailed: 'Échec du téléchargement',
     textboxTooltip: 'Vous pouvez modifier le texte et appuyer sur Entrée pour le mettre à jour sur le meme',
     templateTooltip: 'Cliquez pour générer',
-    textboxPlaceholder: 'Modifiez le texte puis appuyez sur Entrée'
+    textboxPlaceholder: 'Modifiez le texte puis appuyez sur Entrée',
+    invalidRequest: 'Requête invalide. Le texte peut être trop long ou contenir des caractères invalides.'
   },
   German: {
     downloadPng: 'Herunterladen',
@@ -54,7 +57,8 @@ const overlayTranslations = {
     downloadFailed: 'Download fehlgeschlagen',
     textboxTooltip: 'Sie können den Text ändern und Enter drücken, um ihn im Meme zu aktualisieren',
     templateTooltip: 'Klicken Sie zum Generieren',
-    textboxPlaceholder: 'Text ändern und Enter drücken'
+    textboxPlaceholder: 'Text ändern und Enter drücken',
+    invalidRequest: 'Ungültige Anfrage. Text kann zu lang sein oder ungültige Zeichen enthalten.'
   }
 };
 
@@ -134,7 +138,7 @@ async function regenerateMeme(specificTemplate?: string): Promise<void> {
     const textToUse = isManualEdit ? originalText : originalInput;
     console.log('[Chuckle] Regenerating with text:', textToUse, 'originalInput:', originalInput, 'specificTemplate:', specificTemplate);
     const truncatedText = textToUse?.slice(0, 100) || '';
-    const template = specificTemplate || await analyzeMemeContext(truncatedText, Date.now());
+    const template = specificTemplate || (isManualEdit && currentTemplate) || await analyzeMemeContext(originalInput?.slice(0, 100) || '', Date.now());
     currentTemplate = template;
     const skipFormatting = isManualEdit;
     const forceRegenerate = !!specificTemplate;
@@ -184,6 +188,8 @@ async function regenerateMeme(specificTemplate?: string): Promise<void> {
     
     if (errorStr.includes('API') || errorStr.includes('429') || errorStr.includes('Too Many Requests')) {
       errorMessage = errorStr;
+    } else if (errorStr.includes('400')) {
+      errorMessage = getTranslation('invalidRequest');
     } else if (errorStr.includes('fetch') || errorStr.includes('Network') || errorStr.includes('Failed to fetch')) {
       errorMessage = await getErrorMessage('networkError');
     } else if (errorStr.includes('401') || errorStr.includes('403') || errorStr.includes('API key')) {

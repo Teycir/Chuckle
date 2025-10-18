@@ -153,9 +153,12 @@ export async function analyzeMemeContext(text: string, variant: number = 0): Pro
       }
 
       if (!response.ok) {
-        console.error('[Chuckle] Gemini API error:', response.status);
+        console.error(`[Chuckle] ${provider === 'google' ? 'Gemini' : 'OpenRouter'} API error:`, response.status);
         if (response.status === 429) {
           throw new Error(await getErrorMessage('tooManyRequests'));
+        }
+        if (response.status === 403 || response.status === 401) {
+          throw new Error(await getErrorMessage('invalidApiKey'));
         }
         throw new Error(`API error: ${response.status}`);
       }
