@@ -1,7 +1,7 @@
 export const MEME_TEMPLATES = [
   { id: 'drake', name: 'Drake', topics: ['choice', 'preference', 'comparison', 'rejection', 'approval'] },
   { id: 'db', name: 'Distracted BF', topics: ['temptation', 'distraction', 'betrayal', 'choice', 'infidelity'] },
-  { id: 'ds', name: 'Daily Struggle', topics: ['dilemma', 'hard choice', 'stress', 'decision', 'pressure'] },
+  { id: 'ds', name: 'Daily Struggle', topics: ['impossible choice', 'dilemma', 'absurd', 'stress', 'panic'] },
   { id: 'cmm', name: 'Change My Mind', topics: ['opinion', 'debate', 'controversial', 'statement', 'challenge'] },
   { id: 'pigeon', name: 'Pigeon', topics: ['confusion', 'misunderstanding', 'wrong', 'mistake', 'identification'] },
   { id: 'woman-cat', name: 'Woman Cat', topics: ['argument', 'accusation', 'defense', 'dismissal', 'conflict'] },
@@ -20,7 +20,7 @@ export const MEME_TEMPLATES = [
 ] as const;
 
 export const GEMINI_PROMPT_TEMPLATE = (text: string, topic?: string) => 
-  `Analyze this text and suggest ONE meme template from this list: db (distracted boyfriend), drake, ds (daily struggle), cmm (change my mind), pigeon, woman-cat, fine (this is fine), stonks, success, blb (bad luck brian), fry (futurama fry), fwp (first world problems), doge, iw (insanity wolf), philosoraptor, grumpycat. Text: "${text}".${topic ? ` Topic: ${topic}.` : ''} Return ONLY the template ID (e.g., "db", "drake"). No explanation.`;
+  `Analyze this text and suggest ONE meme template from this list: db (distracted boyfriend), drake, ds (two buttons - sweating over impossible choices), cmm (change my mind), pigeon, woman-cat, fine (this is fine), stonks, success, blb (bad luck brian), fry (futurama fry), fwp (first world problems), doge, iw (insanity wolf), philosoraptor, grumpycat. Text: "${text}".${topic ? ` Topic: ${topic}.` : ''} Return ONLY the template ID (e.g., "db", "drake"). No explanation.`;
 
 export const TEXT_OPTIMIZATION_PROMPT = (text: string) => 
   `Transform this into HILARIOUS meme text (max 100 chars). Be creative, witty, and punchy. Add comedic timing, irony, or relatable humor. Fix typos, complete or remove cut-off sentences. Make it viral-worthy! Text: "${text}". Return ONLY the optimized text, nothing else.`;
