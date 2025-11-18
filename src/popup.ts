@@ -1,4 +1,5 @@
 import { getAnalytics, exportData } from './analytics';
+import { validateAndSetupModels } from './modelValidator';
 
 let cachedModels: any = null;
 let cachedApiKey: string | null = null;
@@ -29,68 +30,6 @@ function constantTimeCompare(a: string, b: string): boolean {
   return result === 0;
 }
 
-async function loadOpenRouterModels(apiKey: string): Promise<any[]> {
-  if (!apiKey || typeof apiKey !== 'string' || apiKey.length < 20) return [];
-  
-  const { statusMsg } = getElements();
-  
-  try {
-    if (statusMsg) {
-      statusMsg.textContent = 'Loading models...';
-      statusMsg.className = 'status-msg';
-    }
-    
-    const response = await fetch('https://openrouter.ai/api/v1/models', {
-      headers: { 'Authorization': `Bearer ${apiKey}` }
-    });
-    
-    if (!response.ok) throw new Error(`API error: ${response.status}`);
-    const data = await response.json();
-    
-    const script = document.createElement('script');
-    script.src = chrome.runtime.getURL('lib/model-selector.js');
-    await new Promise((resolve, reject) => {
-      script.onload = resolve;
-      script.onerror = reject;
-      document.head.appendChild(script);
-    });
-    
-    const selected = (window as any).selectBestOpenAIModels(data.data);
-    
-    if (!selected.primary) throw new Error('No free models found');
-    
-    await chrome.storage.local.set({ 
-      openrouterPrimaryModel: selected.primary,
-      openrouterFallbackModels: selected.fallbacks
-    });
-    
-    // Update model label
-    updateModelLabel('openrouterModelLabel', selected.primary);
-    
-    if (statusMsg) {
-      statusMsg.textContent = `✓ Model: ${modelName}`;
-      statusMsg.className = 'status-msg success';
-      setTimeout(() => {
-        statusMsg.textContent = '';
-        statusMsg.className = 'status-msg';
-      }, 2000);
-    }
-    
-    return data.data;
-  } catch (error) {
-    console.error('Failed to load OpenRouter models:', error);
-    if (statusMsg) {
-      statusMsg.textContent = `⚠️ ${error instanceof Error ? error.message : 'Error'}`;
-      statusMsg.className = 'status-msg error';
-      setTimeout(() => {
-        statusMsg.textContent = '';
-        statusMsg.className = 'status-msg';
-      }, 4000);
-    }
-    return [];
-  }
-}
-
 function updateModelLabel(labelId: string, modelName: string) {
   const label = document.getElementById(labelId);
   if (label && modelName) {
@@ -99,121 +38,6 @@ function updateModelLabel(labelId: string, modelName: string) {
     label.style.color = '#137333';
     label.style.background = '#e6f4ea';
   }
-}
-
-async function validateModelForMemeGeneration(apiKey: string, model: string, provider: string): Promise<boolean> {
-  try {
-    // Test the actual formatting task that the extension will use
-    const testPrompt = 'Convert "test message" to meme format. Return exactly: "top text / bottom text"';
-    let response: Response;
-    
-    if (provider === 'google') {
-      const modelName = model.replace('models/', '');
-      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent`;
-      response = await fetch(`${apiUrl}?key=${apiKey}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: testPrompt }] }],
-          generationConfig: { temperature: 0.1, maxOutputTokens: 50 }
-        })
-      });
-    } else {
-      response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model,
-          messages: [{ role: 'user', content: testPrompt }],
-          temperature: 0.1,
-          max_tokens: 50
-        })
-      });
-    }
-    
-    if (!response.ok) {
-      console.log(`[Chuckle] Model validation failed with status ${response.status}`);
-      return false;
-    }
-    
-    const data = await response.json();
-    if (provider === 'google') {
-      // Check if model returns actual visible text (not just reasoning tokens)
-      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-      return !!(text && text.trim().length > 0 && text.includes('/'));
-    } else {
-      const text = data.choices?.[0]?.message?.content;
-      return !!(text && text.trim().length > 0 && text.includes('/'));
-    }
-  } catch (error) {
-    console.log('[Chuckle] Model validation error:', error);
-    return false;
-  }
-}
-
-
-
-async function validateAndSetupModels(apiKey: string): Promise<boolean> {
-  const { statusMsg } = getElements();
-  
-  if (statusMsg) {
-    statusMsg.textContent = 'Testing models...';
-    statusMsg.className = 'status-msg';
-  }
-  
-  // Test confirmed working models (non-reasoning) in priority order
-  const testModels = [
-    'models/gemini-2.0-flash',
-    'models/gemini-2.0-flash-001'
-  ];
-  
-  const validModels = [];
-  
-  for (const model of testModels) {
-    try {
-      console.log('[Chuckle] Testing model:', model);
-      const isValid = await validateModelForMemeGeneration(apiKey, model, 'google');
-      if (isValid) {
-        validModels.push(model);
-        console.log('[Chuckle] ✅ Valid model:', model);
-      } else {
-        console.log('[Chuckle] ❌ Invalid model:', model);
-      }
-    } catch (error) {
-      console.log('[Chuckle] ❌ Error testing', model, error);
-    }
-  }
-  
-  if (validModels.length === 0) {
-    if (statusMsg) {
-      statusMsg.textContent = '⚠️ No working models found';
-      statusMsg.className = 'status-msg error';
-    }
-    return false;
-  }
-  
-  // Set up cascade: primary + fallbacks
-  const primary = validModels[0];
-  const fallbacks = validModels.slice(1);
-  
-  await chrome.storage.local.set({
-    primaryModel: primary,
-    fallbackModels: fallbacks
-  });
-  
-  console.log('[Chuckle] ✅ Model cascade setup:', { primary, fallbacks });
-  
-  if (statusMsg) {
-    const modelName = primary.split('/').pop();
-    statusMsg.textContent = `✓ Using ${modelName} (+${fallbacks.length} fallbacks)`;
-    statusMsg.className = 'status-msg success';
-    setTimeout(() => {
-      statusMsg.textContent = '';
-      statusMsg.className = 'status-msg';
-    }, 2000);
-  }
-  
-  return true;
 }
 
 const translations = {
@@ -418,7 +242,25 @@ document.addEventListener('DOMContentLoaded', async () => {
         isLoadingModels = true;
         console.log('[Chuckle] Auto-validating models for stored key');
         try {
-          await validateAndSetupModels(data.geminiApiKey);
+          await validateAndSetupModels(data.geminiApiKey, 'google', (msg, type) => {
+            const { statusMsg } = getElements();
+            if (statusMsg) {
+              statusMsg.textContent = type === 'error' ? `⚠️ ${msg}` : type === 'success' ? `✓ ${msg}` : msg;
+              statusMsg.className = `status-msg ${type === 'error' ? 'error' : type === 'success' ? 'success' : ''}`;
+              if (type === 'success') {
+                setTimeout(() => {
+                  statusMsg.textContent = '';
+                  statusMsg.className = 'status-msg';
+                }, 2000);
+              }
+            }
+          }).then(success => {
+            if (success) {
+              const { primaryModel } = chrome.storage.local.get(['primaryModel']).then(data => {
+                if (data.primaryModel) updateModelLabel('geminiModelLabel', data.primaryModel);
+              });
+            }
+          });
         } finally {
           isLoadingModels = false;
         }
@@ -431,9 +273,27 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Validate key format before loading models
     if (/^sk-or-v1-[a-f0-9]{64}$/.test(data.openrouterApiKey)) {
       openrouterInput.classList.add('valid');
-      // Auto-load models for existing valid key
+      // Auto-validate models for existing valid key
       if (data.aiProvider === 'openrouter') {
-        await loadOpenRouterModels(data.openrouterApiKey);
+        await validateAndSetupModels(data.openrouterApiKey, 'openrouter', (msg, type) => {
+          const { statusMsg } = getElements();
+          if (statusMsg) {
+            statusMsg.textContent = type === 'error' ? `⚠️ ${msg}` : type === 'success' ? `✓ ${msg}` : msg;
+            statusMsg.className = `status-msg ${type === 'error' ? 'error' : type === 'success' ? 'success' : ''}`;
+            if (type === 'success') {
+              setTimeout(() => {
+                statusMsg.textContent = '';
+                statusMsg.className = 'status-msg';
+              }, 2000);
+            }
+          }
+        }).then(success => {
+          if (success) {
+            chrome.storage.local.get(['openrouterPrimaryModel']).then(data => {
+              if (data.openrouterPrimaryModel) updateModelLabel('openrouterModelLabel', data.openrouterPrimaryModel);
+            });
+          }
+        });
       }
     }
   }
@@ -555,7 +415,25 @@ document.getElementById('geminiApiKey')?.addEventListener('input', (e) => {
         isLoadingModels = true;
         console.log('[Chuckle] Auto-validating models for key input');
         try {
-          await validateAndSetupModels(key);
+          await validateAndSetupModels(key, 'google', (msg, type) => {
+            const { statusMsg } = getElements();
+            if (statusMsg) {
+              statusMsg.textContent = type === 'error' ? `⚠️ ${msg}` : type === 'success' ? `✓ ${msg}` : msg;
+              statusMsg.className = `status-msg ${type === 'error' ? 'error' : type === 'success' ? 'success' : ''}`;
+              if (type === 'success') {
+                setTimeout(() => {
+                  statusMsg.textContent = '';
+                  statusMsg.className = 'status-msg';
+                }, 2000);
+              }
+            }
+          }).then(success => {
+            if (success) {
+              chrome.storage.local.get(['primaryModel']).then(data => {
+                if (data.primaryModel) updateModelLabel('geminiModelLabel', data.primaryModel);
+              });
+            }
+          });
         } finally {
           isLoadingModels = false;
         }
@@ -577,7 +455,25 @@ document.getElementById('openrouterApiKey')?.addEventListener('input', (e) => {
     input.classList.add('valid');
     // Debounced auto-load models
     openrouterKeyTimeout = setTimeout(async () => {
-      await loadOpenRouterModels(key);
+      await validateAndSetupModels(key, 'openrouter', (msg, type) => {
+        const { statusMsg } = getElements();
+        if (statusMsg) {
+          statusMsg.textContent = type === 'error' ? `⚠️ ${msg}` : type === 'success' ? `✓ ${msg}` : msg;
+          statusMsg.className = `status-msg ${type === 'error' ? 'error' : type === 'success' ? 'success' : ''}`;
+          if (type === 'success') {
+            setTimeout(() => {
+              statusMsg.textContent = '';
+              statusMsg.className = 'status-msg';
+            }, 2000);
+          }
+        }
+      }).then(success => {
+        if (success) {
+          chrome.storage.local.get(['openrouterPrimaryModel']).then(data => {
+            if (data.openrouterPrimaryModel) updateModelLabel('openrouterModelLabel', data.openrouterPrimaryModel);
+          });
+        }
+      });
     }, 1000);
   } else {
     input.classList.remove('valid');
@@ -616,50 +512,26 @@ document.getElementById('saveKey')?.addEventListener('click', async () => {
 
   try {
     if (saveBtn) saveBtn.disabled = true;
-    statusMsg.textContent = 'Testing API key...';
+    statusMsg.textContent = 'Saving settings...';
     statusMsg.className = 'status-msg';
     
-    await chrome.storage.local.remove(['primaryModel', 'fallbackModels', 'openrouterPrimaryModel', 'openrouterFallbackModels']);
-    
+    // Get already validated models from storage (validation happened on key input)
     let primary, fallbacks;
     if (provider === 'google') {
-      const success = await validateAndSetupModels(geminiKey);
-      if (!success) throw new Error(t.cannotLoadModels);
-      
       const { primaryModel, fallbackModels } = await chrome.storage.local.get(['primaryModel', 'fallbackModels']);
       primary = primaryModel;
       fallbacks = fallbackModels || [];
     } else {
-      const models = await loadOpenRouterModels(openrouterKey);
-      if (models.length === 0) throw new Error(t.cannotLoadModels);
-      
-      // Get currently selected model from dropdown
-      const modelSelect = document.getElementById('openrouterModelSelect') as HTMLSelectElement;
-      const selectedModel = modelSelect?.value;
-      
-      if (selectedModel) {
-        primary = selectedModel;
-      } else {
-        const { openrouterPrimaryModel } = await chrome.storage.local.get(['openrouterPrimaryModel']);
-        primary = openrouterPrimaryModel;
-      }
-      
-      if (!primary) throw new Error(t.noModelsFound);
-      
-      // Validate the selected model works for meme generation
-      statusMsg.textContent = 'Validating model...';
-      const isValid = await validateModelForMemeGeneration(openrouterKey, primary, 'openrouter');
-      if (!isValid) {
-        throw new Error('Selected model cannot generate text content. Please choose a different model.');
-      }
-      
-      fallbacks = models.filter((m: any) => m.name !== primary).slice(0, 2).map((m: any) => m.name);
+      const { openrouterPrimaryModel, openrouterFallbackModels } = await chrome.storage.local.get(['openrouterPrimaryModel', 'openrouterFallbackModels']);
+      primary = openrouterPrimaryModel;
+      fallbacks = openrouterFallbackModels || [];
     }
     
     const offlineModeCheckbox = document.getElementById('offlineMode') as HTMLInputElement;
     const offlineMode = offlineModeCheckbox?.checked || false;
     
-    const storageData: any = { 
+    // Save all settings including API keys
+    const storageData: any = {
       aiProvider: provider,
       geminiApiKey: geminiKey,
       openrouterApiKey: openrouterKey,
@@ -667,10 +539,11 @@ document.getElementById('saveKey')?.addEventListener('click', async () => {
       offlineMode
     };
     
-    if (provider === 'google') {
+    // Only set model data if it exists
+    if (provider === 'google' && primary) {
       storageData.primaryModel = primary;
       storageData.fallbackModels = fallbacks;
-    } else {
+    } else if (provider === 'openrouter' && primary) {
       storageData.openrouterPrimaryModel = primary;
       storageData.openrouterFallbackModels = fallbacks;
     }
