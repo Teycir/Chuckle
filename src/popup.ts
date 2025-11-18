@@ -2,6 +2,7 @@ import { getAnalytics, exportData } from './analytics';
 
 let cachedModels: any = null;
 let cachedApiKey: string | null = null;
+let cachedValidModels: any = null;
 let elements: any = null;
 
 function getElements() {
@@ -63,16 +64,8 @@ async function loadOpenRouterModels(apiKey: string): Promise<any[]> {
       openrouterFallbackModels: selected.fallbacks
     });
     
-    const modelName = selected.primary.split('/').pop();
-    const tooltip = document.getElementById('openrouterModelTooltip');
-    console.log('[Chuckle] OpenRouter tooltip element:', tooltip);
-    console.log('[Chuckle] OpenRouter model name:', modelName);
-    if (tooltip) {
-      tooltip.textContent = `🤖 ${modelName}`;
-      console.log('[Chuckle] OpenRouter tooltip updated:', tooltip.textContent);
-    } else {
-      console.error('[Chuckle] OpenRouter tooltip element not found!');
-    }
+    // Update model label
+    updateModelLabel('openrouterModelLabel', selected.primary);
     
     if (statusMsg) {
       statusMsg.textContent = `✓ Model: ${modelName}`;
@@ -98,98 +91,129 @@ async function loadOpenRouterModels(apiKey: string): Promise<any[]> {
   }
 }
 
-async function loadModels(apiKey: string): Promise<any[]> {
-  if (!apiKey || typeof apiKey !== 'string' || apiKey.length < 39) return [];
-  if (cachedModels && constantTimeCompare(cachedApiKey || '', apiKey)) {
-    return cachedModels;
+function updateModelLabel(labelId: string, modelName: string) {
+  const label = document.getElementById(labelId);
+  if (label && modelName) {
+    const displayName = modelName.split('/').pop() || modelName;
+    label.textContent = `🤖 ${displayName}`;
+    label.style.color = '#137333';
+    label.style.background = '#e6f4ea';
   }
-  
-  const { statusMsg } = getElements();
-  
+}
+
+async function validateModelForMemeGeneration(apiKey: string, model: string, provider: string): Promise<boolean> {
   try {
-    if (statusMsg) {
-      statusMsg.textContent = 'Loading models...';
-      statusMsg.className = 'status-msg';
+    // Test the actual formatting task that the extension will use
+    const testPrompt = 'Convert "test message" to meme format. Return exactly: "top text / bottom text"';
+    let response: Response;
+    
+    if (provider === 'google') {
+      const modelName = model.replace('models/', '');
+      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent`;
+      response = await fetch(`${apiUrl}?key=${apiKey}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: testPrompt }] }],
+          generationConfig: { temperature: 0.1, maxOutputTokens: 50 }
+        })
+      });
+    } else {
+      response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model,
+          messages: [{ role: 'user', content: testPrompt }],
+          temperature: 0.1,
+          max_tokens: 50
+        })
+      });
     }
-    
-    const url = new URL('https://generativelanguage.googleapis.com/v1beta/models');
-    url.searchParams.set('key', apiKey);
-    
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 10000);
-    
-    const response = await fetch(url.toString(), { signal: controller.signal });
-    clearTimeout(timeout);
     
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.error?.message || `API error: ${response.status}`);
+      console.log(`[Chuckle] Model validation failed with status ${response.status}`);
+      return false;
     }
+    
     const data = await response.json();
-    
-    const models = data.models?.filter((m: any) => {
-      if (!m.supportedGenerationMethods?.includes('generateContent')) return false;
-      const displayName = m.displayName.toLowerCase();
-      return displayName.includes('flash') && !displayName.includes('lite');
-    }).sort((a: any, b: any) => {
-      const aName = a.name.toLowerCase();
-      const bName = b.name.toLowerCase();
-      const aVersion = parseFloat((aName.match(/(\d+\.\d+)/) || ['0'])[0]);
-      const bVersion = parseFloat((bName.match(/(\d+\.\d+)/) || ['0'])[0]);
-      if (aVersion !== bVersion) return bVersion - aVersion;
-      const aHasPreview = aName.includes('preview');
-      const bHasPreview = bName.includes('preview');
-      if (aHasPreview !== bHasPreview) return aHasPreview ? 1 : -1;
-      return a.name.length - b.name.length;
-    }) || [];
-    
-    const latestVersion = models[0] ? parseFloat((models[0].name.toLowerCase().match(/(\d+\.\d+)/) || ['0'])[0]) : 0;
-    const latestStable = models.find((m: any) => !m.name.toLowerCase().includes('preview') && parseFloat((m.name.toLowerCase().match(/(\d+\.\d+)/) || ['0'])[0]) === latestVersion);
-    const latestPreview = models.find((m: any) => m.name.toLowerCase().includes('preview') && parseFloat((m.name.toLowerCase().match(/(\d+\.\d+)/) || ['0'])[0]) === latestVersion);
-    const prevVersion = models.find((m: any) => parseFloat((m.name.toLowerCase().match(/(\d+\.\d+)/) || ['0'])[0]) < latestVersion);
-    
-    const primary = latestStable?.name || latestPreview?.name || prevVersion?.name;
-    const fallbacks = [latestPreview?.name, prevVersion?.name].filter(Boolean).filter((m: any) => m !== primary).slice(0, 2);
-    
-    cachedModels = models;
-    cachedApiKey = apiKey;
-    
-    await chrome.storage.local.set({ 
-      primaryModel: primary,
-      fallbackModels: fallbacks
-    });
-    
-    if (primary) {
-      const modelName = primary.split('/').pop();
-      const tooltip = document.getElementById('geminiModelTooltip');
-      if (tooltip) tooltip.textContent = `🤖 ${modelName}`;
+    if (provider === 'google') {
+      // Check if model returns actual visible text (not just reasoning tokens)
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      return !!(text && text.trim().length > 0 && text.includes('/'));
+    } else {
+      const text = data.choices?.[0]?.message?.content;
+      return !!(text && text.trim().length > 0 && text.includes('/'));
     }
-    
-    if (statusMsg) {
-      statusMsg.textContent = primary ? `✓ Model loaded` : '⚠️ No models found';
-      statusMsg.className = primary ? 'status-msg success' : 'status-msg error';
-      setTimeout(() => {
-        statusMsg.textContent = '';
-        statusMsg.className = 'status-msg';
-      }, 2000);
-    }
-    
-    return models;
   } catch (error) {
-    console.error('Failed to load models:', error);
-    
-    if (statusMsg) {
-      const isAbort = error instanceof Error && error.name === 'AbortError';
-      statusMsg.textContent = isAbort ? '⚠️ Request timeout' : `⚠️ ${error instanceof Error ? error.message : 'Error'}`;
-      statusMsg.className = 'status-msg error';
-      setTimeout(() => {
-        statusMsg.textContent = '';
-        statusMsg.className = 'status-msg';
-      }, 4000);
-    }
-    
-    return [];
+    console.log('[Chuckle] Model validation error:', error);
+    return false;
   }
+}
+
+
+
+async function validateAndSetupModels(apiKey: string): Promise<boolean> {
+  const { statusMsg } = getElements();
+  
+  if (statusMsg) {
+    statusMsg.textContent = 'Testing models...';
+    statusMsg.className = 'status-msg';
+  }
+  
+  // Test confirmed working models (non-reasoning) in priority order
+  const testModels = [
+    'models/gemini-2.0-flash',
+    'models/gemini-2.0-flash-001'
+  ];
+  
+  const validModels = [];
+  
+  for (const model of testModels) {
+    try {
+      console.log('[Chuckle] Testing model:', model);
+      const isValid = await validateModelForMemeGeneration(apiKey, model, 'google');
+      if (isValid) {
+        validModels.push(model);
+        console.log('[Chuckle] ✅ Valid model:', model);
+      } else {
+        console.log('[Chuckle] ❌ Invalid model:', model);
+      }
+    } catch (error) {
+      console.log('[Chuckle] ❌ Error testing', model, error);
+    }
+  }
+  
+  if (validModels.length === 0) {
+    if (statusMsg) {
+      statusMsg.textContent = '⚠️ No working models found';
+      statusMsg.className = 'status-msg error';
+    }
+    return false;
+  }
+  
+  // Set up cascade: primary + fallbacks
+  const primary = validModels[0];
+  const fallbacks = validModels.slice(1);
+  
+  await chrome.storage.local.set({
+    primaryModel: primary,
+    fallbackModels: fallbacks
+  });
+  
+  console.log('[Chuckle] ✅ Model cascade setup:', { primary, fallbacks });
+  
+  if (statusMsg) {
+    const modelName = primary.split('/').pop();
+    statusMsg.textContent = `✓ Using ${modelName} (+${fallbacks.length} fallbacks)`;
+    statusMsg.className = 'status-msg success';
+    setTimeout(() => {
+      statusMsg.textContent = '';
+      statusMsg.className = 'status-msg';
+    }, 2000);
+  }
+  
+  return true;
 }
 
 const translations = {
@@ -348,11 +372,16 @@ function updateUILanguage(lang: string) {
 document.getElementById('providerSelect')?.addEventListener('change', (e) => {
   const isOpenRouter = (e.target as HTMLSelectElement).value === 'openrouter';
   const geminiGroup = document.getElementById('geminiKeyGroup');
+  const geminiModelGroup = document.getElementById('geminiModelGroup');
   const openrouterGroup = document.getElementById('openrouterKeyGroup');
+  const openrouterModelGroup = document.getElementById('openrouterModelGroup');
   const geminiHelp = document.getElementById('geminiKeyHelp');
   const openrouterHelp = document.getElementById('openrouterKeyHelp');
+  
   if (geminiGroup) geminiGroup.style.display = isOpenRouter ? 'none' : 'block';
+  if (geminiModelGroup) geminiModelGroup.style.display = isOpenRouter ? 'none' : 'block';
   if (openrouterGroup) openrouterGroup.style.display = isOpenRouter ? 'block' : 'none';
+  if (openrouterModelGroup) openrouterModelGroup.style.display = isOpenRouter ? 'block' : 'none';
   if (geminiHelp) geminiHelp.style.display = isOpenRouter ? 'none' : 'block';
   if (openrouterHelp) openrouterHelp.style.display = isOpenRouter ? 'block' : 'none';
 });
@@ -365,23 +394,48 @@ document.addEventListener('DOMContentLoaded', async () => {
     providerSelect.value = data.aiProvider || 'google';
     const isOpenRouter = (data.aiProvider || 'google') === 'openrouter';
     const geminiGroup = document.getElementById('geminiKeyGroup');
+    const geminiModelGroup = document.getElementById('geminiModelGroup');
     const openrouterGroup = document.getElementById('openrouterKeyGroup');
+    const openrouterModelGroup = document.getElementById('openrouterModelGroup');
     const geminiHelp = document.getElementById('geminiKeyHelp');
     const openrouterHelp = document.getElementById('openrouterKeyHelp');
+    
     if (geminiGroup) geminiGroup.style.display = isOpenRouter ? 'none' : 'block';
+    if (geminiModelGroup) geminiModelGroup.style.display = isOpenRouter ? 'none' : 'block';
     if (openrouterGroup) openrouterGroup.style.display = isOpenRouter ? 'block' : 'none';
+    if (openrouterModelGroup) openrouterModelGroup.style.display = isOpenRouter ? 'block' : 'none';
     if (geminiHelp) geminiHelp.style.display = isOpenRouter ? 'none' : 'block';
     if (openrouterHelp) openrouterHelp.style.display = isOpenRouter ? 'block' : 'none';
   }
   
   if (geminiInput && data.geminiApiKey) {
     geminiInput.value = data.geminiApiKey;
-    geminiInput.classList.add('valid');
+    // Validate key format before loading models
+    if (/^AIza[0-9A-Za-z_-]{35}$/.test(data.geminiApiKey)) {
+      geminiInput.classList.add('valid');
+      // Auto-validate models for existing valid key
+      if (data.aiProvider !== 'openrouter' && !isLoadingModels) {
+        isLoadingModels = true;
+        console.log('[Chuckle] Auto-validating models for stored key');
+        try {
+          await validateAndSetupModels(data.geminiApiKey);
+        } finally {
+          isLoadingModels = false;
+        }
+      }
+    }
   }
   
   if (openrouterInput && data.openrouterApiKey) {
     openrouterInput.value = data.openrouterApiKey;
-    openrouterInput.classList.add('valid');
+    // Validate key format before loading models
+    if (/^sk-or-v1-[a-f0-9]{64}$/.test(data.openrouterApiKey)) {
+      openrouterInput.classList.add('valid');
+      // Auto-load models for existing valid key
+      if (data.aiProvider === 'openrouter') {
+        await loadOpenRouterModels(data.openrouterApiKey);
+      }
+    }
   }
   
   if (langSelect && data.selectedLanguage) {
@@ -402,15 +456,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   const { primaryModel, openrouterPrimaryModel } = await chrome.storage.local.get(['primaryModel', 'openrouterPrimaryModel']);
   
   if (primaryModel) {
-    const modelName = primaryModel.split('/').pop();
-    const tooltip = document.getElementById('geminiModelTooltip');
-    if (tooltip) tooltip.textContent = `🤖 ${modelName}`;
+    updateModelLabel('geminiModelLabel', primaryModel);
   }
   
   if (openrouterPrimaryModel && !openrouterPrimaryModel.includes('scout')) {
-    const modelName = openrouterPrimaryModel.split('/').pop();
-    const tooltip = document.getElementById('openrouterModelTooltip');
-    if (tooltip) tooltip.textContent = `🤖 ${modelName}`;
+    updateModelLabel('openrouterModelLabel', openrouterPrimaryModel);
   }
 
   document.getElementById('settingsTab')?.addEventListener('click', () => switchTab('settings'));
@@ -435,6 +485,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   document.getElementById('exportBtn')?.addEventListener('click', exportData);
+  
+  // Remove model selection dropdown handlers (no longer needed)
+  
+  document.getElementById('openrouterModelSelect')?.addEventListener('change', async (e) => {
+    const selectedModel = (e.target as HTMLSelectElement).value;
+    if (selectedModel) {
+      await chrome.storage.local.set({ openrouterPrimaryModel: selectedModel });
+      const modelName = selectedModel.split('/').pop();
+      const tooltip = document.getElementById('openrouterModelTooltip');
+      if (tooltip) tooltip.textContent = `🤖 ${modelName}`;
+    }
+  });
 
 });
 
@@ -477,21 +539,46 @@ document.getElementById('offlineMode')?.addEventListener('change', (e) => {
   chrome.storage.local.set({ offlineMode: checked });
 });
 
+let geminiKeyTimeout: NodeJS.Timeout;
+let isLoadingModels = false;
 document.getElementById('geminiApiKey')?.addEventListener('input', (e) => {
   const key = (e.target as HTMLInputElement).value.trim();
   const input = e.target as HTMLInputElement;
+  
+  clearTimeout(geminiKeyTimeout);
+  
   if (key.length >= 39 && /^AIza[0-9A-Za-z_-]{35}$/.test(key)) {
     input.classList.add('valid');
+    // Debounced auto-load models
+    geminiKeyTimeout = setTimeout(async () => {
+      if (!isLoadingModels) {
+        isLoadingModels = true;
+        console.log('[Chuckle] Auto-validating models for key input');
+        try {
+          await validateAndSetupModels(key);
+        } finally {
+          isLoadingModels = false;
+        }
+      }
+    }, 1000);
   } else {
     input.classList.remove('valid');
   }
 });
 
+let openrouterKeyTimeout: NodeJS.Timeout;
 document.getElementById('openrouterApiKey')?.addEventListener('input', (e) => {
   const key = (e.target as HTMLInputElement).value.trim();
   const input = e.target as HTMLInputElement;
-  if (key.length >= 20) {
+  
+  clearTimeout(openrouterKeyTimeout);
+  
+  if (key.length >= 20 && /^sk-or-v1-[a-f0-9]{64}$/.test(key)) {
     input.classList.add('valid');
+    // Debounced auto-load models
+    openrouterKeyTimeout = setTimeout(async () => {
+      await loadOpenRouterModels(key);
+    }, 1000);
   } else {
     input.classList.remove('valid');
   }
@@ -536,19 +623,37 @@ document.getElementById('saveKey')?.addEventListener('click', async () => {
     
     let primary, fallbacks;
     if (provider === 'google') {
-      const models = await loadModels(geminiKey);
-      if (models.length === 0) throw new Error(t.cannotLoadModels);
+      const success = await validateAndSetupModels(geminiKey);
+      if (!success) throw new Error(t.cannotLoadModels);
+      
       const { primaryModel, fallbackModels } = await chrome.storage.local.get(['primaryModel', 'fallbackModels']);
       primary = primaryModel;
-      fallbacks = fallbackModels;
-      if (!primary) throw new Error(t.noModelsFound);
+      fallbacks = fallbackModels || [];
     } else {
       const models = await loadOpenRouterModels(openrouterKey);
       if (models.length === 0) throw new Error(t.cannotLoadModels);
-      const { openrouterPrimaryModel, openrouterFallbackModels } = await chrome.storage.local.get(['openrouterPrimaryModel', 'openrouterFallbackModels']);
-      primary = openrouterPrimaryModel;
-      fallbacks = openrouterFallbackModels;
+      
+      // Get currently selected model from dropdown
+      const modelSelect = document.getElementById('openrouterModelSelect') as HTMLSelectElement;
+      const selectedModel = modelSelect?.value;
+      
+      if (selectedModel) {
+        primary = selectedModel;
+      } else {
+        const { openrouterPrimaryModel } = await chrome.storage.local.get(['openrouterPrimaryModel']);
+        primary = openrouterPrimaryModel;
+      }
+      
       if (!primary) throw new Error(t.noModelsFound);
+      
+      // Validate the selected model works for meme generation
+      statusMsg.textContent = 'Validating model...';
+      const isValid = await validateModelForMemeGeneration(openrouterKey, primary, 'openrouter');
+      if (!isValid) {
+        throw new Error('Selected model cannot generate text content. Please choose a different model.');
+      }
+      
+      fallbacks = models.filter((m: any) => m.name !== primary).slice(0, 2).map((m: any) => m.name);
     }
     
     const offlineModeCheckbox = document.getElementById('offlineMode') as HTMLInputElement;
@@ -573,18 +678,13 @@ document.getElementById('saveKey')?.addEventListener('click', async () => {
     await chrome.storage.local.set(storageData);
     
     if (provider === 'google' && primary) {
-      const modelName = primary.split('/').pop();
-      const tooltip = document.getElementById('geminiModelTooltip');
-      if (tooltip) tooltip.textContent = `🤖 ${modelName}`;
+      updateModelLabel('geminiModelLabel', primary);
     } else if (provider === 'openrouter' && primary) {
-      const modelName = primary.split('/').pop();
-      const tooltip = document.getElementById('openrouterModelTooltip');
-      if (tooltip) tooltip.textContent = `🤖 ${modelName}`;
+      updateModelLabel('openrouterModelLabel', primary);
     }
     
     updateUILanguage(lang);
     
-    const t = translations[lang as keyof typeof translations] || translations.English;
     statusMsg.textContent = `✓ ${t.saved}`;
     statusMsg.className = 'status-msg success';
     if (provider === 'google') {

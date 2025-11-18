@@ -48,9 +48,10 @@ export async function formatTextForTemplate(text: string, template: string, forc
   const templatePrompt = TEMPLATE_PROMPTS[template] || 'Format as two parts: "part 1 / part 2" (max 35 chars each)';
   console.log(`[Chuckle] Formatting text for ${template}`);
   
-  const { aiProvider, geminiApiKey, openrouterApiKey, openrouterPrimaryModel, selectedLanguage } = await chrome.storage.local.get(['aiProvider', 'geminiApiKey', 'openrouterApiKey', 'openrouterPrimaryModel', 'selectedLanguage']);
+  const { aiProvider, geminiApiKey, openrouterApiKey, primaryModel, openrouterPrimaryModel, selectedLanguage } = await chrome.storage.local.get(['aiProvider', 'geminiApiKey', 'openrouterApiKey', 'primaryModel', 'openrouterPrimaryModel', 'selectedLanguage']);
   const provider = aiProvider || 'google';
   const language = selectedLanguage || 'English';
+  const model = provider === 'google' ? (primaryModel || 'models/gemini-2.0-flash') : (openrouterPrimaryModel || 'meta-llama/llama-3.2-3b-instruct:free');
   
   if (provider === 'google' && !geminiApiKey) throw new Error('No API key');
   if (provider === 'openrouter' && !openrouterApiKey) throw new Error('No API key');
@@ -88,7 +89,9 @@ Response (ONLY the 2 parts):`;
     let response: Response;
     
     if (provider === 'google') {
-      response = await fetch(`${CONFIG.GEMINI_API_URL}?key=${geminiApiKey}`, {
+      const modelName = model.replace('models/', '');
+      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent`;
+      response = await fetch(`${apiUrl}?key=${geminiApiKey}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -97,12 +100,11 @@ Response (ONLY the 2 parts):`;
             temperature: 0.7,
             topP: 0.85,
             topK: 25,
-            maxOutputTokens: 80
+            maxOutputTokens: 100
           }
         })
       });
     } else {
-      const model = openrouterPrimaryModel || 'meta-llama/llama-3.2-3b-instruct:free';
       response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -140,6 +142,10 @@ Response (ONLY the 2 parts):`;
     }
     
     console.log('[Chuckle] Raw AI response:', formatted);
+    
+    if (!formatted) {
+      throw new Error('AI returned no visible text output');
+    }
     
     if (formatted) {
       formatted = formatted.replace(/^["']|["']$/g, '').trim();

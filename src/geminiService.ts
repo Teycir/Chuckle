@@ -27,8 +27,11 @@ async function extractTopic(text: string, provider: string, apiKey: string, mode
   try {
     let response: Response;
     if (provider === 'google') {
+      // Use selected model for topic extraction
+      const modelName = model.replace('models/', '');
+      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent`;
       response = await fetchWithTimeout(
-        `${CONFIG.GEMINI_API_URL}?key=${apiKey}`,
+        `${apiUrl}?key=${apiKey}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -91,7 +94,7 @@ export async function analyzeMemeContext(text: string, variant: number = 0): Pro
 
   const { aiProvider, geminiApiKey, openrouterApiKey, primaryModel, openrouterPrimaryModel } = await chrome.storage.local.get(['aiProvider', 'geminiApiKey', 'openrouterApiKey', 'primaryModel', 'openrouterPrimaryModel']);
   const provider = aiProvider || 'google';
-  const model = provider === 'google' ? (primaryModel || 'gemini-2.0-flash-exp') : (openrouterPrimaryModel || 'meta-llama/llama-3.2-3b-instruct:free');
+  const model = provider === 'google' ? (primaryModel || 'models/gemini-2.0-flash') : (openrouterPrimaryModel || 'meta-llama/llama-3.2-3b-instruct:free');
   
   console.log('[Chuckle] Calling AI API for text:', text.slice(0, 50), isRegenerate ? '(regenerate)' : '', `| Provider: ${provider} | Model: ${model}`);
   
@@ -108,8 +111,10 @@ export async function analyzeMemeContext(text: string, variant: number = 0): Pro
       let response: Response;
       
       if (provider === 'google') {
+        const modelName = model.replace('models/', '');
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent`;
         response = await fetchWithTimeout(
-          `${CONFIG.GEMINI_API_URL}?key=${geminiApiKey}`,
+          `${apiUrl}?key=${geminiApiKey}`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -211,8 +216,14 @@ async function summarizeText(text: string): Promise<string> {
   console.log('[Chuckle] Summarizing long text');
   
   try {
+    // Get current model from storage
+    const { primaryModel } = await chrome.storage.local.get(['primaryModel']);
+    const currentModel = primaryModel || 'models/gemini-2.0-flash';
+    const modelName = currentModel.replace('models/', '');
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent`;
+    
     const response = await fetchWithTimeout(
-      `${CONFIG.GEMINI_API_URL}?key=${geminiApiKey}`,
+      `${apiUrl}?key=${geminiApiKey}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

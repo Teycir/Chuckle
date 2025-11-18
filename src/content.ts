@@ -5,29 +5,103 @@ import { createOverlay } from './overlay';
 import { saveMeme } from './storage';
 import { optimizeText } from './textOptimizer';
 import { performCleanup, shouldCleanup } from './cleanup';
+import { ConflictDetector } from './conflictDetector';
+import { StatusIndicator } from './statusIndicator';
 
 function showError(message: string): void {
-  const errorDiv = document.createElement('div');
-  errorDiv.className = 'meme-error';
-  errorDiv.textContent = message;
-  errorDiv.style.cssText = 'position:fixed;top:20px;right:20px;background:#c5221f;color:#fff;padding:15px 20px;border-radius:8px;z-index:100001;box-shadow:0 4px 12px rgba(0,0,0,0.3);font-size:14px;max-width:400px;word-wrap:break-word;';
-  document.body.appendChild(errorDiv);
-  console.log('[Chuckle] Showing error to user:', message);
-  setTimeout(() => errorDiv.remove(), 5000);
+  try {
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'meme-error';
+    errorDiv.textContent = message;
+    errorDiv.style.cssText = 'position:fixed;top:20px;right:20px;background:#c5221f;color:#fff;padding:15px 20px;border-radius:8px;z-index:100001;box-shadow:0 4px 12px rgba(0,0,0,0.3);font-size:14px;max-width:400px;word-wrap:break-word;';
+    
+    if (document.body) {
+      document.body.appendChild(errorDiv);
+      console.log('[Chuckle] Showing error to user:', message);
+      setTimeout(() => {
+        try {
+          if (errorDiv.parentNode) {
+            errorDiv.remove();
+          }
+        } catch (e) {
+          console.log('[Chuckle] Error cleanup failed (non-critical):', e.message);
+        }
+      }, 5000);
+    } else {
+      console.log('[Chuckle] Cannot show error - document.body not available:', message);
+    }
+  } catch (error) {
+    console.log('[Chuckle] Error showing error message:', error.message);
+  }
 }
 
-chrome.runtime.onMessage.addListener((message) => {
-  console.log('[Chuckle] Message received:', message.action);
-  if (message.action === "generateMeme") {
-    generateMeme(message.text);
-  } else if (message.action === "generateMemeFromSelection") {
-    const selectedText = window.getSelection()?.toString().trim();
-    if (selectedText) {
-      generateMeme(selectedText);
-    } else {
-      showError('Please select some text first');
+// Initialize conflict detection
+// Initialize with proper error handling
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeChuckle);
+} else {
+  initializeChuckle();
+}
+
+function initializeChuckle() {
+  try {
+    // Skip initialization on problematic pages
+    const url = window.location.href;
+    const problematicDomains = [
+      'chrome://',
+      'chrome-extension://',
+      'moz-extension://',
+      'about:',
+      'file://'
+    ];
+    
+    if (problematicDomains.some(domain => url.startsWith(domain))) {
+      return; // Silent skip for system pages
     }
+    
+    console.log('[Chuckle] Extension loaded successfully ✅');
+    console.log('[Chuckle] Page URL:', window.location.href);
+    ConflictDetector.detectConflicts();
+    ConflictDetector.checkExtensionHealth();
+    
+    // Test storage access
+    chrome.storage.local.get(['geminiApiKey', 'primaryModel'], (data) => {
+      console.log('[Chuckle] Storage check - API key exists:', !!data.geminiApiKey);
+      console.log('[Chuckle] Storage check - Model exists:', !!data.primaryModel);
+    });
+  } catch (error) {
+    console.log('[Chuckle] Initialization error (non-critical):', error.message);
   }
+}
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  console.log('[Chuckle] Message received:', message.action);
+  
+  try {
+    if (message.action === "generateMeme") {
+      generateMeme(message.text).catch(error => {
+        console.log('[Chuckle] Meme generation error:', error.message);
+      });
+      sendResponse({ success: true });
+    } else if (message.action === "generateMemeFromSelection") {
+      const selectedText = window.getSelection()?.toString().trim();
+      if (selectedText) {
+        generateMeme(selectedText).catch(error => {
+          console.log('[Chuckle] Meme generation error:', error.message);
+        });
+      } else {
+        showError('Please select some text first');
+      }
+      sendResponse({ success: true });
+    } else {
+      sendResponse({ success: false, error: 'Unknown action' });
+    }
+  } catch (error) {
+    console.log('[Chuckle] Message handler error:', error.message);
+    sendResponse({ success: false, error: error.message });
+  }
+  
+  return true; // Keep message channel open
 });
 
 const errorMessages = {
@@ -102,6 +176,9 @@ async function getErrorMessage(error: unknown): Promise<string> {
 
 export async function generateMeme(text: string): Promise<void> {
   console.log('[Chuckle] Starting meme generation for text:', text.slice(0, 50));
+  
+  // Show status indicator
+  await StatusIndicator.show();
   
   // Auto-cleanup if needed
   if (await shouldCleanup()) {

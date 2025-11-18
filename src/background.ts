@@ -1,15 +1,22 @@
 import { performCleanup } from './cleanup';
 
 chrome.runtime.onInstalled.addListener(() => {
-  console.log('[Chuckle] Extension installed, creating context menu');
-  chrome.contextMenus.create({
-    id: "remixAsMeme",
-    title: "Remix as a Meme",
-    contexts: ["selection"]
-  });
+  console.log('[Chuckle] Background script loaded ✅');
   
-  // Schedule weekly cleanup
-  chrome.alarms.create('weeklyCleanup', { periodInMinutes: 10080 }); // 7 days
+  try {
+    chrome.contextMenus.create({
+      id: "remixAsMeme",
+      title: "Remix as a Meme",
+      contexts: ["selection"]
+    });
+    console.log('[Chuckle] Context menu created ✅');
+    
+    // Schedule weekly cleanup
+    chrome.alarms.create('weeklyCleanup', { periodInMinutes: 10080 }); // 7 days
+    console.log('[Chuckle] Cleanup alarm scheduled ✅');
+  } catch (error) {
+    console.log('[Chuckle] Setup error:', error.message);
+  }
 });
 
 chrome.alarms.onAlarm.addListener((alarm) => {
@@ -28,6 +35,8 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
     chrome.tabs.sendMessage(tab.id, {
       action: "generateMeme",
       text: info.selectionText
+    }).catch((error) => {
+      console.log('[Chuckle] Message send failed (tab may be closed):', error.message);
     });
   }
 });
@@ -37,7 +46,9 @@ chrome.commands.onCommand.addListener((command) => {
   if (command === "generate-meme") {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       if (tabs[0]?.id) {
-        chrome.tabs.sendMessage(tabs[0].id, { action: "generateMemeFromSelection" });
+        chrome.tabs.sendMessage(tabs[0].id, { action: "generateMemeFromSelection" }).catch((error) => {
+          console.log('[Chuckle] Message send failed (content script may not be ready):', error.message);
+        });
       }
     });
   }
@@ -47,8 +58,17 @@ chrome.action.onClicked.addListener(() => {
   chrome.tabs.create({ url: chrome.runtime.getURL('popup.html') });
 });
 
-chrome.runtime.onMessage.addListener((message) => {
-  if (message.action === 'openPopup') {
-    chrome.tabs.create({ url: chrome.runtime.getURL('popup.html') });
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  try {
+    if (message.action === 'openPopup') {
+      chrome.tabs.create({ url: chrome.runtime.getURL('popup.html') });
+      sendResponse({ success: true });
+    } else {
+      sendResponse({ success: false, error: 'Unknown action' });
+    }
+  } catch (error) {
+    console.log('[Chuckle] Background message error:', error.message);
+    sendResponse({ success: false, error: error.message });
   }
+  return true; // Keep message channel open for async response
 });
