@@ -4,13 +4,13 @@ export function showLoading(message: string = 'Generating meme...'): void {
   if (loadingOverlay) return;
 
   loadingOverlay = document.createElement('div');
-  loadingOverlay.className = 'loading-overlay';
+  loadingOverlay.className = 'chuckle-loading-overlay';
   
   const spinner = document.createElement('div');
-  spinner.className = 'loading-spinner';
+  spinner.className = 'chuckle-loading-spinner';
   
   const text = document.createElement('div');
-  text.className = 'loading-text';
+  text.className = 'chuckle-loading-text';
   text.textContent = message;
   
   loadingOverlay.appendChild(spinner);

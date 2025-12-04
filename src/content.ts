@@ -3,7 +3,6 @@ import { logger } from './logger';
 import { analyzeMemeContext, generateMemeImage } from './geminiService';
 import { createOverlay } from './overlay';
 import { saveMeme } from './storage';
-import { optimizeText } from './textOptimizer';
 import { performCleanup, shouldCleanup } from './cleanup';
 import { ConflictDetector } from './conflictDetector';
 import { StatusIndicator } from './statusIndicator';
@@ -11,9 +10,9 @@ import { StatusIndicator } from './statusIndicator';
 function showError(message: string): void {
   try {
     const errorDiv = document.createElement('div');
-    errorDiv.className = 'meme-error';
+    errorDiv.className = 'chuckle-meme-error';
     errorDiv.textContent = message;
-    errorDiv.style.cssText = 'position:fixed;top:20px;right:20px;background:#c5221f;color:#fff;padding:15px 20px;border-radius:8px;z-index:100001;box-shadow:0 4px 12px rgba(0,0,0,0.3);font-size:14px;max-width:400px;word-wrap:break-word;';
+    errorDiv.style.cssText = 'position:fixed;top:20px;right:20px;background:#c5221f;color:#fff;padding:15px 20px;border-radius:8px;z-index:2147483647;box-shadow:0 4px 12px rgba(0,0,0,0.3);font-size:14px;max-width:400px;word-wrap:break-word;font-family:system-ui,-apple-system,sans-serif;';
     
     if (document.body) {
       document.body.appendChild(errorDiv);
@@ -61,8 +60,6 @@ function initializeChuckle() {
     
     console.log('[Chuckle] Extension loaded successfully ✅');
     console.log('[Chuckle] Page URL:', window.location.href);
-    ConflictDetector.detectConflicts();
-    ConflictDetector.checkExtensionHealth();
     
     // Test storage access
     chrome.storage.local.get(['geminiApiKey', 'primaryModel'], (data) => {
