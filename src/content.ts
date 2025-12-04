@@ -24,14 +24,14 @@ function showError(message: string): void {
             errorDiv.remove();
           }
         } catch (e) {
-          console.log('[Chuckle] Error cleanup failed (non-critical):', e.message);
+          console.log('[Chuckle] Error cleanup failed (non-critical):', e instanceof Error ? e.message : String(e));
         }
       }, 5000);
     } else {
       console.log('[Chuckle] Cannot show error - document.body not available:', message);
     }
   } catch (error) {
-    console.log('[Chuckle] Error showing error message:', error.message);
+    console.log('[Chuckle] Error showing error message:', error instanceof Error ? error.message : String(error));
   }
 }
 
@@ -70,7 +70,7 @@ function initializeChuckle() {
       console.log('[Chuckle] Storage check - Model exists:', !!data.primaryModel);
     });
   } catch (error) {
-    console.log('[Chuckle] Initialization error (non-critical):', error.message);
+    console.log('[Chuckle] Initialization error (non-critical):', error instanceof Error ? error.message : String(error));
   }
 }
 
@@ -80,14 +80,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   try {
     if (message.action === "generateMeme") {
       generateMeme(message.text).catch(error => {
-        console.log('[Chuckle] Meme generation error:', error.message);
+        console.log('[Chuckle] Meme generation error:', error instanceof Error ? error.message : String(error));
       });
       sendResponse({ success: true });
     } else if (message.action === "generateMemeFromSelection") {
       const selectedText = window.getSelection()?.toString().trim();
       if (selectedText) {
         generateMeme(selectedText).catch(error => {
-          console.log('[Chuckle] Meme generation error:', error.message);
+          console.log('[Chuckle] Meme generation error:', error instanceof Error ? error.message : String(error));
         });
       } else {
         showError('Please select some text first');
@@ -97,8 +97,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       sendResponse({ success: false, error: 'Unknown action' });
     }
   } catch (error) {
-    console.log('[Chuckle] Message handler error:', error.message);
-    sendResponse({ success: false, error: error.message });
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    console.log('[Chuckle] Message handler error:', errorMsg);
+    sendResponse({ success: false, error: errorMsg });
   }
   
   return true; // Keep message channel open

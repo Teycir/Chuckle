@@ -256,7 +256,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
           }).then(success => {
             if (success) {
-              const { primaryModel } = chrome.storage.local.get(['primaryModel']).then(data => {
+              chrome.storage.local.get(['primaryModel']).then(data => {
                 if (data.primaryModel) updateModelLabel('geminiModelLabel', data.primaryModel);
               });
             }

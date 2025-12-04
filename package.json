@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "AI-powered meme generator Chrome extension",
   "scripts": {
-    "build": "node esbuild.js",
+    "build": "node esbuild.config.js",
     "build:check": "tsc --noEmit",
-    "build:prod": "tsc && node build.js && node build-prod.js",
+    "build:prod": "node esbuild.config.js && node build-prod.js",
     "build:clean": "rm -rf dist && npm run build",
     "watch": "tsc --watch",
     "test": "echo '🧪 Running tests...' && jest",

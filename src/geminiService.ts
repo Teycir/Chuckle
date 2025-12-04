@@ -28,7 +28,7 @@ async function extractTopic(text: string, provider: string, apiKey: string, mode
     let response: Response;
     if (provider === 'google') {
       // Use selected model for topic extraction
-      const modelName = model.replace('models/', '');
+      const modelName = (model || 'models/gemini-2.0-flash').replace('models/', '');
       const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent`;
       response = await fetchWithTimeout(
         `${apiUrl}?key=${apiKey}`,
