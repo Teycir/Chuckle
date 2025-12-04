@@ -15,7 +15,7 @@ chrome.runtime.onInstalled.addListener(() => {
     chrome.alarms.create('weeklyCleanup', { periodInMinutes: 10080 }); // 7 days
     console.log('[Chuckle] Cleanup alarm scheduled ✅');
   } catch (error) {
-    console.log('[Chuckle] Setup error:', error.message);
+    console.log('[Chuckle] Setup error:', error instanceof Error ? error.message : String(error));
   }
 });
 
@@ -36,7 +36,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
       action: "generateMeme",
       text: info.selectionText
     }).catch((error) => {
-      console.log('[Chuckle] Message send failed (tab may be closed):', error.message);
+      console.log('[Chuckle] Message send failed (tab may be closed):', error instanceof Error ? error.message : String(error));
     });
   }
 });
@@ -47,7 +47,7 @@ chrome.commands.onCommand.addListener((command) => {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       if (tabs[0]?.id) {
         chrome.tabs.sendMessage(tabs[0].id, { action: "generateMemeFromSelection" }).catch((error) => {
-          console.log('[Chuckle] Message send failed (content script may not be ready):', error.message);
+          console.log('[Chuckle] Message send failed (content script may not be ready):', error instanceof Error ? error.message : String(error));
         });
       }
     });
@@ -67,8 +67,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       sendResponse({ success: false, error: 'Unknown action' });
     }
   } catch (error) {
-    console.log('[Chuckle] Background message error:', error.message);
-    sendResponse({ success: false, error: error.message });
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    console.log('[Chuckle] Background message error:', errorMsg);
+    sendResponse({ success: false, error: errorMsg });
   }
   return true; // Keep message channel open for async response
 });
