@@ -11,6 +11,8 @@ Everything stays on your computer—no tracking, no data collection, no ads. Ful
   <img src="chuckleAdmin.png" alt="Chuckle Admin">
 </p>
 
+
+
 ### ✨ What Can Chuckle Do?
 
 - 🆓 **Free to Use** - Get 1,500 free memes every day using Google AI Studio's free tier, fallback use with OpenRouter
