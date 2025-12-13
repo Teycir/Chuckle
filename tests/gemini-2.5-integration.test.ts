@@ -3,7 +3,7 @@
  * This test makes REAL API calls to verify the model works
  */
 
-const TEST_API_KEY = 'AIzaSyCHopEXJ9mkRpRiCGk-qumfSvLq9VcibyQ';
+const TEST_API_KEY = process.env.GEMINI_API_KEY || 'YOUR_API_KEY_HERE';
 
 describe('Gemini 2.5 Flash Integration Tests', () => {
   
