@@ -51,7 +51,7 @@ export async function formatTextForTemplate(text: string, template: string, forc
   const { aiProvider, geminiApiKey, openrouterApiKey, primaryModel, openrouterPrimaryModel, selectedLanguage } = await chrome.storage.local.get(['aiProvider', 'geminiApiKey', 'openrouterApiKey', 'primaryModel', 'openrouterPrimaryModel', 'selectedLanguage']);
   const provider = aiProvider || 'google';
   const language = selectedLanguage || 'English';
-  const model = provider === 'google' ? (primaryModel || 'models/gemini-2.0-flash') : (openrouterPrimaryModel || 'meta-llama/llama-3.2-3b-instruct:free');
+  const model = provider === 'google' ? (primaryModel || 'models/gemini-2.5-flash') : (openrouterPrimaryModel || 'meta-llama/llama-3.2-3b-instruct:free');
   
   if (provider === 'google' && !geminiApiKey) throw new Error('No API key');
   if (provider === 'openrouter' && !openrouterApiKey) throw new Error('No API key');
@@ -100,7 +100,7 @@ Response (ONLY the 2 parts):`;
             temperature: 0.7,
             topP: 0.85,
             topK: 25,
-            maxOutputTokens: 100
+            maxOutputTokens: 500
           }
         })
       });
@@ -133,6 +133,7 @@ Response (ONLY the 2 parts):`;
     }
     
     const data: any = await response.json();
+    console.log('[Chuckle] Format API full response:', JSON.stringify(data));
     let formatted: string | undefined;
     
     if (provider === 'google') {

@@ -28,7 +28,7 @@ async function extractTopic(text: string, provider: string, apiKey: string, mode
     let response: Response;
     if (provider === 'google') {
       // Use selected model for topic extraction
-      const modelName = (model || 'models/gemini-2.0-flash').replace('models/', '');
+      const modelName = (model || 'models/gemini-2.5-flash').replace('models/', '');
       const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent`;
       response = await fetchWithTimeout(
         `${apiUrl}?key=${apiKey}`,
@@ -37,7 +37,7 @@ async function extractTopic(text: string, provider: string, apiKey: string, mode
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             contents: [{ parts: [{ text: prompt }] }],
-            generationConfig: { temperature: 0.3, topP: 0.8, topK: 20, maxOutputTokens: 10 }
+            generationConfig: { temperature: 0.3, topP: 0.8, topK: 20, maxOutputTokens: 50 }
           })
         },
         5000
@@ -62,6 +62,7 @@ async function extractTopic(text: string, provider: string, apiKey: string, mode
     
     if (!response.ok) return '';
     const data: any = await response.json();
+    console.log('[Chuckle] Topic extraction raw response:', JSON.stringify(data));
     const topic = provider === 'google' 
       ? data.candidates?.[0]?.content?.parts?.[0]?.text?.trim().toLowerCase()
       : data.choices?.[0]?.message?.content?.trim().toLowerCase();
@@ -94,7 +95,7 @@ export async function analyzeMemeContext(text: string, variant: number = 0): Pro
 
   const { aiProvider, geminiApiKey, openrouterApiKey, primaryModel, openrouterPrimaryModel } = await chrome.storage.local.get(['aiProvider', 'geminiApiKey', 'openrouterApiKey', 'primaryModel', 'openrouterPrimaryModel']);
   const provider = aiProvider || 'google';
-  const model = provider === 'google' ? (primaryModel || 'models/gemini-2.0-flash') : (openrouterPrimaryModel || 'meta-llama/llama-3.2-3b-instruct:free');
+  const model = provider === 'google' ? (primaryModel || 'models/gemini-2.5-flash') : (openrouterPrimaryModel || 'meta-llama/llama-3.2-3b-instruct:free');
   
   console.log('[Chuckle] Calling AI API for text:', text.slice(0, 50), isRegenerate ? '(regenerate)' : '', `| Provider: ${provider} | Model: ${model}`);
   
@@ -218,7 +219,7 @@ async function summarizeText(text: string): Promise<string> {
   try {
     // Get current model from storage
     const { primaryModel } = await chrome.storage.local.get(['primaryModel']);
-    const currentModel = primaryModel || 'models/gemini-2.0-flash';
+    const currentModel = primaryModel || 'models/gemini-2.5-flash';
     const modelName = currentModel.replace('models/', '');
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent`;
     

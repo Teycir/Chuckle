@@ -43,7 +43,7 @@ export async function validateAndSetupModels(apiKey: string, provider: 'google' 
   statusCallback?.('Testing models...', 'loading');
   
   const testModels = provider === 'google' 
-    ? ['models/gemini-2.0-flash', 'models/gemini-2.0-flash-001']
+    ? ['models/gemini-2.5-flash']
     : ['meta-llama/llama-3.3-70b-instruct:free', 'qwen/qwen-2.5-72b-instruct:free', 'meta-llama/llama-3.2-3b-instruct:free'];
   
   const validModels = [];
