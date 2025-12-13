@@ -74,20 +74,20 @@
       justify-content: center;
       flex-wrap: wrap;
     }
-    button {
+    .actions button {
       padding: 12px 24px;
-      border: none;
-      border-radius: 8px;
+      border: 2px solid #dadce0;
+      border-radius: 50px;
       cursor: pointer;
       font-size: 14px;
       font-weight: 600;
       transition: all 0.2s;
+      background: #e8eaed;
+      color: #5f6368;
     }
-    button:hover { transform: scale(1.05); }
-    .download { background: #4285f4; color: white; }
-    .share { background: #34a853; color: white; }
-    .regenerate { background: #fbbc04; color: #000; }
-    .close { background: #ea4335; color: white; }
+    .actions button:hover { transform: scale(1.05); background: #dadce0; }
+    body.dark .actions button { background: #2a2a3e; border-color: #3a3a4e; color: #e0e0e0; }
+    body.dark .actions button:hover { background: #3a3a4e; }
     .loading {
       position: fixed;
       top: 50%;

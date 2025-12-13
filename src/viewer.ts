@@ -83,9 +83,41 @@ document.getElementById('shareBtn')?.addEventListener('click', () => {
   alert('Text copied! Download the image and share on social media.');
 });
 
-document.getElementById('regenerateBtn')?.addEventListener('click', () => {
-  isManualEdit = false;
-  regenerate();
+document.getElementById('regenerateBtn')?.addEventListener('click', async () => {
+  loading.classList.add('show');
+  try {
+    const currentText = textEditor.textContent?.trim() || '';
+    const hasTextChanged = currentText !== memeData.text;
+    
+    if (hasTextChanged) {
+      // User edited text - use edited text with current template
+      const { watermarkedUrl, formattedText } = await generateMemeImage(currentTemplate, currentText, true, true);
+      img.src = watermarkedUrl;
+      textEditor.textContent = formattedText;
+      memeData.imageUrl = watermarkedUrl;
+      memeData.text = formattedText;
+    } else {
+      // Text unchanged - regenerate with new template and formatting
+      const text = memeData.originalInput || memeData.text;
+      const template = await analyzeMemeContext(text, Date.now());
+      currentTemplate = template;
+      const { watermarkedUrl, formattedText } = await generateMemeImage(template, text, false, true);
+      img.src = watermarkedUrl;
+      textEditor.textContent = formattedText;
+      memeData.imageUrl = watermarkedUrl;
+      memeData.text = formattedText;
+      memeData.template = template;
+      document.querySelectorAll('.template-btn').forEach(btn => btn.classList.remove('active'));
+      const activeBtn = Array.from(document.querySelectorAll('.template-btn')).find(
+        btn => btn.textContent === MEME_TEMPLATES.find(t => t.id === template)?.name
+      );
+      activeBtn?.classList.add('active');
+    }
+  } catch (error) {
+    alert('Regeneration failed: ' + (error instanceof Error ? error.message : String(error)));
+  } finally {
+    loading.classList.remove('show');
+  }
 });
 
 document.getElementById('closeBtn')?.addEventListener('click', () => {
