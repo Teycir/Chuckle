@@ -16,8 +16,13 @@ if (memeData) {
   img.src = memeData.imageUrl;
   textEditor.textContent = memeData.text;
   
-  chrome.storage.local.get(['darkMode'], (data) => {
+  chrome.storage.local.get(['darkMode', 'offlineMode'], (data) => {
     if (data.darkMode) document.body.classList.add('dark');
+    isOffline = data.offlineMode || false;
+    if (offlineIcon && offlineText) {
+      offlineIcon.textContent = isOffline ? '📴' : '📡';
+      offlineText.textContent = isOffline ? 'Offline' : 'Online';
+    }
   });
   
   MEME_TEMPLATES.forEach(template => {
@@ -187,4 +192,27 @@ document.getElementById('closeBtn')?.addEventListener('click', () => {
 
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') window.close();
+});
+
+// Offline mode toggle
+let isOffline = false;
+const offlineIndicator = document.getElementById('offlineIndicator');
+const offlineIcon = document.getElementById('offlineIcon');
+const offlineText = document.getElementById('offlineText');
+
+offlineIndicator?.addEventListener('click', () => {
+  isOffline = !isOffline;
+  chrome.storage.local.set({ offlineMode: isOffline });
+  if (offlineIcon && offlineText) {
+    offlineIcon.textContent = isOffline ? '📴' : '📡';
+    offlineText.textContent = isOffline ? 'Offline' : 'Online';
+  }
+});
+
+chrome.storage.local.get(['offlineMode'], (data) => {
+  isOffline = data.offlineMode || false;
+  if (offlineIcon && offlineText) {
+    offlineIcon.textContent = isOffline ? '📴' : '📡';
+    offlineText.textContent = isOffline ? 'Offline' : 'Online';
+  }
 });
