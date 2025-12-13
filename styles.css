@@ -1,144 +1,154 @@
 /* Loading Styles */
-.loading-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.9);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  z-index: 2147483648;
+.chuckle-loading-overlay {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  background-color: rgba(0, 0, 0, 0.9) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  z-index: 2147483648 !important;
+  pointer-events: auto !important;
 }
 
-.loading-spinner {
-  width: 50px;
-  height: 50px;
-  border: 4px solid rgba(255, 255, 255, 0.3);
-  border-top-color: #fff;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
+.chuckle-loading-spinner {
+  width: 50px !important;
+  height: 50px !important;
+  border: 4px solid rgba(255, 255, 255, 0.3) !important;
+  border-top-color: #fff !important;
+  border-radius: 50% !important;
+  animation: chuckle-spin 1s linear infinite !important;
 }
 
-@keyframes spin {
+@keyframes chuckle-spin {
   to { transform: rotate(360deg); }
 }
 
-.loading-text {
-  margin-top: 20px;
-  color: #fff;
-  font-size: 16px;
+.chuckle-loading-text {
+  margin-top: 20px !important;
+  color: #fff !important;
+  font-size: 16px !important;
 }
 
 /* Toast Notification */
-.toast-notification {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: #333;
-  color: #fff;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-size: 14px;
-  z-index: 10002;
-  animation: fadeInOut 2s ease-in-out;
+.chuckle-toast-notification {
+  position: fixed !important;
+  bottom: 20px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  background-color: #333 !important;
+  color: #fff !important;
+  padding: 12px 24px !important;
+  border-radius: 8px !important;
+  font-size: 14px !important;
+  z-index: 2147483646 !important;
+  animation: chuckle-fadeInOut 2s ease-in-out !important;
+  pointer-events: none !important;
 }
 
-@keyframes fadeInOut {
+@keyframes chuckle-fadeInOut {
   0%, 100% { opacity: 0; }
   10%, 90% { opacity: 1; }
 }
 
 /* Overlay Styles */
-.meme-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.8);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.chuckle-meme-overlay {
+  all: initial !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  background-color: rgba(0, 0, 0, 0.8) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
   z-index: 2147483647 !important;
+  pointer-events: auto !important;
+  font-family: system-ui, -apple-system, sans-serif !important;
 }
 
-.meme-content {
-  background-color: #fff;
-  border-radius: 12px;
-  padding: 20px 30px 30px 30px;
-  max-width: 95vw;
-  max-height: 95vh;
-  overflow: auto;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.chuckle-meme-content {
+  all: initial !important;
+  background-color: #fff !important;
+  border-radius: 12px !important;
+  padding: 20px 30px 30px 30px !important;
+  max-width: 95vw !important;
+  max-height: 95vh !important;
+  overflow: auto !important;
+  position: relative !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  pointer-events: auto !important;
+  font-family: system-ui, -apple-system, sans-serif !important;
 }
 
-.meme-overlay.dark .meme-content {
-  background-color: #1a1a2e;
+.chuckle-meme-overlay.chuckle-dark .chuckle-meme-content {
+  background-color: #1a1a2e !important;
 }
 
-.meme-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  align-items: center;
+.chuckle-meme-actions {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 16px !important;
+  align-items: center !important;
 }
 
-.star-btn,
-.download-btn,
-.regenerate-btn,
-.share-btn {
-  background: #e8eaed;
-  border: 2px solid #dadce0;
-  font-size: 16px;
-  color: #5f6368;
-  cursor: pointer;
-  padding: 0;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  transition: all 0.2s ease;
-  flex-shrink: 0;
+.chuckle-star-btn,
+.chuckle-download-btn,
+.chuckle-regenerate-btn,
+.chuckle-share-btn {
+  all: initial !important;
+  background: #e8eaed !important;
+  border: 2px solid #dadce0 !important;
+  font-size: 16px !important;
+  color: #5f6368 !important;
+  cursor: pointer !important;
+  padding: 0 !important;
+  width: 28px !important;
+  height: 28px !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  position: relative !important;
+  transition: all 0.2s ease !important;
+  flex-shrink: 0 !important;
+  font-family: system-ui, -apple-system, sans-serif !important;
 }
 
-.star-btn:hover,
-.regenerate-btn:hover,
-.share-btn:hover {
-  background: #dadce0;
-  transform: scale(1.1);
+.chuckle-star-btn:hover,
+.chuckle-regenerate-btn:hover,
+.chuckle-share-btn:hover {
+  background: #dadce0 !important;
+  transform: scale(1.1) !important;
 }
 
-.meme-overlay.dark .star-btn,
-.meme-overlay.dark .download-btn,
-.meme-overlay.dark .regenerate-btn,
-.meme-overlay.dark .share-btn {
-  background: #2a2a3e;
-  border-color: #3a3a4e;
-  color: #e0e0e0;
+.chuckle-meme-overlay.chuckle-dark .chuckle-star-btn,
+.chuckle-meme-overlay.chuckle-dark .chuckle-download-btn,
+.chuckle-meme-overlay.chuckle-dark .chuckle-regenerate-btn,
+.chuckle-meme-overlay.chuckle-dark .chuckle-share-btn {
+  background: #2a2a3e !important;
+  border-color: #3a3a4e !important;
+  color: #e0e0e0 !important;
 }
 
-.meme-overlay.dark .star-btn:hover,
-.meme-overlay.dark .download-btn:hover,
-.meme-overlay.dark .regenerate-btn:hover,
-.meme-overlay.dark .share-btn:hover {
-  background: #3a3a4e;
+.chuckle-meme-overlay.chuckle-dark .chuckle-star-btn:hover,
+.chuckle-meme-overlay.chuckle-dark .chuckle-download-btn:hover,
+.chuckle-meme-overlay.chuckle-dark .chuckle-regenerate-btn:hover,
+.chuckle-meme-overlay.chuckle-dark .chuckle-share-btn:hover {
+  background: #3a3a4e !important;
 }
 
-.star-btn[data-tooltip]::before,
-.download-btn[data-tooltip]::before,
-.regenerate-btn[data-tooltip]::before,
-.share-btn[data-tooltip]::before,
-.close-btn[data-tooltip]::before {
+.chuckle-star-btn[data-tooltip]::before,
+.chuckle-download-btn[data-tooltip]::before,
+.chuckle-regenerate-btn[data-tooltip]::before,
+.chuckle-share-btn[data-tooltip]::before,
+.chuckle-close-btn[data-tooltip]::before {
   content: attr(data-tooltip) !important;
   position: absolute !important;
   top: 100% !important;
@@ -159,64 +169,67 @@
   z-index: 10004 !important;
 }
 
-.meme-overlay.dark .star-btn[data-tooltip]::before,
-.meme-overlay.dark .download-btn[data-tooltip]::before,
-.meme-overlay.dark .regenerate-btn[data-tooltip]::before,
-.meme-overlay.dark .share-btn[data-tooltip]::before,
-.meme-overlay.dark .close-btn[data-tooltip]::before {
-  background: #2a2a3e;
-  color: #e0e0e0;
+.chuckle-meme-overlay.chuckle-dark .chuckle-star-btn[data-tooltip]::before,
+.chuckle-meme-overlay.chuckle-dark .chuckle-download-btn[data-tooltip]::before,
+.chuckle-meme-overlay.chuckle-dark .chuckle-regenerate-btn[data-tooltip]::before,
+.chuckle-meme-overlay.chuckle-dark .chuckle-share-btn[data-tooltip]::before,
+.chuckle-meme-overlay.chuckle-dark .chuckle-close-btn[data-tooltip]::before {
+  background: #2a2a3e !important;
+  color: #e0e0e0 !important;
 }
 
-.star-btn:hover[data-tooltip]::before,
-.download-btn:hover[data-tooltip]::before,
-.regenerate-btn:hover[data-tooltip]::before,
-.share-btn:hover[data-tooltip]::before,
-.close-btn:hover[data-tooltip]::before {
+.chuckle-star-btn:hover[data-tooltip]::before,
+.chuckle-download-btn:hover[data-tooltip]::before,
+.chuckle-regenerate-btn:hover[data-tooltip]::before,
+.chuckle-share-btn:hover[data-tooltip]::before,
+.chuckle-close-btn:hover[data-tooltip]::before {
   opacity: 1 !important;
   transition: opacity 0.15s ease-in !important;
 }
 
 
 
-.close-btn {
-  background: #e8eaed;
-  border: 2px solid #dadce0;
-  font-size: 18px;
-  color: #5f6368;
-  cursor: pointer;
-  padding: 0;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  flex-shrink: 0;
-  position: relative;
+.chuckle-close-btn {
+  all: initial !important;
+  background: #e8eaed !important;
+  border: 2px solid #dadce0 !important;
+  font-size: 18px !important;
+  color: #5f6368 !important;
+  cursor: pointer !important;
+  padding: 0 !important;
+  width: 28px !important;
+  height: 28px !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s ease !important;
+  flex-shrink: 0 !important;
+  position: relative !important;
+  font-family: system-ui, -apple-system, sans-serif !important;
 }
 
-.close-btn:hover {
-  background: #dadce0;
-  transform: scale(1.1);
+.chuckle-close-btn:hover {
+  background: #dadce0 !important;
+  transform: scale(1.1) !important;
 }
 
-.meme-overlay.dark .close-btn {
-  background: #2a2a3e;
-  border-color: #3a3a4e;
-  color: #e0e0e0;
+.chuckle-meme-overlay.chuckle-dark .chuckle-close-btn {
+  background: #2a2a3e !important;
+  border-color: #3a3a4e !important;
+  color: #e0e0e0 !important;
 }
 
-.meme-overlay.dark .close-btn:hover {
-  background: #3a3a4e;
+.chuckle-meme-overlay.chuckle-dark .chuckle-close-btn:hover {
+  background: #3a3a4e !important;
 }
 
-.share-btn {
-  position: relative;
+.chuckle-share-btn {
+  position: relative !important;
 }
 
-.share-menu {
+.chuckle-share-menu {
+  all: initial !important;
   position: absolute !important;
   top: 100% !important;
   right: 0 !important;
@@ -226,145 +239,142 @@
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15) !important;
   padding: 8px !important;
   min-width: 180px !important;
-  z-index: 10002 !important;
+  z-index: 2147483647 !important;
   display: none !important;
   flex-direction: column !important;
   gap: 4px !important;
+  font-family: system-ui, -apple-system, sans-serif !important;
 }
 
-.share-menu.visible {
+.chuckle-share-menu.chuckle-visible {
   display: flex !important;
 }
 
-body.dark .share-menu {
-  background: #2a2a3e;
-  border: 1px solid #3a3a4e;
+.chuckle-meme-overlay.chuckle-dark .chuckle-share-menu {
+  background: #2a2a3e !important;
+  border: 1px solid #3a3a4e !important;
 }
 
-.meme-overlay.dark .share-menu {
-  background: #2a2a3e;
-  border: 1px solid #3a3a4e;
+.chuckle-share-option {
+  all: initial !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 10px 14px !important;
+  text-align: left !important;
+  cursor: pointer !important;
+  border-radius: 6px !important;
+  font-size: 14px !important;
+  color: #3c4043 !important;
+  transition: background 0.2s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  font-family: system-ui, -apple-system, sans-serif !important;
 }
 
-.share-option {
-  background: transparent;
-  border: none;
-  padding: 10px 14px;
-  text-align: left;
-  cursor: pointer;
-  border-radius: 6px;
-  font-size: 14px;
-  color: #3c4043;
-  transition: background 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.chuckle-share-option:hover {
+  background: #f1f3f4 !important;
 }
 
-.share-option:hover {
-  background: #f1f3f4;
+.chuckle-meme-overlay.chuckle-dark .chuckle-share-option {
+  color: #e0e0e0 !important;
 }
 
-.meme-overlay.dark .share-option {
-  color: #e0e0e0;
+.chuckle-meme-overlay.chuckle-dark .chuckle-share-option:hover {
+  background: #3a3a4e !important;
 }
 
-.meme-overlay.dark .share-option:hover {
-  background: #3a3a4e;
-}
-
-.meme-image {
-  max-width: 95%;
-  max-height: 62vh;
-  width: auto;
-  height: auto;
-  border-radius: 8px;
-  object-fit: contain;
-  margin-bottom: 10px;
-}
-
-
-
-.template-btn {
-  padding: 6px 10px;
-  border: none;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  cursor: pointer;
-  font-size: 10px;
-  color: white;
-  transition: all 0.3s ease;
-  white-space: nowrap;
-  border-radius: 6px;
-  font-weight: 600;
-  box-shadow: 0 3px 10px rgba(102, 126, 234, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  letter-spacing: 0.2px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  line-height: 1;
-  position: relative;
+.chuckle-meme-image {
+  all: initial !important;
+  max-width: 95% !important;
+  max-height: 62vh !important;
+  width: auto !important;
+  height: auto !important;
+  border-radius: 8px !important;
+  object-fit: contain !important;
+  margin-bottom: 10px !important;
+  display: block !important;
 }
 
 
 
-.template-btn:hover {
-  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+.chuckle-template-btn {
+  all: initial !important;
+  padding: 6px 10px !important;
+  border: none !important;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  cursor: pointer !important;
+  font-size: 10px !important;
+  color: white !important;
+  transition: all 0.3s ease !important;
+  white-space: nowrap !important;
+  border-radius: 6px !important;
+  font-weight: 600 !important;
+  box-shadow: 0 3px 10px rgba(102, 126, 234, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+  letter-spacing: 0.2px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  line-height: 1 !important;
+  position: relative !important;
+  font-family: system-ui, -apple-system, sans-serif !important;
 }
 
-.template-btn.active {
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-  box-shadow: 0 5px 18px rgba(245, 87, 108, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.3);
-  transform: scale(1.05);
+.chuckle-template-btn:hover {
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
 }
 
-.meme-overlay.dark .template-btn {
-  background: linear-gradient(135deg, #2d3561 0%, #1f2544 100%);
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  color: #a8b3ff;
+.chuckle-template-btn.active {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
+  box-shadow: 0 5px 18px rgba(245, 87, 108, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+  transform: scale(1.05) !important;
 }
 
-
-
-.meme-overlay.dark .template-btn:hover {
-  background: linear-gradient(135deg, #3d4571 0%, #2f3554 100%);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.15);
-  color: #c8d3ff;
+.chuckle-meme-overlay.chuckle-dark .chuckle-template-btn {
+  background: linear-gradient(135deg, #2d3561 0%, #1f2544 100%) !important;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  color: #a8b3ff !important;
 }
 
-.meme-overlay.dark .template-btn.active {
-  background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-  box-shadow: 0 5px 18px rgba(250, 112, 154, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.3);
-  transform: scale(1.05);
-  color: #1a1a2e;
+.chuckle-meme-overlay.chuckle-dark .chuckle-template-btn:hover {
+  background: linear-gradient(135deg, #3d4571 0%, #2f3554 100%) !important;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+  color: #c8d3ff !important;
 }
 
-.text-editor-input {
-  background: white;
-  color: black;
-  position: relative;
+.chuckle-meme-overlay.chuckle-dark .chuckle-template-btn.active {
+  background: linear-gradient(135deg, #fa709a 0%, #fee140 100%) !important;
+  box-shadow: 0 5px 18px rgba(250, 112, 154, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+  transform: scale(1.05) !important;
+  color: #1a1a2e !important;
 }
 
-.text-editor-input:empty:before {
-  content: attr(data-placeholder);
-  color: #9aa0a6;
-  pointer-events: none;
+.chuckle-text-editor-input {
+  all: initial !important;
+  background: white !important;
+  color: black !important;
+  position: relative !important;
+  display: block !important;
+  font-family: system-ui, -apple-system, sans-serif !important;
 }
 
-.meme-overlay.dark .text-editor-input {
-  background: #2a2a3e;
-  color: white;
-  border-color: #3a3a4e;
+.chuckle-text-editor-input:empty:before {
+  content: attr(data-placeholder) !important;
+  color: #9aa0a6 !important;
+  pointer-events: none !important;
 }
 
-.meme-overlay.dark .text-editor-input:empty:before {
-  color: #5f6368;
+.chuckle-meme-overlay.chuckle-dark .chuckle-text-editor-input {
+  background: #2a2a3e !important;
+  color: white !important;
+  border-color: #3a3a4e !important;
 }
 
-.meme-overlay.dark .text-editor-input {
-  color: #5f6368;
+.chuckle-meme-overlay.chuckle-dark .chuckle-text-editor-input:empty:before {
+  color: #5f6368 !important;
 }
 
 
@@ -372,100 +382,112 @@ body.dark .share-menu {
 
 
 /* History Panel Styles */
-.history-panel {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  width: 300px;
-  max-height: 80vh;
-  background-color: #fff;
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-  z-index: 9999;
-  overflow: auto;
+.chuckle-history-panel {
+  all: initial !important;
+  position: fixed !important;
+  top: 20px !important;
+  right: 20px !important;
+  width: 300px !important;
+  max-height: 80vh !important;
+  background-color: #fff !important;
+  border-radius: 12px !important;
+  padding: 20px !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3) !important;
+  z-index: 2147483646 !important;
+  overflow: auto !important;
+  font-family: system-ui, -apple-system, sans-serif !important;
 }
 
-.history-panel.dark {
-  background-color: #1a1a2e;
+.chuckle-history-panel.chuckle-dark {
+  background-color: #1a1a2e !important;
 }
 
-.history-close {
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  color: #333;
+.chuckle-history-close {
+  all: initial !important;
+  background: none !important;
+  border: none !important;
+  font-size: 24px !important;
+  cursor: pointer !important;
+  color: #333 !important;
+  font-family: system-ui, -apple-system, sans-serif !important;
 }
 
-.history-panel.dark .history-close {
-  color: #fff;
+.chuckle-history-panel.chuckle-dark .chuckle-history-close {
+  color: #fff !important;
 }
 
-.history-search {
-  flex: 1;
-  padding: 8px;
-  border-radius: 6px;
-  border: 1px solid #ddd;
-  background-color: #fff;
-  color: #333;
-  font-size: 14px;
+.chuckle-history-search {
+  all: initial !important;
+  flex: 1 !important;
+  padding: 8px !important;
+  border-radius: 6px !important;
+  border: 1px solid #ddd !important;
+  background-color: #fff !important;
+  color: #333 !important;
+  font-size: 14px !important;
+  font-family: system-ui, -apple-system, sans-serif !important;
 }
 
-.history-panel.dark .history-search {
-  border-color: #444;
-  background-color: #2a2a3e;
-  color: #fff;
+.chuckle-history-panel.chuckle-dark .chuckle-history-search {
+  border-color: #444 !important;
+  background-color: #2a2a3e !important;
+  color: #fff !important;
 }
 
-.favorites-filter {
-  padding: 8px 12px;
-  border-radius: 6px;
-  border: none;
-  background-color: #f5f5f5;
-  cursor: pointer;
-  font-size: 16px;
+.chuckle-favorites-filter {
+  all: initial !important;
+  padding: 8px 12px !important;
+  border-radius: 6px !important;
+  border: none !important;
+  background-color: #f5f5f5 !important;
+  cursor: pointer !important;
+  font-size: 16px !important;
+  font-family: system-ui, -apple-system, sans-serif !important;
 }
 
-.history-panel.dark .favorites-filter {
-  background-color: #2a2a3e;
+.chuckle-history-panel.chuckle-dark .chuckle-favorites-filter {
+  background-color: #2a2a3e !important;
 }
 
-.history-item {
-  margin-bottom: 10px;
-  padding: 10px;
-  border-radius: 8px;
-  cursor: pointer;
-  background-color: #f5f5f5;
-  transition: transform 0.2s;
+.chuckle-history-item {
+  all: initial !important;
+  margin-bottom: 10px !important;
+  padding: 10px !important;
+  border-radius: 8px !important;
+  cursor: pointer !important;
+  background-color: #f5f5f5 !important;
+  transition: transform 0.2s !important;
+  display: block !important;
+  font-family: system-ui, -apple-system, sans-serif !important;
 }
 
-.history-panel.dark .history-item {
-  background-color: #2a2a3e;
+.chuckle-history-panel.chuckle-dark .chuckle-history-item {
+  background-color: #2a2a3e !important;
 }
 
-.history-item:hover {
-  transform: scale(1.02);
+.chuckle-history-item:hover {
+  transform: scale(1.02) !important;
 }
 
-.meme-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
+.chuckle-meme-tags {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 4px !important;
 }
 
-
-
-.empty-history,
-.no-results,
-.no-favorites {
-  text-align: center;
-  color: #666;
-  padding: 20px;
+.chuckle-empty-history,
+.chuckle-no-results,
+.chuckle-no-favorites {
+  all: initial !important;
+  text-align: center !important;
+  color: #666 !important;
+  padding: 20px !important;
+  display: block !important;
+  font-family: system-ui, -apple-system, sans-serif !important;
 }
 
-.history-panel.dark .empty-history,
-.history-panel.dark .no-results,
-.history-panel.dark .no-favorites {
-  color: #999;
+.chuckle-history-panel.chuckle-dark .chuckle-empty-history,
+.chuckle-history-panel.chuckle-dark .chuckle-no-results,
+.chuckle-history-panel.chuckle-dark .chuckle-no-favorites {
+  color: #999 !important;
 }

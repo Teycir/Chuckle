@@ -63,6 +63,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.action === 'openPopup') {
       chrome.tabs.create({ url: chrome.runtime.getURL('popup.html') });
       sendResponse({ success: true });
+    } else if (message.action === 'openTab') {
+      chrome.tabs.create({ url: message.url });
+      sendResponse({ success: true });
     } else {
       sendResponse({ success: false, error: 'Unknown action' });
     }
@@ -71,5 +74,5 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     console.log('[Chuckle] Background message error:', errorMsg);
     sendResponse({ success: false, error: errorMsg });
   }
-  return true; // Keep message channel open for async response
+  return true;
 });

@@ -165,7 +165,7 @@ function createShareModal(imageUrl: string, text: string, lang: string): HTMLDiv
 export function createShareButton(imageUrl: string, text: string, lang: string = 'English'): HTMLDivElement {
   const container = document.createElement('div');
   const btn = document.createElement('button');
-  btn.className = 'share-btn';
+  btn.className = 'chuckle-share-btn';
   btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="display: block; pointer-events: none;"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M15.5 6.5L8.5 10.5M8.5 13.5L15.5 17.5" stroke="currentColor" stroke-width="2" fill="none"/></svg>';
   btn.setAttribute('aria-label', getTranslation('shareMeme', lang));
   

@@ -289,80 +289,9 @@ function showError(message: string): void {
 }
 
 export async function createOverlay(memeData: MemeData): Promise<void> {
-  if (currentOverlay) closeOverlay();
-
-  await loadLanguage();
-  const { darkMode, offlineMode } = await chrome.storage.local.get(['darkMode', 'offlineMode']);
-  const isDark = darkMode !== undefined ? darkMode : true;
-
-  const overlay = document.createElement('div');
-  overlay.className = `chuckle-meme-overlay${isDark ? ' chuckle-dark' : ''}`;
-  overlay.setAttribute('role', 'dialog');
-  overlay.setAttribute('aria-modal', 'true');
-
-  const content = document.createElement('div');
-  content.className = 'chuckle-meme-content';
-
-  originalText = memeData.text;
-  originalInput = memeData.originalInput || memeData.text;
-  originalImageUrl = memeData.originalUrl || memeData.imageUrl;
-  currentTemplate = memeData.template;
-
-  currentMemeKey = `meme_${simpleHash(memeData.text + memeData.timestamp)}`;
-  currentMemeData = memeData;
-
-  content.appendChild(createTemplateSelector());
-  content.appendChild(createTextEditor());
-  
-  const imgWrapper = document.createElement('div');
-  imgWrapper.style.cssText = 'display: flex; justify-content: center; align-items: flex-start; width: 100%; position: relative;';
-  imgWrapper.appendChild(createMemeImage(memeData));
-  
-  const actionsContainer = document.createElement('div');
-  actionsContainer.className = 'chuckle-meme-actions';
-  actionsContainer.style.cssText = 'position: absolute; left: 8px; top: 8px; display: flex; flex-direction: column; gap: 12px;';
-  actionsContainer.appendChild(createDownloadButton());
-  actionsContainer.appendChild(createShareButton(memeData.originalUrl || memeData.imageUrl, memeData.text, currentLanguage));
-  actionsContainer.appendChild(createCloseButton());
-  
-  if (offlineMode) {
-    const offlineIndicator = document.createElement('div');
-    offlineIndicator.textContent = '📴';
-    offlineIndicator.style.cssText = 'font-size: 20px; opacity: 0.7; margin-top: 8px;';
-    actionsContainer.appendChild(offlineIndicator);
-  }
-  
-  imgWrapper.appendChild(actionsContainer);
-  
-  content.appendChild(imgWrapper);
-  overlay.appendChild(content);
-  
-  const currentTemplateBtn = overlay.querySelector(`[data-template="${memeData.template}"]`);
-  if (currentTemplateBtn) {
-    currentTemplateBtn.classList.add('active');
-  }
-
-  overlay.onclick = (e) => e.target === overlay && closeOverlay();
-  content.onclick = (e) => e.stopPropagation();
-
-  document.body.style.overflow = 'hidden';
-  document.body.appendChild(overlay);
-  currentOverlay = overlay;
-  enableShortcuts();
-
-  registerShortcut('download', downloadPng);
-
-  const closeButton = overlay.querySelector('.chuckle-close-btn') as HTMLButtonElement;
-  closeButton?.focus();
-
-  let escapeHandler: ((e: KeyboardEvent) => void) | null = null;
-  escapeHandler = (e: KeyboardEvent) => {
-    if (e.key === 'Escape') {
-      closeOverlay();
-      if (escapeHandler) document.removeEventListener('keydown', escapeHandler);
-    }
-  };
-  document.addEventListener('keydown', escapeHandler);
+  const data = encodeURIComponent(JSON.stringify(memeData));
+  const url = chrome.runtime.getURL(`viewer.html?data=${data}`);
+  chrome.runtime.sendMessage({ action: 'openTab', url });
 }
 
 export function closeOverlay(): void {
@@ -376,7 +305,6 @@ export function closeOverlay(): void {
     originalImageUrl = null;
     currentTemplate = null;
     isManualEdit = false;
-    document.body.style.overflow = '';
     disableShortcuts();
   }
 }
