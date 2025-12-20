@@ -1,10 +1,10 @@
 {
   "manifest_version": 3,
   "name": "Chuckle",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Transform any text into shareable memes using AI",
   "permissions": ["contextMenus", "activeTab", "storage", "alarms"],
-  "host_permissions": ["https://generativelanguage.googleapis.com/*", "https://openrouter.ai/*"],
+  "host_permissions": ["https://openrouter.ai/*"],
   "background": {
     "service_worker": "background.js"
   },
