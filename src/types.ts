@@ -7,19 +7,6 @@ export interface MemeResponse {
   template: string;
 }
 
-export interface GeminiResponse {
-  candidates: Array<{
-    content: {
-      parts: Array<{
-        text: string;
-      }>;
-    };
-  }>;
-  error?: {
-    message: string;
-  };
-}
-
 export interface MemeData {
   text: string;
   imageUrl: string;

@@ -1,7 +1,6 @@
 import type { MemeData } from './types';
-import { simpleHash, updateMeme } from './storage';
-import { enableShortcuts, disableShortcuts, registerShortcut } from './shortcuts';
-import { analyzeMemeContext, generateMemeImage } from './geminiService';
+import { updateMeme } from './storage';
+import { analyzeMemeContext, generateMemeImage } from './memeService';
 import { showLoading, hideLoading } from './loading';
 import { createShareButton } from './social-share';
 import { MEME_TEMPLATES } from './constants';

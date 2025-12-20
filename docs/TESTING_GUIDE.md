@@ -19,7 +19,7 @@ This creates the `dist/` folder with all deployable files.
 
 ### 3. Setup API Key
 
-1. Visit: https://aistudio.google.com/app/apikey
+1. Visit: https://openrouter.ai/keys
 2. Create API key
 3. Click Chuckle icon in Chrome
 4. Paste key → Save Settings

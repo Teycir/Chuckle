@@ -1,5 +1,3 @@
-import { addWatermark } from './watermark';
-
 interface SharePlatform {
   name: string;
   icon: string;
@@ -71,7 +69,7 @@ async function downloadMeme(imageUrl: string): Promise<void> {
   URL.revokeObjectURL(url);
 }
 
-function getPlatforms(lang: string): SharePlatform[] {
+function getPlatforms(_lang: string): SharePlatform[] {
   return [
     {
       name: 'Twitter',

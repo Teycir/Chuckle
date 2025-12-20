@@ -1,5 +1,5 @@
 import { MEME_TEMPLATES } from './constants';
-import { analyzeMemeContext, generateMemeImage } from './geminiService';
+import { analyzeMemeContext, generateMemeImage } from './memeService';
 
 const params = new URLSearchParams(window.location.search);
 const dataStr = params.get('data');

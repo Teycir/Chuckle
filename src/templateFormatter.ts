@@ -1,4 +1,3 @@
-import { CONFIG } from './config';
 import { getErrorMessage } from './errorMessages';
 import { formattedCache } from './cache';
 import { decodeHtmlEntities, cleanText } from '../lib/text-utils';
@@ -48,13 +47,11 @@ export async function formatTextForTemplate(text: string, template: string, forc
   const templatePrompt = TEMPLATE_PROMPTS[template] || 'Format as two parts: "part 1 / part 2" (max 35 chars each)';
   console.log(`[Chuckle] Formatting text for ${template}`);
   
-  const { aiProvider, geminiApiKey, openrouterApiKey, primaryModel, openrouterPrimaryModel, selectedLanguage } = await chrome.storage.local.get(['aiProvider', 'geminiApiKey', 'openrouterApiKey', 'primaryModel', 'openrouterPrimaryModel', 'selectedLanguage']);
-  const provider = aiProvider || 'google';
+  const { openrouterApiKey, openrouterPrimaryModel, selectedLanguage } = await chrome.storage.local.get(['openrouterApiKey', 'openrouterPrimaryModel', 'selectedLanguage']);
   const language = selectedLanguage || 'English';
-  const model = provider === 'google' ? (primaryModel || 'models/gemini-2.5-flash') : (openrouterPrimaryModel || 'meta-llama/llama-3.2-3b-instruct:free');
+  const model = openrouterPrimaryModel || 'meta-llama/llama-3.2-3b-instruct:free';
   
-  if (provider === 'google' && !geminiApiKey) throw new Error('No API key');
-  if (provider === 'openrouter' && !openrouterApiKey) throw new Error('No API key');
+  if (!openrouterApiKey) throw new Error('No API key');
   
   const prompt = `Format: "${text}"
 
@@ -86,40 +83,20 @@ FORBIDDEN - DO NOT INCLUDE:
 Response (ONLY the 2 parts):`;
 
   try {
-    let response: Response;
-    
-    if (provider === 'google') {
-      const modelName = model.replace('models/', '');
-      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent`;
-      response = await fetch(`${apiUrl}?key=${geminiApiKey}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            temperature: 0.7,
-            topP: 0.85,
-            topK: 25,
-            maxOutputTokens: 500
-          }
-        })
-      });
-    } else {
-      response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${openrouterApiKey}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          model,
-          messages: [{ role: 'user', content: prompt }],
-          temperature: 0.7,
-          top_p: 0.85,
-          max_tokens: 80
-        })
-      });
-    }
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openrouterApiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model,
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.7,
+        top_p: 0.85,
+        max_tokens: 80
+      })
+    });
     
     if (!response.ok) {
       if (response.status === 429) {
@@ -134,13 +111,7 @@ Response (ONLY the 2 parts):`;
     
     const data: any = await response.json();
     console.log('[Chuckle] Format API full response:', JSON.stringify(data));
-    let formatted: string | undefined;
-    
-    if (provider === 'google') {
-      formatted = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
-    } else {
-      formatted = data.choices?.[0]?.message?.content?.trim();
-    }
+    let formatted = data.choices?.[0]?.message?.content?.trim();
     
     console.log('[Chuckle] Raw AI response:', formatted);
     
@@ -174,29 +145,20 @@ Response (ONLY the 2 parts):`;
         if (firstLine.includes(sep)) {
           const parts = firstLine.split(sep).map(p => p.trim());
           if (parts.length >= 2 && parts[0] && parts[1]) {
-            // Ensure we don't cut words - limit to 60 chars but keep words complete
-            let part1 = parts[0];
-            let part2 = parts[1];
-            
-            if (part1.length > 80) {
-              const words = part1.split(/\s+/);
-              part1 = '';
+            const truncatePart = (part: string, maxLen: number): string => {
+              if (part.length <= maxLen) return part;
+              const words = part.split(/\s+/);
+              let result = '';
               for (const word of words) {
-                if ((part1 + ' ' + word).trim().length <= 80) {
-                  part1 = (part1 + ' ' + word).trim();
+                if ((result + ' ' + word).trim().length <= maxLen) {
+                  result = (result + ' ' + word).trim();
                 } else break;
               }
-            }
+              return result;
+            };
             
-            if (part2.length > 80) {
-              const words = part2.split(/\s+/);
-              part2 = '';
-              for (const word of words) {
-                if ((part2 + ' ' + word).trim().length <= 80) {
-                  part2 = (part2 + ' ' + word).trim();
-                } else break;
-              }
-            }
+            const part1 = truncatePart(parts[0], 80);
+            const part2 = truncatePart(parts[1], 80);
             
             const cleanedLine = `${part1} / ${part2}`;
             console.log('[Chuckle] Text formatted for template:', cleanedLine, `(${part1.length}/${part2.length} chars)`);

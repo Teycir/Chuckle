@@ -1,1 +1,1 @@
-export { analyzeMemeContext, generateMemeImage, validateApiKey } from './geminiService';
+export { analyzeMemeContext, generateMemeImage } from './memeService';

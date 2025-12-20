@@ -2,13 +2,13 @@
 
 ## Overview
 
-Chuckle is a Chrome extension built with TypeScript that transforms highlighted text into memes using Google's Gemini 2.5 Flash API.
+Chuckle is a Chrome extension built with TypeScript that transforms highlighted text into memes using OpenRouter's AI API.
 
 ## Tech Stack
 
 - **TypeScript**: Type-safe development
 - **Chrome Extension API**: Browser integration
-- **Gemini 2.5 Flash**: AI-powered meme template selection
+- **OpenRouter API**: AI-powered meme template selection
 - **memegen.link API**: Meme image generation
 - **Jest**: Unit testing framework (237 tests, 100% coverage)
 - **ESLint + Prettier**: Code quality and formatting
@@ -95,28 +95,31 @@ interface MemeData {
 
 **Key Functions**:
 - `generateMeme(text: string)`: Orchestrates the meme generation process
-- `analyzeMemeContext(text: string)`: Calls Gemini API to select meme template
+- `analyzeMemeContext(text: string)`: Calls OpenRouter API to select meme template
 - `generateMemeImage(template: string)`: Generates meme image with text overlay
 
 **Flow**:
 ```
-Receive text → Analyze with Gemini → Get template suggestion
+Receive text → Analyze with OpenRouter → Get template suggestion
 → Generate meme image → Store in chrome.storage → Open popup
 ```
 
 **API Integration**:
 ```typescript
-// Gemini API call
+// OpenRouter API call
 const response = await fetch(
-  `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`,
+  'https://openrouter.ai/api/v1/chat/completions',
   {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json'
+    },
     body: JSON.stringify({
-      contents: [{
-        parts: [{
-          text: `Analyze this text and suggest a meme template: "${text}"`
-        }]
+      model: 'meta-llama/llama-3.2-3b-instruct:free',
+      messages: [{
+        role: 'user',
+        content: `Analyze this text and suggest a meme template: "${text}"`
       }]
     })
   }
@@ -125,13 +128,13 @@ const response = await fetch(
 
 ### 4. Cache Layer (`cache.ts`)
 
-**Purpose**: LRU cache for Gemini API responses.
+**Purpose**: LRU cache for OpenRouter API responses.
 
 **Features**:
 - 100 item limit
 - 1-hour TTL
 - Automatic eviction of oldest items
-- Cache key format: `gemini:{text}:v{variant}`
+- Cache key format: `openrouter:{text}:v{variant}`
 
 **Implementation**:
 ```typescript
@@ -228,7 +231,7 @@ class LRUCache<T> {
 **Settings Schema**:
 ```typescript
 interface Settings {
-  geminiApiKey: string;
+  openrouterApiKey: string;
   selectedLanguage: 'English' | 'Spanish' | 'French' | 'German';
   darkMode: boolean;
 }
@@ -240,7 +243,6 @@ interface Settings {
 
 ```typescript
 export const CONFIG = {
-  GEMINI_API_URL: string;
   MEMEGEN_API_URL: string;
   FALLBACK_IMAGE_URL: string;
   DEBOUNCE_DELAY: 150;
@@ -272,8 +274,8 @@ export const CONFIG = {
 4. Background worker sends message to content script
 5. Content script shows loading overlay
 6. Content script checks cache for response
-7. If cache miss, calls Gemini API with text
-8. Gemini returns meme template suggestion
+7. If cache miss, calls OpenRouter API with text
+8. OpenRouter returns meme template suggestion
 9. Content script generates meme image URL
 10. Meme saved to chrome.storage.local
 11. Overlay displays meme with controls
@@ -306,7 +308,7 @@ export const CONFIG = {
 ```json
 {
   "permissions": ["contextMenus", "activeTab", "storage"],
-  "host_permissions": ["https://generativelanguage.googleapis.com/*"]
+  "host_permissions": ["https://openrouter.ai/*"]
 }
 ```
 
@@ -337,17 +339,17 @@ npm run test:coverage # Coverage report
 
 ## API Integration
 
-### Gemini 2.5 Flash
+### OpenRouter API
 
-**Endpoint**: `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent`
+**Endpoint**: `https://openrouter.ai/api/v1/chat/completions`
 
 **Request Format**:
 ```json
 {
-  "contents": [{
-    "parts": [{
-      "text": "Analyze this text and suggest a meme template: [USER_TEXT]"
-    }]
+  "model": "meta-llama/llama-3.2-3b-instruct:free",
+  "messages": [{
+    "role": "user",
+    "content": "Analyze this text and suggest a meme template: [USER_TEXT]"
   }]
 }
 ```
@@ -355,11 +357,9 @@ npm run test:coverage # Coverage report
 **Response Format**:
 ```json
 {
-  "candidates": [{
-    "content": {
-      "parts": [{
-        "text": "drake"
-      }]
+  "choices": [{
+    "message": {
+      "content": "drake"
     }
   }]
 }
@@ -436,7 +436,7 @@ try {
 
 ### Storage Errors
 ```typescript
-chrome.storage.local.get(['geminiApiKey'], (result) => {
+chrome.storage.local.get(['openrouterApiKey'], (result) => {
   if (chrome.runtime.lastError) {
     console.error('Storage error:', chrome.runtime.lastError);
     return;
@@ -449,7 +449,7 @@ chrome.storage.local.get(['geminiApiKey'], (result) => {
 
 ✅ **Core Features**
 - Instant meme generation from highlighted text
-- AI-powered template selection (Gemini 2.5 Flash)
+- AI-powered template selection (OpenRouter)
 - Multi-language support (4 languages)
 - Dark mode with animated backgrounds
 
@@ -557,7 +557,7 @@ MIT License - See LICENSE file for details
 
 - **Author**: [Teycir Ben Soltane](https://teycirbensoltane.tn/)
 - **Inspired by**: Gist Chrome Extension
-- **AI Provider**: Google Gemini 2.5 Flash
+- **AI Provider**: OpenRouter
 - **Design**: Custom gradient animations and glassmorphism
 
 ## Build Process

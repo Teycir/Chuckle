@@ -1,10 +1,9 @@
 import { showLoading, hideLoading } from './loading';
 import { logger } from './logger';
-import { analyzeMemeContext, generateMemeImage } from './geminiService';
+import { analyzeMemeContext, generateMemeImage } from './memeService';
 import { createOverlay } from './overlay';
 import { saveMeme } from './storage';
 import { performCleanup, shouldCleanup } from './cleanup';
-import { ConflictDetector } from './conflictDetector';
 import { StatusIndicator } from './statusIndicator';
 
 function showError(message: string): void {
@@ -62,9 +61,9 @@ function initializeChuckle() {
     console.log('[Chuckle] Page URL:', window.location.href);
     
     // Test storage access
-    chrome.storage.local.get(['geminiApiKey', 'primaryModel'], (data) => {
-      console.log('[Chuckle] Storage check - API key exists:', !!data.geminiApiKey);
-      console.log('[Chuckle] Storage check - Model exists:', !!data.primaryModel);
+    chrome.storage.local.get(['openrouterApiKey', 'openrouterPrimaryModel'], (data) => {
+      console.log('[Chuckle] Storage check - API key exists:', !!data.openrouterApiKey);
+      console.log('[Chuckle] Storage check - Model exists:', !!data.openrouterPrimaryModel);
     });
   } catch (error) {
     console.log('[Chuckle] Initialization error (non-critical):', error instanceof Error ? error.message : String(error));

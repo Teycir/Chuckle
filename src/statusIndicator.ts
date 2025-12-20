@@ -3,12 +3,11 @@ export class StatusIndicator {
   private static indicator: HTMLElement | null = null;
 
   static async show(): Promise<void> {
-    const { offlineMode, geminiApiKey, openrouterApiKey, aiProvider } = await chrome.storage.local.get([
-      'offlineMode', 'geminiApiKey', 'openrouterApiKey', 'aiProvider'
+    const { offlineMode, openrouterApiKey } = await chrome.storage.local.get([
+      'offlineMode', 'openrouterApiKey'
     ]);
 
-    const provider = aiProvider || 'google';
-    const hasApiKey = provider === 'google' ? !!geminiApiKey : !!openrouterApiKey;
+    const hasApiKey = !!openrouterApiKey;
 
     if (offlineMode || !hasApiKey) {
       this.showOfflineIndicator();
@@ -40,31 +39,21 @@ export class StatusIndicator {
   }
 
   static async checkApiStatus(): Promise<{ hasCredits: boolean; provider: string }> {
-    const { aiProvider, geminiApiKey, openrouterApiKey } = await chrome.storage.local.get([
-      'aiProvider', 'geminiApiKey', 'openrouterApiKey'
-    ]);
+    const { openrouterApiKey } = await chrome.storage.local.get(['openrouterApiKey']);
 
-    const provider = aiProvider || 'google';
-    const apiKey = provider === 'google' ? geminiApiKey : openrouterApiKey;
-
-    if (!apiKey) {
-      return { hasCredits: false, provider };
+    if (!openrouterApiKey) {
+      return { hasCredits: false, provider: 'openrouter' };
     }
 
     try {
-      // Quick test call to check API status
-      const testUrl = provider === 'google' 
-        ? `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`
-        : 'https://openrouter.ai/api/v1/models';
-
-      const response = await fetch(testUrl, {
+      const response = await fetch('https://openrouter.ai/api/v1/models', {
         method: 'GET',
-        headers: provider === 'openrouter' ? { 'Authorization': `Bearer ${apiKey}` } : {}
+        headers: { 'Authorization': `Bearer ${openrouterApiKey}` }
       });
 
-      return { hasCredits: response.ok, provider };
+      return { hasCredits: response.ok, provider: 'openrouter' };
     } catch (error) {
-      return { hasCredits: false, provider };
+      return { hasCredits: false, provider: 'openrouter' };
     }
   }
 }

@@ -15,10 +15,10 @@ Everything stays on your computer—no tracking, no data collection, no ads. Ful
 
 ### ✨ What Can Chuckle Do?
 
-- 🆓 **Free to Use** - Get 1,500 free memes every day using Google AI Studio's free tier, fallback use with OpenRouter
+- 🆓 **Free to Use** - Get free memes using OpenRouter's free tier models
 - 🔒 **Your Privacy is Safe** - Everything stays on your computer, no tracking
 - ⚡ **Super Fast** - Get a meme in 2-3 seconds, try different templates instantly
-- 🤖 **AI-Powered** - Gemini 2.5 Flash picks the perfect meme template for your text
+- 🤖 **AI-Powered** - AI picks the perfect meme template for your text
 - 🌍 **Speaks Your Language** - Available in English, Spanish, French, and German
 - 🎨 **20 Meme Templates** - Drake, Distracted Boyfriend, Woman Yelling at Cat, and 17 more
 - **Social Sharing** - Share instantly to Twitter, LinkedIn, or Email
@@ -79,26 +79,16 @@ Everything stays on your computer—no tracking, no data collection, no ads. Ful
 
 **Step 2: Get Your Free AI Key (1 minute)**
 
-**Option A: Google AI (Recommended - Easiest)**
-1. Visit [Google AI Studio](https://aistudio.google.com/app/apikey)
-2. Sign in with your Google account
-3. Click "Create API Key"
-4. Copy the key (it looks like: AIza...)
-5. Click the Chuckle icon in Chrome
-6. Paste your key and click "Save Settings"
-
-**Option B: OpenRouter (Alternative - More Models)**
 1. Visit [OpenRouter](https://openrouter.ai/keys)
 2. Sign up for a free account
 3. Create an API key
 4. Click the Chuckle icon in Chrome
-5. Select "OpenRouter" from the dropdown
-6. Paste your key and click "Save Settings"
+5. Paste your key and click "Save Settings"
 
-**Which one should I choose?**
-- Choose Google AI if you want the simplest setup
-- Choose OpenRouter if you want access to different AI models
-- Both give you 1,500 free memes per day
+**Why OpenRouter?**
+- Access to multiple free AI models
+- No daily limits on free tier models
+- Simple setup
 
 **Step 3: Start Making Memes**
 1. Go to any website
@@ -222,7 +212,7 @@ Chuckle works in 4 languages:
 ### Common Questions
 
 **Q: Is Chuckle really free?**
-A: Yes! Google gives you 1,500 free AI requests per day. That's enough for most people.
+A: Yes! OpenRouter provides free tier models with no daily limits.
 
 **Q: Is my data safe?**
 A: Yes! Everything stays on your computer. Chuckle doesn't send your data to any servers.
@@ -231,7 +221,7 @@ A: Yes! Everything stays on your computer. Chuckle doesn't send your data to any
 A: No! If you can right-click, you can use Chuckle. Just follow the 3 setup steps above.
 
 **Q: What if I run out of free requests?**
-A: You get 1,500 per day. That resets every 24 hours. Most people use 10-20 per day.
+A: OpenRouter's free tier models have no daily limits. You can create unlimited memes.
 
 **Q: Can I use Chuckle on my phone?**
 A: Not yet. Chuckle only works on Chrome browser on computers right now.
@@ -240,7 +230,7 @@ A: Not yet. Chuckle only works on Chrome browser on computers right now.
 A: Yes! Chuckle works on any website where you can highlight text. Just make sure to select between 6 and 30 words for best results.
 
 **Q: Why do I need my own API key?**
-A: This keeps Chuckle free and private. You connect directly to Google AI or OpenRouter, not through our servers.
+A: This keeps Chuckle free and private. You connect directly to OpenRouter, not through our servers.
 
 **Q: What meme templates does Chuckle use?**
 A: Chuckle has 20 popular templates including Drake, Distracted Boyfriend, Woman Yelling at Cat, Success Kid, and more. The AI picks the best one for your text.
@@ -291,7 +281,7 @@ A: Yes! Click the template button to see all 20 templates and choose a different
 **What Chuckle DOES Do:**
 - ✅ Stores your API key only in your browser
 - ✅ Saves memes only on your computer
-- ✅ Connects directly to Google AI for total privacy
+- ✅ Connects directly to OpenRouter for total privacy
 - ✅ Works completely privately
 
 **Open Source**: All our code is public on GitHub. Anyone can check what Chuckle does.
@@ -299,7 +289,7 @@ A: Yes! Click the template button to see all 20 templates and choose a different
 ### Troubleshooting
 
 **Problem: "No API key found"**
-- Solution: Click the Chuckle icon and add your API key from Google AI Studio
+- Solution: Click the Chuckle icon and add your API key from OpenRouter
 
 **Problem: Meme takes too long**
 - Solution: Check your internet connection. Memes usually take 2-3 seconds.
@@ -314,7 +304,7 @@ A: Yes! Click the template button to see all 20 templates and choose a different
 - Solution: Make sure you've highlighted text first, then right-click.
 
 **Problem: "API error"**
-- Solution: Check your API key is correct. You might have hit the daily limit (1,500 requests).
+- Solution: Check your API key is correct.
 
 **Problem: Keyboard shortcuts not working**
 - Solution: Alt+M works anywhere on any webpage when you have text selected.
@@ -345,8 +335,8 @@ A: Yes! Click the template button to see all 20 templates and choose a different
 ### Technical Stack
 - **TypeScript** - Type-safe code
 - **Chrome Extension API** - Browser integration
-- **Gemini 2.5 Flash** - AI-powered template selection
-- **Jest** - 255 passing tests (100% coverage)
+- **OpenRouter API** - AI-powered template selection
+- **Jest** - Testing framework
 - **ESLint + Prettier** - Code quality
 
 ### Key Features

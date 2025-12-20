@@ -1,5 +1,4 @@
 export const CONFIG = {
-  GEMINI_API_URL: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent',
   IMGFLIP_API_URL: 'https://api.imgflip.com/caption_image',
   MEMEGEN_API_URL: 'https://api.memegen.link/images',
   FALLBACK_IMAGE_URL: 'https://api.memegen.link/images/drake/meme_generation_failed/please_try_again.png',
