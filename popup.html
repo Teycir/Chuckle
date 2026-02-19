@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +10,7 @@
       width: 100%;
       height: 100%;
     }
+
     body {
       width: 100%;
       height: 100%;
@@ -22,6 +24,7 @@
       position: relative;
       overflow: auto;
     }
+
     body::before {
       content: '';
       position: fixed;
@@ -29,13 +32,14 @@
       left: -50%;
       width: 200%;
       height: 200%;
-      background: 
+      background:
         radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.25) 20%, transparent 50%),
         radial-gradient(circle at 80% 70%, rgba(255, 60, 120, 0.5) 0%, rgba(255, 60, 120, 0.2) 20%, transparent 50%),
         radial-gradient(circle at 50% 50%, rgba(60, 160, 255, 0.5) 0%, rgba(60, 160, 255, 0.2) 20%, transparent 50%);
       animation: shader 8s ease-in-out infinite;
       z-index: 0;
     }
+
     body::after {
       content: '';
       position: fixed;
@@ -43,20 +47,37 @@
       left: -50%;
       width: 200%;
       height: 200%;
-      background: 
+      background:
         radial-gradient(circle at 70% 20%, rgba(255, 160, 0, 0.45) 0%, rgba(255, 160, 0, 0.18) 20%, transparent 50%),
         radial-gradient(circle at 30% 80%, rgba(160, 60, 255, 0.5) 0%, rgba(160, 60, 255, 0.2) 20%, transparent 50%);
       animation: shader2 10s ease-in-out infinite;
       z-index: 0;
     }
+
     @keyframes shader {
-      0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); }
-      50% { transform: translate(15%, 15%) scale(1.1) rotate(10deg); }
+
+      0%,
+      100% {
+        transform: translate(0, 0) scale(1) rotate(0deg);
+      }
+
+      50% {
+        transform: translate(15%, 15%) scale(1.1) rotate(10deg);
+      }
     }
+
     @keyframes shader2 {
-      0%, 100% { transform: translate(10%, 5%) rotate(0deg) scale(1); }
-      50% { transform: translate(-5%, -10%) rotate(-10deg) scale(1.08); }
+
+      0%,
+      100% {
+        transform: translate(10%, 5%) rotate(0deg) scale(1);
+      }
+
+      50% {
+        transform: translate(-5%, -10%) rotate(-10deg) scale(1.08);
+      }
     }
+
     .container {
       width: 100%;
       max-width: 380px;
@@ -71,17 +92,46 @@
       border: 1px solid rgba(255, 255, 255, 0.3);
       box-sizing: border-box;
     }
+
     @media (max-width: 420px) {
-      body { padding: 12px; align-items: flex-start; }
-      .container { width: 100%; padding: 20px 16px; margin: 10px auto; border-radius: 12px; }
-      h2 { font-size: 16px; }
-      input, select { font-size: 14px; }
-      button { font-size: 14px; }
+      body {
+        padding: 12px;
+        align-items: flex-start;
+      }
+
+      .container {
+        width: 100%;
+        padding: 20px 16px;
+        margin: 10px auto;
+        border-radius: 12px;
+      }
+
+      h2 {
+        font-size: 16px;
+      }
+
+      input,
+      select {
+        font-size: 14px;
+      }
+
+      button {
+        font-size: 14px;
+      }
     }
+
     @media (max-height: 700px) {
-      body { align-items: flex-start; padding-top: 20px; padding-bottom: 20px; }
-      .container { margin: 10px auto; }
+      body {
+        align-items: flex-start;
+        padding-top: 20px;
+        padding-bottom: 20px;
+      }
+
+      .container {
+        margin: 10px auto;
+      }
     }
+
     h2 {
       margin: 0;
       font-size: 16px;
@@ -89,8 +139,15 @@
       color: #202124;
       letter-spacing: -0.5px;
     }
-    .form-group { margin-bottom: 10px; }
-    .form-group:first-of-type { margin-top: 12px; }
+
+    .form-group {
+      margin-bottom: 10px;
+    }
+
+    .form-group:first-of-type {
+      margin-top: 12px;
+    }
+
     label {
       display: block;
       font-size: 10px;
@@ -100,7 +157,9 @@
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
-    input, select {
+
+    input,
+    select {
       width: 100%;
       padding: 8px;
       border: 2px solid #e8eaed;
@@ -110,16 +169,25 @@
       transition: all 0.2s ease;
       background: white;
     }
-    input:focus, select:focus {
+
+    input:focus,
+    select:focus {
       outline: none;
       border-color: #667eea;
       box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
     }
-    button:focus, input:focus, select:focus {
+
+    button:focus,
+    input:focus,
+    select:focus {
       outline: 2px solid #667eea;
       outline-offset: 2px;
     }
-    input.valid { border-color: #34a853; }
+
+    input.valid {
+      border-color: #34a853;
+    }
+
     button {
       width: 100%;
       padding: 9px;
@@ -134,17 +202,21 @@
       box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
       margin-bottom: 6px;
     }
+
     button:hover:not(:disabled) {
       transform: translateY(-1px);
       box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
     }
+
     button:active:not(:disabled) {
       transform: translateY(0);
     }
+
     button:disabled {
       opacity: 0.6;
       cursor: not-allowed;
     }
+
     .status-msg {
       padding: 6px 10px;
       border-radius: 6px;
@@ -155,14 +227,17 @@
       margin-top: -6px;
       margin-bottom: 6px;
     }
+
     .status-msg.success {
       background: #e6f4ea;
       color: #137333;
     }
+
     .status-msg.error {
       background: #fce8e6;
       color: #c5221f;
     }
+
     .info {
       margin-top: 10px;
       padding-top: 10px;
@@ -171,12 +246,14 @@
       color: #5f6368;
       text-align: center;
     }
+
     .info a {
       color: #667eea;
       text-decoration: none;
       font-weight: 600;
       font-size: 10px;
     }
+
     .info a:hover {
       text-decoration: underline;
     }
@@ -184,35 +261,77 @@
     body.dark {
       background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
     }
+
     body.dark .container {
       background: linear-gradient(135deg, rgba(30, 30, 46, 0.95) 0%, rgba(24, 24, 37, 0.95) 100%);
       border-color: rgba(255, 255, 255, 0.1);
     }
-    body.dark h2 { color: #e0e0e0; }
-    body.dark label { color: #e0e0e0 !important; }
+
+    body.dark h2 {
+      color: #e0e0e0;
+    }
+
+    body.dark label {
+      color: #e0e0e0 !important;
+    }
+
     body.dark input {
       background: #2a2a3e;
       border-color: #3a3a4e;
       color: #e0e0e0;
     }
-    body.dark input:focus { border-color: #667eea; }
-    body.dark .info { color: #b0b0b0; }
-    body.dark .info a { color: #8899ff; }
+
+    body.dark input:focus {
+      border-color: #667eea;
+    }
+
+    body.dark .info {
+      color: #b0b0b0;
+    }
+
+    body.dark .info a {
+      color: #8899ff;
+    }
+
     body.dark select {
       background: #2a2a3e;
       border-color: #3a3a4e;
       color: #e0e0e0;
     }
+
     body.dark select option {
       background: #2a2a3e;
       color: #e0e0e0;
     }
-    body.dark select:focus { border-color: #667eea; }
-    body.dark .tab-btn { background: #2a2a3e !important; color: #b0b0b0 !important; }
-    body.dark .tab-btn.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; color: white !important; }
-    body.dark #statsContent { color: #e0e0e0; }
-    body.dark .status-msg.success { background: rgba(52, 168, 83, 0.2); color: #81c995; }
-    body.dark .status-msg.error { background: rgba(197, 34, 31, 0.2); color: #f28b82; }
+
+    body.dark select:focus {
+      border-color: #667eea;
+    }
+
+    body.dark .tab-btn {
+      background: #2a2a3e !important;
+      color: #b0b0b0 !important;
+    }
+
+    body.dark .tab-btn.active {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+      color: white !important;
+    }
+
+    body.dark #statsContent {
+      color: #e0e0e0;
+    }
+
+    body.dark .status-msg.success {
+      background: rgba(52, 168, 83, 0.2);
+      color: #81c995;
+    }
+
+    body.dark .status-msg.error {
+      background: rgba(197, 34, 31, 0.2);
+      color: #f28b82;
+    }
+
     .footer-text {
       text-align: center;
       margin-top: 4px;
@@ -221,10 +340,19 @@
       color: #80868b;
       animation: fadeInUp 0.6s ease-out;
     }
+
     @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
+
     .footer-text a {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #667eea 100%);
       background-size: 200% auto;
@@ -235,8 +363,15 @@
       font-weight: 700;
       transition: background-position 0.3s ease;
     }
-    .footer-text a:hover { background-position: right center; }
-    body.dark .footer-text { color: #b0b0b0; }
+
+    .footer-text a:hover {
+      background-position: right center;
+    }
+
+    body.dark .footer-text {
+      color: #b0b0b0;
+    }
+
     .model-tooltip {
       position: absolute;
       bottom: 100%;
@@ -256,10 +391,12 @@
       border: 1px solid #e8eaed;
       z-index: 10;
     }
-    input:hover + .model-tooltip:not(:empty),
-    input:focus + .model-tooltip:not(:empty) {
+
+    input:hover+.model-tooltip:not(:empty),
+    input:focus+.model-tooltip:not(:empty) {
       opacity: 1;
     }
+
     body.dark .model-tooltip {
       background: #2a2a3e;
       color: #e0e0e0;
@@ -267,49 +404,45 @@
     }
   </style>
 </head>
+
 <body>
   <div class="container">
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; border-bottom: 2px solid #e8eaed; padding-bottom: 8px;">
-      <button id="settingsTab" class="tab-btn" style="padding: 8px; border: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600;">⚙️ Settings</button>
-      <button id="statsTab" class="tab-btn" style="padding: 8px; border: none; background: #f5f5f5; color: #666; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600;">📊 Stats</button>
+    <div
+      style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; border-bottom: 2px solid #e8eaed; padding-bottom: 8px;">
+      <button id="settingsTab" class="tab-btn"
+        style="padding: 8px; border: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600;">⚙️
+        Settings</button>
+      <button id="statsTab" class="tab-btn"
+        style="padding: 8px; border: none; background: #f5f5f5; color: #666; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600;">📊
+        Stats</button>
     </div>
     <div id="settingsPanel">
-    <h2>🎭 Chuckle Settings</h2>
-    <div class="form-group">
-      <label for="openrouterApiKey">🔑 OpenRouter Key</label>
-      <div style="position: relative;">
-        <input type="password" id="openrouterApiKey" placeholder="sk-or-v1-..." autocomplete="off"/>
-        <span class="model-tooltip" id="openrouterModelTooltip"></span>
+      <h2>🎭 Chuckle Settings</h2>
+
+      <div class="form-group">
+        <label for="languageSelect">🌐 Language</label>
+        <select id="languageSelect">
+          <option value="English">🇺🇸 English</option>
+          <option value="Spanish">🇪🇸 Español</option>
+          <option value="French">🇫🇷 Français</option>
+          <option value="German">🇩🇪 Deutsch</option>
+        </select>
       </div>
-    </div>
-    <div class="form-group">
-      <label>🤖 Loaded Model</label>
-      <div id="openrouterModelLabel" style="padding: 8px; background: #f8f9fa; border: 2px solid #e8eaed; border-radius: 8px; font-size: 12px; color: #5f6368;">No model loaded</div>
-    </div>
-    <div class="form-group">
-      <label for="languageSelect">🌐 Language</label>
-      <select id="languageSelect">
-        <option value="English">🇺🇸 English</option>
-        <option value="Spanish">🇪🇸 Español</option>
-        <option value="French">🇫🇷 Français</option>
-        <option value="German">🇩🇪 Deutsch</option>
-      </select>
-    </div>
-    <div class="form-group" style="display: flex; align-items: center; gap: 6px; margin-bottom: 12px;">
-      <input type="checkbox" id="darkMode" style="width: auto; margin: 0;" />
-      <label for="darkMode" style="margin: 0; text-transform: none; font-size: 12px; font-weight: 500;">🌙 Dark Mode</label>
-    </div>
-    <div class="form-group" style="display: flex; align-items: center; gap: 6px; margin-bottom: 12px;">
-      <input type="checkbox" id="offlineMode" style="width: auto; margin: 0;" />
-      <label for="offlineMode" style="margin: 0; text-transform: none; font-size: 12px; font-weight: 500;">📴 Offline Mode</label>
-    </div>
-    <div id="statusMsg" class="status-msg"></div>
-    <button id="saveKey">💾 Save Settings</button>
-    <div class="info" dir="auto"><span id="openrouterKeyHelpText">Get key from</span> <a href="https://openrouter.ai/keys" target="_blank" rel="noopener noreferrer">OpenRouter</a></div>
-    <div class="info" style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #e8eaed;">How to use: Highlight text → Right-click → Remix as a Meme</div>
-    <div class="footer-text">
-      <span>Meme generator, made by</span> <a href="https://teycirbensoltane.tn/" target="_blank" rel="noopener noreferrer">Teycir</a>
-    </div>
+      <div class="form-group" style="display: flex; align-items: center; gap: 6px; margin-bottom: 12px;">
+        <input type="checkbox" id="darkMode" style="width: auto; margin: 0;" />
+        <label for="darkMode" style="margin: 0; text-transform: none; font-size: 12px; font-weight: 500;">🌙 Dark
+          Mode</label>
+      </div>
+      <div id="statusMsg" class="status-msg"></div>
+
+      <button id="saveKey">💾 Save Settings</button>
+      <div class="info" style="display: none;"></div>
+      <div class="info" style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #e8eaed;">How to use: Highlight
+        text → Right-click → Remix as a Meme</div>
+      <div class="footer-text">
+        <span>Meme generator, made by</span> <a href="https://teycirbensoltane.tn/" target="_blank"
+          rel="noopener noreferrer">Teycir</a>
+      </div>
     </div>
     <div id="statsPanel" style="display: none;">
       <h2>📊 Your Meme Stats</h2>
@@ -320,4 +453,5 @@
 
   <script src="popup.js"></script>
 </body>
+
 </html>

@@ -129,12 +129,11 @@ function createCloseButton(): HTMLButtonElement {
 async function regenerateMeme(specificTemplate?: string): Promise<void> {
   if (!originalInput || isRegenerating) return;
   isRegenerating = true;
-  
+
   showLoading(getTranslation('regenerating'));
-  
+
   try {
     const textToUse = isManualEdit ? originalText : originalInput;
-    console.log('[Chuckle] Regenerating with text:', textToUse, 'originalInput:', originalInput, 'specificTemplate:', specificTemplate);
     const truncatedText = textToUse?.slice(0, 100) || '';
     const template = specificTemplate || (isManualEdit && currentTemplate) || await analyzeMemeContext(originalInput?.slice(0, 100) || '', Date.now());
     currentTemplate = template;
@@ -142,7 +141,7 @@ async function regenerateMeme(specificTemplate?: string): Promise<void> {
     const forceRegenerate = !!specificTemplate;
     const { watermarkedUrl, originalUrl, formattedText } = await generateMemeImage(template, truncatedText, skipFormatting, forceRegenerate);
     isManualEdit = false;
-    
+
     if (currentMemeData && currentOverlay) {
       currentMemeData.imageUrl = watermarkedUrl;
       currentMemeData.text = formattedText;
@@ -152,28 +151,28 @@ async function regenerateMeme(specificTemplate?: string): Promise<void> {
       if (!isManualEdit) {
         originalInput = currentMemeData.originalInput || originalInput;
       }
-      
+
       const img = currentOverlay.querySelector('.chuckle-meme-image') as HTMLImageElement;
       if (img) {
         img.src = watermarkedUrl;
         img.setAttribute('data-template', template);
       }
-      
+
       const textInput = currentOverlay.querySelector('.chuckle-text-editor-input') as HTMLDivElement;
       if (textInput) textInput.innerText = formattedText;
-      
+
       const actionsContainer = currentOverlay.querySelector('.chuckle-meme-actions');
       if (actionsContainer) {
         const oldShareBtn = actionsContainer.children[1];
         const newShareBtn = createShareButton(originalUrl, formattedText, currentLanguage);
         actionsContainer.replaceChild(newShareBtn, oldShareBtn);
       }
-      
+
       const templateButtons = currentOverlay.querySelectorAll('.chuckle-template-btn');
       templateButtons.forEach(btn => btn.classList.remove('active'));
       const activeBtn = currentOverlay.querySelector(`[data-template="${template}"]`);
       activeBtn?.classList.add('active');
-      
+
       if (currentMemeKey) {
         await updateMeme(currentMemeKey, { imageUrl: originalUrl, originalUrl, template, timestamp: currentMemeData.timestamp, text: currentMemeData.text });
       }
@@ -204,18 +203,18 @@ function createMemeImage(memeData: MemeData): HTMLImageElement {
 function createTextEditor(): HTMLDivElement {
   const wrapper = document.createElement('div');
   wrapper.style.cssText = 'display: flex; justify-content: center; align-items: center; padding: 8px 0; width: 100%;';
-  
+
   const input = document.createElement('div');
   input.className = 'chuckle-text-editor-input chuckle-meme-text';
   input.contentEditable = 'true';
   input.setAttribute('data-placeholder', getTranslation('textboxPlaceholder'));
   input.style.cssText = 'padding: 8px 16px; border: 1px solid #dadce0; border-radius: 8px; font-size: 14px; max-width: 90vw; width: 100%; box-sizing: border-box; min-height: 40px; background: white; color: #9aa0a6;';
-  
+
   setTimeout(() => {
     input.innerText = originalText || '';
     input.style.color = 'black';
   }, 3000);
-  
+
   input.onblur = async () => {
     const newText = input.textContent?.trim() || '';
     if (newText && newText !== originalText) {
@@ -224,7 +223,7 @@ function createTextEditor(): HTMLDivElement {
       await regenerateMeme();
     }
   };
-  
+
   input.onkeydown = async (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -236,7 +235,7 @@ function createTextEditor(): HTMLDivElement {
       }
     }
   };
-  
+
   wrapper.appendChild(input);
   return wrapper;
 }
@@ -244,10 +243,10 @@ function createTextEditor(): HTMLDivElement {
 function createTemplateSelector(): HTMLDivElement {
   const wrapper = document.createElement('div');
   wrapper.style.cssText = 'display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 16px 0 8px 0; width: 100%;';
-  
+
   const templatesRow = document.createElement('div');
   templatesRow.style.cssText = 'display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; max-width: 90vw; width: 100%;';
-  
+
   MEME_TEMPLATES.forEach((template) => {
     const btn = document.createElement('button');
     btn.className = 'chuckle-template-btn';
@@ -259,7 +258,7 @@ function createTemplateSelector(): HTMLDivElement {
     };
     templatesRow.appendChild(btn);
   });
-  
+
   wrapper.appendChild(templatesRow);
   return wrapper;
 }
@@ -287,9 +286,14 @@ function showError(message: string): void {
   }, 5000);
 }
 
-export async function createOverlay(memeData: MemeData): Promise<void> {
-  const data = encodeURIComponent(JSON.stringify(memeData));
-  const url = chrome.runtime.getURL(`viewer.html?data=${data}`);
+export async function createOverlay(memeData: MemeData, memeId?: string): Promise<void> {
+  let url;
+  if (memeId) {
+    url = chrome.runtime.getURL(`viewer.html?id=${memeId}`);
+  } else {
+    const data = encodeURIComponent(JSON.stringify(memeData));
+    url = chrome.runtime.getURL(`viewer.html?data=${data}`);
+  }
   chrome.runtime.sendMessage({ action: 'openTab', url });
 }
 
@@ -304,7 +308,6 @@ export function closeOverlay(): void {
     originalImageUrl = null;
     currentTemplate = null;
     isManualEdit = false;
-    disableShortcuts();
   }
 }
 

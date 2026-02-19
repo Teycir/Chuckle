@@ -1,20 +1,14 @@
-// Status indicator for API credits and offline mode
 export class StatusIndicator {
   private static indicator: HTMLElement | null = null;
 
   static async show(): Promise<void> {
-    const { offlineMode, openrouterApiKey } = await chrome.storage.local.get([
-      'offlineMode', 'openrouterApiKey'
-    ]);
-
-    const hasApiKey = !!openrouterApiKey;
-
-    if (offlineMode || !hasApiKey) {
-      this.showOfflineIndicator();
-    } else {
+    if (navigator.onLine) {
       this.hideIndicator();
+    } else {
+      this.showOfflineIndicator();
     }
   }
+
 
   private static showOfflineIndicator(): void {
     if (this.indicator) return;
@@ -27,7 +21,7 @@ export class StatusIndicator {
       </div>
     `;
     document.body.appendChild(this.indicator);
-    
+
     setTimeout(() => this.hideIndicator(), 5000);
   }
 
@@ -39,21 +33,7 @@ export class StatusIndicator {
   }
 
   static async checkApiStatus(): Promise<{ hasCredits: boolean; provider: string }> {
-    const { openrouterApiKey } = await chrome.storage.local.get(['openrouterApiKey']);
-
-    if (!openrouterApiKey) {
-      return { hasCredits: false, provider: 'openrouter' };
-    }
-
-    try {
-      const response = await fetch('https://openrouter.ai/api/v1/models', {
-        method: 'GET',
-        headers: { 'Authorization': `Bearer ${openrouterApiKey}` }
-      });
-
-      return { hasCredits: response.ok, provider: 'openrouter' };
-    } catch (error) {
-      return { hasCredits: false, provider: 'openrouter' };
-    }
+    // API checks are no longer relevant in manual mode
+    return { hasCredits: true, provider: 'manual' };
   }
 }

@@ -71,15 +71,9 @@ export const MEME_TEMPLATES = [
   },
 ] as const;
 
-export const PROMPT_TEMPLATE = (text: string, topic?: string) =>
-  `Analyze this text and suggest ONE meme template from this list: db (distracted boyfriend), drake, ds (two buttons - sweating over impossible choices), cmm (change my mind), pigeon, woman-cat, fine (this is fine), stonks, success, blb (bad luck brian), fry (futurama fry), fwp (first world problems), doge, iw (insanity wolf), philosoraptor, grumpycat. Text: "${text}".${topic ? ` Topic: ${topic}.` : ''} Return ONLY the template ID (e.g., "db", "drake"). No explanation.`;
-
-export const TEXT_OPTIMIZATION_PROMPT = (text: string) =>
-  `Transform this into HILARIOUS meme text (max 100 chars). Be creative, witty, and punchy. Add comedic timing, irony, or relatable humor. Fix typos, complete or remove cut-off sentences. Make it viral-worthy! Text: "${text}". Return ONLY the optimized text, nothing else.`;
+// Prompts removed as AI features are disabled.
 
 export const ERROR_MESSAGES = {
-  NO_API_KEY: 'API key not configured',
-  INVALID_API_KEY: 'Invalid API key format',
   API_ERROR: (status: number) => `API error: ${status}`,
   INVALID_RESPONSE: 'Invalid API response',
   TEMPLATE_UNAVAILABLE: 'Template unavailable',
