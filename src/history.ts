@@ -175,7 +175,7 @@ export async function createHistoryPanel(): Promise<void> {
       const text = document.createElement('div');
       text.className = 'meme-text';
       const displayText = meme.text.length > 50 ? meme.text.slice(0, 50) + '...' : meme.text;
-      text.innerHTML = displayText;
+      text.textContent = displayText;
       Object.assign(text.style, {
         fontSize: '12px',
         color: isDark ? '#ccc' : '#555',
@@ -215,13 +215,13 @@ export async function applyFilters(): Promise<void> {
   const noResults = currentPanel.querySelector('.no-results') as HTMLElement;
   const searchInput = currentPanel.querySelector('.history-search') as HTMLInputElement;
   const searchQuery = searchInput?.value.toLowerCase() || '';
-  
+
   await chrome.storage.local.set({
     historyFilters: {
       recent: recentFilterActive
     }
   });
-  
+
   let visibleCount = 0;
   const now = Date.now();
   const dayMs = 24 * 60 * 60 * 1000;
@@ -231,21 +231,21 @@ export async function applyFilters(): Promise<void> {
     const meme = allMemes.find(m => `meme_${simpleHash(m.text + m.timestamp)}` === memeId);
     if (!meme) return;
 
-    const matchesSearch = searchQuery === '' || 
+    const matchesSearch = searchQuery === '' ||
       meme.text.toLowerCase().includes(searchQuery) ||
       meme.template.toLowerCase().includes(searchQuery);
-    
+
     const matchesRecent = !recentFilterActive || (now - meme.timestamp < dayMs);
 
     if (matchesSearch && matchesRecent) {
       (item as HTMLElement).style.display = 'block';
       visibleCount++;
-      
+
       if (searchQuery) {
         const textEl = item.querySelector('.meme-text') as HTMLElement;
         if (textEl) {
           const originalText = meme.text.length > 50 ? meme.text.slice(0, 50) + '...' : meme.text;
-          textEl.innerHTML = highlightText(originalText, searchQuery);
+          textEl.replaceChildren(...highlightTextNodes(originalText, searchQuery));
         }
       }
     } else {
@@ -277,7 +277,22 @@ export async function filterRecent(): Promise<void> {
 
 
 
-function highlightText(text: string, query: string): string {
-  const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-  return text.replace(regex, '<mark style="background:#ffeb3b;color:#000;padding:2px 0;">$1</mark>');
+function highlightTextNodes(text: string, query: string): Node[] {
+  if (!query) return [document.createTextNode(text)];
+
+  const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\$&')})`, 'gi');
+  const parts = text.split(regex);
+  const nodes: Node[] = [];
+
+  parts.forEach((part, index) => {
+    if (index % 2 === 1) {
+      const mark = document.createElement('mark');
+      mark.style.cssText = 'background:#ffeb3b;color:#000;padding:2px 0;';
+      mark.textContent = part;
+      nodes.push(mark);
+    } else if (part) {
+      nodes.push(document.createTextNode(part));
+    }
+  });
+  return nodes;
 }

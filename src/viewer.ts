@@ -1,12 +1,13 @@
 import { MEME_TEMPLATES } from './constants';
-import { analyzeMemeContext, generateMemeImage } from './memeService';
+import { selectMemeTemplate, generateMemeImage } from './memeService';
 import { getMeme } from './storage';
+import type { MemeData } from './types';
 
 const params = new URLSearchParams(globalThis.location.search);
 const id = params.get('id');
 const dataStr = params.get('data');
 
-let memeData: any = null; // Will be loaded async
+let memeData: MemeData | null = null; // Will be loaded async
 let isManualEdit = false;
 
 // UI Elements
@@ -30,12 +31,17 @@ async function initViewer() {
   if (memeData) {
     initializeUI();
   } else {
-    document.body.innerHTML = '<div style="color: white; text-align: center; margin-top: 50px;">Meme not found or expired.</div>';
+    document.body.replaceChildren();
+    const div = document.createElement('div');
+    div.style.cssText = 'color: white; text-align: center; margin-top: 50px;';
+    div.textContent = 'Meme not found or expired.';
+    document.body.appendChild(div);
   }
 }
 
 function initializeUI() {
-  let currentTemplate = memeData?.template;
+  if (!memeData) return;
+  let currentTemplate = memeData.template;
 
   img.src = memeData.imageUrl;
   textEditor.textContent = memeData.text;
@@ -63,10 +69,11 @@ function initializeUI() {
   });
 
   async function regenerate(templateId?: string) {
+    if (!memeData) return;
     loading.classList.add('show');
     try {
       const text = isManualEdit ? textEditor.textContent || '' : memeData.originalInput || memeData.text;
-      const template = templateId || currentTemplate || await analyzeMemeContext(text);
+      const template = templateId || currentTemplate || await selectMemeTemplate(text);
       currentTemplate = template;
 
       const { watermarkedUrl, formattedText } = await generateMemeImage(template, text, isManualEdit, !!templateId);
@@ -132,11 +139,13 @@ function initializeUI() {
 
     platforms.forEach(platform => {
       const btn = document.createElement('button');
-      btn.innerHTML = platform.icon;
+      const doc = new DOMParser().parseFromString(platform.icon, 'image/svg+xml');
+      btn.appendChild(doc.documentElement);
       btn.style.cssText = 'background: transparent; border: none; cursor: pointer; padding: 20px; border-radius: 20px; transition: all 0.2s;';
       btn.onmouseover = () => { btn.style.transform = 'scale(1.1)'; btn.style.background = '#f5f5f5'; };
       btn.onmouseout = () => { btn.style.transform = 'scale(1)'; btn.style.background = 'transparent'; };
       btn.onclick = async () => {
+        if (!memeData) return;
         statusText.textContent = 'Text copied!';
         await navigator.clipboard.writeText(`Check this meme: ${memeData.text}`);
         await new Promise(resolve => setTimeout(resolve, 1000));
@@ -169,20 +178,21 @@ function initializeUI() {
   });
 
   document.getElementById('regenerateBtn')?.addEventListener('click', async () => {
+    if (!memeData) return;
     loading.classList.add('show');
     try {
       const currentText = textEditor.textContent?.trim() || '';
       const hasTextChanged = currentText !== memeData.text;
 
       if (hasTextChanged) {
-        const { watermarkedUrl, formattedText } = await generateMemeImage(currentTemplate, currentText, true, true);
+        const { watermarkedUrl, formattedText } = await generateMemeImage(currentTemplate || 'drake', currentText, true, true);
         img.src = watermarkedUrl;
         textEditor.textContent = formattedText;
         memeData.imageUrl = watermarkedUrl;
         memeData.text = formattedText;
       } else {
         const text = memeData.originalInput || memeData.text;
-        const template = await analyzeMemeContext(text, Date.now());
+        const template = await selectMemeTemplate(text);
         currentTemplate = template;
         const { watermarkedUrl, formattedText } = await generateMemeImage(template, text, false, true);
         img.src = watermarkedUrl;

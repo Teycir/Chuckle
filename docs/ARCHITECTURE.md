@@ -2,13 +2,12 @@
 
 ## Overview
 
-Chuckle is a Chrome extension built with TypeScript that transforms highlighted text into memes using OpenRouter's AI API.
+Chuckle is a Chrome extension built with TypeScript that transforms highlighted text into memes.
 
 ## Tech Stack
 
 - **TypeScript**: Type-safe development
 - **Chrome Extension API**: Browser integration
-- **OpenRouter API**: AI-powered meme template selection
 - **memegen.link API**: Meme image generation
 - **Jest**: Unit testing framework (237 tests, 100% coverage)
 - **ESLint + Prettier**: Code quality and formatting
@@ -95,46 +94,26 @@ interface MemeData {
 
 **Key Functions**:
 - `generateMeme(text: string)`: Orchestrates the meme generation process
-- `analyzeMemeContext(text: string)`: Calls OpenRouter API to select meme template
+- `selectMemeTemplate(text: string)`: Selects a meme template
 - `generateMemeImage(template: string)`: Generates meme image with text overlay
 
 **Flow**:
 ```
-Receive text → Analyze with OpenRouter → Get template suggestion
+Receive text → Select template suggestion
 → Generate meme image → Store in chrome.storage → Open popup
 ```
 
-**API Integration**:
-```typescript
-// OpenRouter API call
-const response = await fetch(
-  'https://openrouter.ai/api/v1/chat/completions',
-  {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${apiKey}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      model: 'meta-llama/llama-3.2-3b-instruct:free',
-      messages: [{
-        role: 'user',
-        content: `Analyze this text and suggest a meme template: "${text}"`
-      }]
-    })
-  }
-);
-```
+
 
 ### 4. Cache Layer (`cache.ts`)
 
-**Purpose**: LRU cache for OpenRouter API responses.
+**Purpose**: LRU cache for template mappings and formatted text.
 
 **Features**:
 - 100 item limit
 - 1-hour TTL
 - Automatic eviction of oldest items
-- Cache key format: `openrouter:{text}:v{variant}`
+- Cache key format: unique keys for each text hash
 
 **Implementation**:
 ```typescript
@@ -223,7 +202,6 @@ class LRUCache<T> {
 **Purpose**: Settings management and configuration.
 
 **Features**:
-- API key storage (encrypted in chrome.storage.local)
 - Language selection (English, Spanish, French, German)
 - Dark mode toggle
 - Input validation with visual feedback
@@ -231,7 +209,6 @@ class LRUCache<T> {
 **Settings Schema**:
 ```typescript
 interface Settings {
-  openrouterApiKey: string;
   selectedLanguage: 'English' | 'Spanish' | 'French' | 'German';
   darkMode: boolean;
 }
@@ -274,8 +251,8 @@ export const CONFIG = {
 4. Background worker sends message to content script
 5. Content script shows loading overlay
 6. Content script checks cache for response
-7. If cache miss, calls OpenRouter API with text
-8. OpenRouter returns meme template suggestion
+7. If cache miss, selects template
+8. Returns meme template suggestion
 9. Content script generates meme image URL
 10. Meme saved to chrome.storage.local
 11. Overlay displays meme with controls
@@ -283,11 +260,6 @@ export const CONFIG = {
 ```
 
 ## Security
-
-### API Key Storage
-- Keys stored in `chrome.storage.local` (encrypted by Chrome)
-- Never exposed in code or logs
-- Retrieved only when needed for API calls
 
 ### Content Security Policy
 ```json
@@ -308,7 +280,7 @@ export const CONFIG = {
 ```json
 {
   "permissions": ["contextMenus", "activeTab", "storage"],
-  "host_permissions": ["https://openrouter.ai/*"]
+  "host_permissions": []
 }
 ```
 
@@ -338,32 +310,6 @@ npm run test:coverage # Coverage report
 ```
 
 ## API Integration
-
-### OpenRouter API
-
-**Endpoint**: `https://openrouter.ai/api/v1/chat/completions`
-
-**Request Format**:
-```json
-{
-  "model": "meta-llama/llama-3.2-3b-instruct:free",
-  "messages": [{
-    "role": "user",
-    "content": "Analyze this text and suggest a meme template: [USER_TEXT]"
-  }]
-}
-```
-
-**Response Format**:
-```json
-{
-  "choices": [{
-    "message": {
-      "content": "drake"
-    }
-  }]
-}
-```
 
 ### memegen.link API
 
@@ -406,7 +352,7 @@ try {
 
 ### Optimization Strategies
 1. **Lazy Loading**: Tags module loaded on demand
-2. **LRU Caching**: API responses cached for 1 hour
+2. **LRU Caching**: Template mappings and text formatting cached for 1 hour
 3. **Debouncing**: Input validation debounced (150ms)
 4. **Parallel Processing**: Batch operations use `Promise.all`
 5. **Minification**: Production builds minified with Terser
@@ -436,12 +382,12 @@ try {
 
 ### Storage Errors
 ```typescript
-chrome.storage.local.get(['openrouterApiKey'], (result) => {
+chrome.storage.local.get(['settings'], (result) => {
   if (chrome.runtime.lastError) {
     console.error('Storage error:', chrome.runtime.lastError);
     return;
   }
-  // Use API key
+  // Use settings
 });
 ```
 
@@ -449,7 +395,7 @@ chrome.storage.local.get(['openrouterApiKey'], (result) => {
 
 ✅ **Core Features**
 - Instant meme generation from highlighted text
-- AI-powered template selection (OpenRouter)
+- Smart template selection based on keyword matching
 - Multi-language support (4 languages)
 - Dark mode with animated backgrounds
 
@@ -522,7 +468,6 @@ chrome.storage.local.get(['openrouterApiKey'], (result) => {
 1. Clone repository
 2. Run `npm install && npm run build`
 3. Load unpacked extension in Chrome
-4. Configure API key in popup
 
 ## Contributing
 
@@ -556,8 +501,6 @@ MIT License - See LICENSE file for details
 ## Credits
 
 - **Author**: [Teycir Ben Soltane](https://teycirbensoltane.tn/)
-- **Inspired by**: Gist Chrome Extension
-- **AI Provider**: OpenRouter
 - **Design**: Custom gradient animations and glassmorphism
 
 ## Build Process

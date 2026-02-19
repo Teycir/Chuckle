@@ -71,10 +71,4 @@ export const MEME_TEMPLATES = [
   },
 ] as const;
 
-// Prompts removed as AI features are disabled.
 
-export const ERROR_MESSAGES = {
-  API_ERROR: (status: number) => `API error: ${status}`,
-  INVALID_RESPONSE: 'Invalid API response',
-  TEMPLATE_UNAVAILABLE: 'Template unavailable',
-} as const;

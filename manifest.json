@@ -30,7 +30,7 @@
     "128": "icons/icon128.png"
   },
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'; style-src 'self' 'unsafe-inline'"
+    "extension_pages": "default-src 'none'; script-src 'self'; object-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://api.memegen.link; connect-src https://api.memegen.link; font-src 'self';"
   },
   "web_accessible_resources": [
     {

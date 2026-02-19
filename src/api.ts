@@ -1,1 +1,1 @@
-export { analyzeMemeContext, generateMemeImage } from './memeService';
+export { selectMemeTemplate, generateMemeImage } from './memeService';

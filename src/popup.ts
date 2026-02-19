@@ -125,7 +125,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   if (darkModeCheckbox) {
     (darkModeCheckbox as HTMLInputElement).checked =
-      data.darkMode !== undefined ? data.darkMode : true;
+      data.darkMode === undefined ? true : data.darkMode;
     if ((darkModeCheckbox as HTMLInputElement).checked) document.body.classList.add('dark');
   }
 
@@ -161,28 +161,71 @@ async function loadStats() {
 
   const stats = await getAnalytics();
   const content = document.getElementById('statsContent')!;
-  content.innerHTML = `
-    <div style="display: grid; gap: 12px;">
-      <div style="padding: 12px; background: #f5f5f5; border-radius: 8px;">
-        <div style="font-size: 24px; font-weight: 700; color: #667eea;">${stats.totalMemes}</div>
-        <div style="font-size: 10px; color: #666; text-transform: uppercase;">${t.totalMemes}</div>
-      </div>
-      ${stats.topTemplates.length
-      ? `
-      <div style="padding: 12px; background: #f5f5f5; border-radius: 8px;">
-        <div style="font-size: 11px; font-weight: 600; margin-bottom: 6px;">${t.topTemplates}</div>
-        ${stats.topTemplates.map(item => `<div style="font-size: 10px; color: #666;">${item.name}: ${item.count}</div>`).join('')}
-      </div>`
-      : ''
-    }
-      <div style="padding: 12px; background: #f5f5f5; border-radius: 8px;">
-        <div style="font-size: 11px; font-weight: 600; margin-bottom: 6px;">${t.sharesLabel}</div>
-        <div style="font-size: 10px; color: #666;">𝕏 Twitter: ${stats.shareStats.twitter}</div>
-        <div style="font-size: 10px; color: #666;">💼 LinkedIn: ${stats.shareStats.linkedin}</div>
-        <div style="font-size: 10px; color: #666;">📧 Email: ${stats.shareStats.email}</div>
-      </div>
-    </div>
-  `;
+  content.replaceChildren();
+
+  const grid = document.createElement('div');
+  grid.style.display = 'grid';
+  grid.style.gap = '12px';
+
+  const totalMemesDiv = document.createElement('div');
+  totalMemesDiv.style.cssText = 'padding: 12px; background: #f5f5f5; border-radius: 8px;';
+
+  const countDiv = document.createElement('div');
+  countDiv.style.cssText = 'font-size: 24px; font-weight: 700; color: #667eea;';
+  countDiv.textContent = stats.totalMemes.toString();
+
+  const labelDiv = document.createElement('div');
+  labelDiv.style.cssText = 'font-size: 10px; color: #666; text-transform: uppercase;';
+  labelDiv.textContent = t.totalMemes;
+
+  totalMemesDiv.appendChild(countDiv);
+  totalMemesDiv.appendChild(labelDiv);
+  grid.appendChild(totalMemesDiv);
+
+  if (stats.topTemplates.length) {
+    const templatesDiv = document.createElement('div');
+    templatesDiv.style.cssText = 'padding: 12px; background: #f5f5f5; border-radius: 8px;';
+
+    const titleDiv = document.createElement('div');
+    titleDiv.style.cssText = 'font-size: 11px; font-weight: 600; margin-bottom: 6px;';
+    titleDiv.textContent = t.topTemplates;
+    templatesDiv.appendChild(titleDiv);
+
+    stats.topTemplates.forEach(item => {
+      const itemDiv = document.createElement('div');
+      itemDiv.style.cssText = 'font-size: 10px; color: #666;';
+      itemDiv.textContent = `${item.name}: ${item.count}`;
+      templatesDiv.appendChild(itemDiv);
+    });
+    grid.appendChild(templatesDiv);
+  }
+
+  const sharesDiv = document.createElement('div');
+  sharesDiv.style.cssText = 'padding: 12px; background: #f5f5f5; border-radius: 8px;';
+
+  const sharesTitle = document.createElement('div');
+  sharesTitle.style.cssText = 'font-size: 11px; font-weight: 600; margin-bottom: 6px;';
+  sharesTitle.textContent = t.sharesLabel;
+  sharesDiv.appendChild(sharesTitle);
+
+  const twitterDiv = document.createElement('div');
+  twitterDiv.style.cssText = 'font-size: 10px; color: #666;';
+  twitterDiv.textContent = `𝕏 Twitter: ${stats.shareStats.twitter}`;
+
+  const lnDiv = document.createElement('div');
+  lnDiv.style.cssText = 'font-size: 10px; color: #666;';
+  lnDiv.textContent = `💼 LinkedIn: ${stats.shareStats.linkedin}`;
+
+  const emailDiv = document.createElement('div');
+  emailDiv.style.cssText = 'font-size: 10px; color: #666;';
+  emailDiv.textContent = `📧 Email: ${stats.shareStats.email}`;
+
+  sharesDiv.appendChild(twitterDiv);
+  sharesDiv.appendChild(lnDiv);
+  sharesDiv.appendChild(emailDiv);
+  grid.appendChild(sharesDiv);
+
+  content.appendChild(grid);
 }
 
 document.getElementById('darkMode')?.addEventListener('change', e => {
@@ -208,7 +251,7 @@ document.getElementById('saveKey')?.addEventListener('click', async () => {
     statusMsg.textContent = 'Saving settings...';
     statusMsg.className = 'status-msg';
 
-    const storageData: Record<string, any> = {
+    const storageData: Record<string, unknown> = {
       selectedLanguage: lang,
     };
 

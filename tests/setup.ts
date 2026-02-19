@@ -1,6 +1,15 @@
 const storage = new Map<string, any>();
 
-global.chrome = {
+globalThis.chrome = {
+  runtime: {
+    getURL: (path: string) => `chrome-extension://id/${path}`,
+    sendMessage: () => Promise.resolve(),
+    onMessage: {
+      addListener: () => { },
+      removeListener: () => { },
+      hasListener: () => false,
+    }
+  },
   storage: {
     local: {
       get: (keys: any) => {
@@ -13,6 +22,10 @@ global.chrome = {
         const result: any = {};
         if (Array.isArray(keys)) {
           keys.forEach(key => result[key] = storage.get(key));
+        } else if (typeof keys === 'object') {
+          Object.keys(keys).forEach(key => {
+            result[key] = storage.has(key) ? storage.get(key) : keys[key];
+          });
         }
         return Promise.resolve(result);
       },

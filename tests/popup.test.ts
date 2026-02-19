@@ -6,7 +6,6 @@ describe('Popup UI', () => {
         <button id="settingsTab"></button>
         <button id="statsTab"></button>
         <div id="settingsPanel">
-          <input id="geminiApiKey" />
           <select id="languageSelect"></select>
           <input id="darkMode" type="checkbox" />
           <button id="saveKey"></button>
@@ -18,13 +17,13 @@ describe('Popup UI', () => {
         </div>
       </div>
     `;
-    
+
     global.chrome = {
-      storage: { 
-        local: { 
-          get: jest.fn().mockResolvedValue({ geminiApiKey: 'test', selectedLanguage: 'English', darkMode: false }),
+      storage: {
+        local: {
+          get: jest.fn().mockResolvedValue({ selectedLanguage: 'English', darkMode: false }),
           set: jest.fn().mockResolvedValue(undefined)
-        } 
+        }
       }
     } as any;
   });
@@ -32,13 +31,13 @@ describe('Popup UI', () => {
   test('displays meme from storage', async () => {
     try {
       require('../src/popup');
-      
+
       const event = new Event('DOMContentLoaded');
       document.dispatchEvent(event);
-      
+
       await new Promise(resolve => setTimeout(resolve, 100));
-      
-      expect(document.getElementById('geminiApiKey')).toBeTruthy();
+
+      expect(document.getElementById('languageSelect')).toBeTruthy();
     } catch (error) {
       console.error('Test error:', error);
       throw error;

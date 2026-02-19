@@ -1,9 +1,7 @@
-// Imports removed as they are no longer needed for AI formatting
-
-// TEMPLATE_PROMPTS removed as AI formatting is disabled.
 
 
-export async function formatTextForTemplate(text: string, template: string, forceRegenerate: boolean = false): Promise<string> {
+
+export async function formatTextForTemplate(text: string): Promise<string> {
   // Simple heuristic splitter: split by newlines first, or punctuation, or just length
 
   // Basic splitting logic

@@ -1,10 +1,9 @@
 import { showLoading, hideLoading } from './loading';
 import { logger } from './logger';
-import { analyzeMemeContext, generateMemeImage } from './memeService';
+import { selectMemeTemplate, generateMemeImage } from './memeService';
 import { createOverlay } from './overlay';
 import { saveMeme } from './storage';
 import { performCleanup, shouldCleanup } from './cleanup';
-import { StatusIndicator } from './statusIndicator';
 
 function showError(message: string): void {
   try {
@@ -21,11 +20,12 @@ function showError(message: string): void {
             errorDiv.remove();
           }
         } catch (e) {
+          logger.error('Failed to remove error message element', e);
         }
       }, 5000);
-    } else {
     }
   } catch (error) {
+    logger.error('Failed to display error message', error);
   }
 }
 
@@ -58,6 +58,7 @@ function initializeChuckle() {
 
 
   } catch (error) {
+    logger.error('Failed to initialize Chuckle', error);
   }
 }
 
@@ -66,12 +67,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   try {
     if (message.action === "generateMeme") {
       generateMeme(message.text).catch(error => {
+        logger.error('Failed to generate meme from message', error, { action: message.action, textLength: message.text?.length });
       });
       sendResponse({ success: true });
     } else if (message.action === "generateMemeFromSelection") {
       const selectedText = globalThis.getSelection()?.toString().trim();
       if (selectedText) {
         generateMeme(selectedText).catch(error => {
+          logger.error('Failed to generate meme from selection', error, { action: message.action, textLength: selectedText.length });
         });
       } else {
         showError('Please select some text first');
@@ -140,13 +143,11 @@ async function getErrorMessage(error: unknown): Promise<string> {
 
 export async function generateMeme(text: string): Promise<void> {
 
-  // Show status indicator
-  await StatusIndicator.show();
-
   // Auto-cleanup if needed
   if (await shouldCleanup()) {
     const result = await performCleanup();
     if (result.removed > 0) {
+      logger.info(`Cleaned up ${result.removed} old memes`);
     }
   }
 
@@ -161,7 +162,7 @@ export async function generateMeme(text: string): Promise<void> {
   try {
     showLoading('Generating meme...');
     const truncatedText = text.slice(0, 1000);
-    const template = await analyzeMemeContext(truncatedText);
+    const template = await selectMemeTemplate(truncatedText);
     const { originalUrl, formattedText } = await generateMemeImage(template, truncatedText);
 
     const memeData = {

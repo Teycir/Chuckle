@@ -23,13 +23,26 @@ export class ConflictDetector {
   private static showConflictWarning(): void {
     const warningDiv = document.createElement('div');
     warningDiv.className = 'chuckle-conflict-warning';
-    warningDiv.innerHTML = `
-      <div style="position:fixed;top:10px;right:10px;background:#ff9800;color:#fff;padding:12px 16px;border-radius:6px;z-index:100002;box-shadow:0 2px 8px rgba(0,0,0,0.2);font-size:13px;max-width:300px;">
-        <strong>⚠️ Chuckle Extension Conflict</strong><br>
-        Other extensions may be interfering. Try disabling other extensions temporarily.
-        <button onclick="this.parentElement.parentElement.remove()" style="float:right;background:none;border:none;color:#fff;cursor:pointer;font-size:16px;margin-left:8px;">×</button>
-      </div>
-    `;
+    const content = document.createElement('div');
+    content.style.cssText = 'position:fixed;top:10px;right:10px;background:#ff9800;color:#fff;padding:12px 16px;border-radius:6px;z-index:100002;box-shadow:0 2px 8px rgba(0,0,0,0.2);font-size:13px;max-width:300px;';
+
+    const strong = document.createElement('strong');
+    strong.textContent = '⚠️ Chuckle Extension Conflict';
+
+    const br = document.createElement('br');
+
+    const textNode = document.createTextNode(' Other extensions may be interfering. Try disabling other extensions temporarily. ');
+
+    const button = document.createElement('button');
+    button.style.cssText = 'float:right;background:none;border:none;color:#fff;cursor:pointer;font-size:16px;margin-left:8px;';
+    button.textContent = '×';
+    button.onclick = () => warningDiv.remove();
+
+    content.appendChild(strong);
+    content.appendChild(br);
+    content.appendChild(textNode);
+    content.appendChild(button);
+    warningDiv.appendChild(content);
     document.body.appendChild(warningDiv);
     setTimeout(() => warningDiv.remove(), 10000);
   }

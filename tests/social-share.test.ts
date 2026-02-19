@@ -3,7 +3,7 @@ import { createShareButton } from '../src/social-share';
 describe('Social Share', () => {
   beforeEach(() => {
     document.body.innerHTML = '';
-    global.chrome = {
+    globalThis.chrome = {
       storage: {
         local: {
           get: jest.fn().mockResolvedValue({}),
@@ -15,7 +15,7 @@ describe('Social Share', () => {
 
   test('creates share button', () => {
     const container = createShareButton('https://example.com/meme.jpg', 'Test meme');
-    const btn = container.querySelector('.share-btn');
+    const btn = container.querySelector('.chuckle-share-btn');
     expect(btn).toBeTruthy();
     expect(btn?.getAttribute('aria-label')).toContain('Share');
   });
@@ -25,10 +25,10 @@ describe('Social Share', () => {
     document.body.appendChild(wrapper);
     const container = createShareButton('https://example.com/meme.jpg', 'Test meme');
     wrapper.appendChild(container);
-    
-    const btn = container.querySelector('.share-btn') as HTMLButtonElement;
+
+    const btn = container.querySelector('.chuckle-share-btn') as HTMLButtonElement;
     btn?.click();
-    
+
     const modal = document.querySelector('.share-modal');
     expect(modal).toBeTruthy();
   });
@@ -38,12 +38,12 @@ describe('Social Share', () => {
     document.body.appendChild(wrapper);
     const container = createShareButton('https://example.com/meme.jpg', 'Test');
     wrapper.appendChild(container);
-    
-    const btn = container.querySelector('.share-btn') as HTMLButtonElement;
+
+    const btn = container.querySelector('.chuckle-share-btn') as HTMLButtonElement;
     btn?.click();
-    
+
     await new Promise(resolve => setTimeout(resolve, 50));
-    
+
     const modal = document.querySelector('.share-modal');
     expect(modal).toBeTruthy();
     const buttons = modal?.querySelectorAll('button');
@@ -55,10 +55,10 @@ describe('Social Share', () => {
     document.body.appendChild(wrapper);
     const container = createShareButton('https://example.com/meme.jpg', 'Test meme');
     wrapper.appendChild(container);
-    
-    const btn = container.querySelector('.share-btn') as HTMLButtonElement;
+
+    const btn = container.querySelector('.chuckle-share-btn') as HTMLButtonElement;
     btn?.click();
-    
+
     const modal = document.querySelector('.share-modal');
     expect(modal).toBeTruthy();
   });

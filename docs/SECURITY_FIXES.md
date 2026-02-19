@@ -58,7 +58,8 @@ if (!data.candidates?.[0]?.content?.parts?.[0]?.text) throw new Error('Invalid A
 
 **Solution**: Added validation
 ```typescript
-if (!geminiApiKey) throw new Error('API key not configured');
+// API key validation removed
+
 ```
 
 **Impact**: Clear error messages instead of silent failures

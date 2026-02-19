@@ -1,12 +1,12 @@
 import { simpleHash, saveMeme, getMeme, getAllMemes, removeMeme, updateMeme } from '../src/storage';
-import type { MemeData } from '../src/types';
+import { MemeData } from '../src/types';
 
 describe('Storage Utilities - Deep Tests', () => {
   let mockStorage: { [key: string]: any };
 
   beforeEach(() => {
     mockStorage = {};
-    
+
     global.chrome = {
       storage: {
         local: {
@@ -283,7 +283,6 @@ describe('Storage Utilities - Deep Tests', () => {
     });
 
     test('should return empty array when no memes exist', async () => {
-      mockStorage['geminiApiKey'] = 'key';
       mockStorage['selectedLanguage'] = 'English';
 
       const result = await getAllMemes();
@@ -300,7 +299,6 @@ describe('Storage Utilities - Deep Tests', () => {
       };
 
       mockStorage['meme_12345678'] = meme;
-      mockStorage['geminiApiKey'] = 'key';
       mockStorage['darkMode'] = true;
       mockStorage['selectedLanguage'] = 'English';
       mockStorage['otherKey'] = 'value';
@@ -376,9 +374,9 @@ describe('Storage Utilities - Deep Tests', () => {
   describe('removeMeme - Comprehensive Tests', () => {
     test('should remove meme from storage', async () => {
       mockStorage['meme_12345678'] = { text: 'test' };
-      
+
       await removeMeme('meme_12345678');
-      
+
       expect(mockStorage['meme_12345678']).toBeUndefined();
     });
 
@@ -444,7 +442,7 @@ describe('Storage Utilities - Deep Tests', () => {
     test('should handle storage errors on set', async () => {
       mockStorage['meme_12345678'] = { ...originalMeme };
       (chrome.storage.local.set as jest.Mock).mockRejectedValue(new Error('Set error'));
-      
+
     });
 
     test('should update multiple fields at once', async () => {

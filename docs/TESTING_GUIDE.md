@@ -17,13 +17,6 @@ This creates the `dist/` folder with all deployable files.
 4. Select the `dist/` folder
 5. Extension loaded! ✅
 
-### 3. Setup API Key
-
-1. Visit: https://openrouter.ai/keys
-2. Create API key
-3. Click Chuckle icon in Chrome
-4. Paste key → Save Settings
-
 ---
 
 ## Test Checklist
@@ -186,12 +179,6 @@ This creates the `dist/` folder with all deployable files.
 
 ### ✅ Error Handling
 
-**Test 20: No API Key**
-- [ ] Remove API key from settings
-- [ ] Try to generate meme
-- [ ] Error message appears
-- [ ] Instructions shown
-
 **Test 21: Invalid Text**
 - [ ] Highlight empty text
 - [ ] Try to generate
@@ -265,7 +252,7 @@ This creates the `dist/` folder with all deployable files.
 - [ ] All 30 tests pass
 - [ ] No console errors
 - [ ] No visual glitches
-- [ ] API key setup works
+
 - [ ] Documentation accurate
 - [ ] Version number correct
 

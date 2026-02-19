@@ -1,17 +1,19 @@
 import { performCleanup } from './cleanup';
+import { logger } from './logger';
 
 chrome.runtime.onInstalled.addListener(() => {
-  
+
   try {
     chrome.contextMenus.create({
       id: "remixAsMeme",
       title: "Remix as a Meme",
       contexts: ["selection"]
     });
-    
+
     // Schedule weekly cleanup
     chrome.alarms.create('weeklyCleanup', { periodInMinutes: 10080 }); // 7 days
   } catch (error) {
+    logger.error('Initialization error:', error);
   }
 });
 
@@ -19,6 +21,7 @@ chrome.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === 'weeklyCleanup') {
     performCleanup().then(result => {
       if (result.removed > 0) {
+        logger.info(`Cleaned up ${result.removed} old memes`);
       }
     });
   }
@@ -29,7 +32,8 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
     chrome.tabs.sendMessage(tab.id, {
       action: "generateMeme",
       text: info.selectionText
-    }).catch((error) => {
+    }).catch((_error) => {
+      // Ignore errors when sending message to tab
     });
   }
 });
@@ -38,7 +42,8 @@ chrome.commands.onCommand.addListener((command) => {
   if (command === "generate-meme") {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       if (tabs[0]?.id) {
-        chrome.tabs.sendMessage(tabs[0].id, { action: "generateMemeFromSelection" }).catch((error) => {
+        chrome.tabs.sendMessage(tabs[0].id, { action: "generateMemeFromSelection" }).catch((_error) => {
+          // Ignore errors
         });
       }
     });

@@ -2,23 +2,20 @@
 
 ## What is Chuckle?
 
-**Chuckle** turns any text on the web into viral memes in seconds. Highlight text, right-click, and let AI create the perfect meme for you.
+**Chuckle** turns any text on the web into viral memes in seconds. Highlight text, right-click, and let Chuckle create the perfect meme for you.
 
-Think of it as your personal meme generator that lives in your browser. No design skills needed—just highlight, click, and share or save to disk. When API credits are exhausted you can continue manually offline.
+Think of it as your personal meme generator that lives in your browser. No design skills needed—just highlight, click, and share or save to disk.
 Everything stays on your computer—no tracking, no data collection, no ads. Fully open-source.
 
 <p align="center">
   <img src="chuckleAdmin.png" alt="Chuckle Admin">
 </p>
 
-
-
 ### ✨ What Can Chuckle Do?
 
-- 🆓 **Free to Use** - Get free memes using OpenRouter's free tier models
+- 🆓 **Free to Use** - Generate memes instantly
 - 🔒 **Your Privacy is Safe** - Everything stays on your computer, no tracking
 - ⚡ **Super Fast** - Get a meme in 2-3 seconds, try different templates instantly
-- 🤖 **AI-Powered** - AI picks the perfect meme template for your text
 - 🌍 **Speaks Your Language** - Available in English, Spanish, French, and German
 - 🎨 **20 Meme Templates** - Drake, Distracted Boyfriend, Woman Yelling at Cat, and 17 more
 - **Social Sharing** - Share instantly to Twitter, LinkedIn, or Email
@@ -30,7 +27,6 @@ Everything stays on your computer—no tracking, no data collection, no ads. Ful
 
 **🎨 No Design Skills Needed**
 - Just highlight text and right-click
-- AI picks the perfect meme template
 - Professional-looking memes in seconds
 - No uploading images or typing captions
 
@@ -41,56 +37,19 @@ Everything stays on your computer—no tracking, no data collection, no ads. Ful
 - Edit text directly and regenerate
 
 **🔒 Private & Secure**
-- Your API key stays on your computer
 - No tracking or data collection
 - Open source code you can verify
 - All meme data stored locally in your browser
 
-### Who Should Use Chuckle?
+### How to Get Started
 
-**🔒 Privacy-Conscious People**
-- All your memes stay on your computer
-- No tracking or data collection
-- Open source code you can verify yourself
-- You control your own API key
-
-**📱 Social Media Enthusiasts**
-- Create viral content quickly
-- Stand out with AI-generated memes
-- Share funny reactions instantly
-
-**💼 Content Creators**
-- Add humor to your posts
-- Engage your audience with memes
-- Save time on content creation
-
-**😄 Anyone Who Loves Memes**
-- Turn any text into a meme
-- Express yourself creatively
-- Make the internet funnier
-
-### How to Get Started (3 Easy Steps)
-
-**Step 1: Install Chuckle (2 minutes)**
+**Step 1: Install Chuckle**
 1. Open Chrome and go to `chrome://extensions/`
 2. Turn on "Developer mode" (top right corner)
-3. Click "Load unpacked" and select under the Chuckle folder the folder dist
+3. Click "Load unpacked" and select the `dist` folder inside the Chuckle project
 4. You'll see the Chuckle icon appear in your browser
 
-**Step 2: Get Your Free AI Key (1 minute)**
-
-1. Visit [OpenRouter](https://openrouter.ai/keys)
-2. Sign up for a free account
-3. Create an API key
-4. Click the Chuckle icon in Chrome
-5. Paste your key and click "Save Settings"
-
-**Why OpenRouter?**
-- Access to multiple free AI models
-- No daily limits on free tier models
-- Simple setup
-
-**Step 3: Start Making Memes**
+**Step 2: Start Making Memes**
 1. Go to any website
 2. Highlight 6-30 words of text (example: "When you finally understand recursion")
 3. Right-click and select "Remix as a Meme"
@@ -106,12 +65,6 @@ Everything stays on your computer—no tracking, no data collection, no ads. Ful
 - Click any template to regenerate your meme with that style
 - Keep trying different templates until you find the perfect fit
 
-**When to try different templates:**
-- The first template doesn't quite fit the vibe
-- You want to try different humor styles
-- You're creating multiple versions for A/B testing
-- You want to see all the creative possibilities
-
 **⌨️ Keyboard Shortcuts**
 - **Alt+M** (or **Option+M** on Mac): Generate meme from selected text (anywhere on any page)
 - **Esc**: Close any open overlay
@@ -126,7 +79,7 @@ Everything stays on your computer—no tracking, no data collection, no ads. Ful
 1. Click the Chuckle icon
 2. Check the "Dark Mode" box
 3. Click "Save Settings"
-4. All popups now use dark colors (easier on your eyes at night!)
+4. All popups now use dark colors
 
 **✏️ Edit Meme Text**
 - Click on the meme text to edit it
@@ -154,74 +107,16 @@ Everything stays on your computer—no tracking, no data collection, no ads. Ful
   - Share counts (Twitter, LinkedIn, Email)
 - Click "🎨 Browse Templates" to see all 20 available templates
 
-**Why check your stats?**
-- See which templates work best for you
-- Track your most popular meme topics
-- Discover templates you haven't tried yet
-
-### Real-Life Examples
-
-**Example 1: Funny Reaction**
-- Highlight: "404 Error: Sleep Not Found"
-- Press Alt+M
-- Get: Perfect tired programmer meme
-- Share on Twitter → Go viral!
-- Time saved: 5 minutes of manual meme creation
-
-**Example 2: Study Humor**
-- Highlight: "Me pretending to understand the lecture"
-- Right-click → "Remix as a Meme"
-- Get: Relatable student meme
-- Share in class group chat
-
-**Example 3: Work Jokes**
-- Highlight: "When the meeting could have been an email"
-- Right-click → "Remix as a Meme"
-- Get: Office humor meme
-- Share with coworkers on Slack
-
-**Example 4: News Commentary**
-- Reading a funny news headline
-- Highlight the headline
-- Press Alt+M
-- Get: Topical meme in 2 seconds
-- Share your hot take on social media
-
-**Example 5: Try Different Templates**
-- Create meme: "When your code works on the first try"
-- First result: Drake template (good, but not perfect)
-- Click template button to see all options
-- Select Success Kid template (perfect!)
-- Download and share with your dev team
-
-### Language Support
-
-Chuckle works in 4 languages:
-- 🇺🇸 **English**
-- 🇪🇸 **Spanish** (Español)
-- 🇫🇷 **French** (Français)
-- 🇩🇪 **German** (Deutsch)
-
-**Cool Feature**: All meme text is generated in your selected language!
-- Select Spanish → Get memes in Spanish
-- Select French → Get memes in French
-- Perfect for international audiences and multilingual content
-
-
-
 ### Common Questions
 
 **Q: Is Chuckle really free?**
-A: Yes! OpenRouter provides free tier models with no daily limits.
+A: Yes! It's completely free to use.
 
 **Q: Is my data safe?**
 A: Yes! Everything stays on your computer. Chuckle doesn't send your data to any servers.
 
 **Q: Do I need to know anything technical?**
-A: No! If you can right-click, you can use Chuckle. Just follow the 3 setup steps above.
-
-**Q: What if I run out of free requests?**
-A: OpenRouter's free tier models have no daily limits. You can create unlimited memes.
+A: No! If you can right-click, you can use Chuckle.
 
 **Q: Can I use Chuckle on my phone?**
 A: Not yet. Chuckle only works on Chrome browser on computers right now.
@@ -229,45 +124,11 @@ A: Not yet. Chuckle only works on Chrome browser on computers right now.
 **Q: Does Chuckle work on all websites?**
 A: Yes! Chuckle works on any website where you can highlight text. Just make sure to select between 6 and 30 words for best results.
 
-**Q: Why do I need my own API key?**
-A: This keeps Chuckle free and private. You connect directly to OpenRouter, not through our servers.
-
 **Q: What meme templates does Chuckle use?**
-A: Chuckle has 20 popular templates including Drake, Distracted Boyfriend, Woman Yelling at Cat, Success Kid, and more. The AI picks the best one for your text.
-
-**Q: What are the keyboard shortcuts?**
-A: Alt+M (generate from selection), Esc (close).
+A: Chuckle has 20 popular templates including Drake, Distracted Boyfriend, Woman Yelling at Cat, Success Kid, and more.
 
 **Q: Can I edit the meme text?**
 A: Yes! Click on the meme text to edit it. Changes save automatically when you click outside.
-
-**Q: How do I download or share memes?**
-A: Click the ↓ button to download, or click the share button to share on Twitter, LinkedIn, or Email.
-
-**Q: Where can I see my meme statistics?**
-A: Click the Chuckle icon, then click the "📊 Stats" tab to see all your analytics.
-
-**Q: What templates are available?**
-A: Click the Chuckle icon, go to Stats tab, and click "🎨 Browse Templates" to see all 20 templates.
-
-**Q: Can I create multiple meme variants?**
-A: Yes! Click the template button to see all 20 templates and choose a different one.
-
-### Tips for Best Memes
-
-**✅ Do:**
-- Highlight 6-30 words (required for best results)
-- Use text with clear emotions or situations
-- Try different phrases to see what works
-- Try different templates to find the best fit
-- Use Alt+M shortcut for instant generation
-- Check your stats to see what works best
-
-**❌ Don't:**
-- Select less than 6 words (too little context)
-- Select more than 30 words (too long for memes)
-- Use text without context or humor
-- Expect perfect results every time (AI is creative!)
 
 ### Your Privacy Matters
 
@@ -279,32 +140,24 @@ A: Yes! Click the template button to see all 20 templates and choose a different
 - ❌ Show you ads
 
 **What Chuckle DOES Do:**
-- ✅ Stores your API key only in your browser
 - ✅ Saves memes only on your computer
-- ✅ Connects directly to OpenRouter for total privacy
 - ✅ Works completely privately
 
 **Open Source**: All our code is public on GitHub. Anyone can check what Chuckle does.
 
 ### Troubleshooting
 
-**Problem: "No API key found"**
-- Solution: Click the Chuckle icon and add your API key from OpenRouter
-
-**Problem: Meme takes too long**
+**Problem: "Meme takes too long"**
 - Solution: Check your internet connection. Memes usually take 2-3 seconds.
 
 **Problem: "You must select between 6 and 30 words"**
-- Solution: Make sure you highlight at least 6 words but no more than 30 words. This ensures the AI has enough context without being too long.
+- Solution: Make sure you highlight at least 6 words but no more than 30 words.
 
 **Problem: "Could not generate meme"**
-- Solution: Try highlighting different text. Some phrases work better than others.
+- Solution: Try highlighting different text.
 
 **Problem: Right-click menu doesn't show "Remix as a Meme"**
 - Solution: Make sure you've highlighted text first, then right-click.
-
-**Problem: "API error"**
-- Solution: Check your API key is correct.
 
 **Problem: Keyboard shortcuts not working**
 - Solution: Alt+M works anywhere on any webpage when you have text selected.
@@ -335,7 +188,7 @@ A: Yes! Click the template button to see all 20 templates and choose a different
 ### Technical Stack
 - **TypeScript** - Type-safe code
 - **Chrome Extension API** - Browser integration
-- **OpenRouter API** - AI-powered template selection
+- **meme-gen** - Template formatting
 - **Jest** - Testing framework
 - **ESLint + Prettier** - Code quality
 

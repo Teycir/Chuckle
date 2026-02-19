@@ -4,9 +4,11 @@ import { getErrorMessage } from './errorMessages';
 import { addWatermark } from './watermark';
 import { formatTextForTemplate } from './templateFormatter';
 
-export async function analyzeMemeContext(text: string, variant: number = 0): Promise<string> {
-  // Default to 'drake' or random if we wanted to be fancy, but let's stick to 'drake' as a safe default
-  // The user will manually change it anyway.
+const MIN_GENERATION_INTERVAL = 3000; // 3 seconds between generations
+
+export async function selectMemeTemplate(_text: string): Promise<string> {
+  // Simple deterministic selection based on text length or random
+  // For now, default to 'drake' as it's versatile
   return 'drake';
 }
 
@@ -14,8 +16,8 @@ export async function analyzeMemeContext(text: string, variant: number = 0): Pro
 function normalizeText(text: string): string {
   // Remove only truly problematic characters, keep accented letters
   const cleaned = text
-    .replace(/[<>"{}|\\^`]/g, '') // Remove URL-unsafe chars
-    .replace(/\s+/g, '_'); // Spaces to underscores
+    .replaceAll(/[<>"{}|\\^`]/g, '') // Remove URL-unsafe chars
+    .replaceAll(/\s+/g, '_'); // Spaces to underscores
 
   // URL encode to safely handle accents and special chars
   return encodeURIComponent(cleaned);
@@ -24,11 +26,11 @@ function normalizeText(text: string): string {
 /**
  * Checks if the error message indicates a critical status that should be re-thrown.
  */
-function isCriticalError(error: any): boolean {
+function isCriticalError(error: unknown): boolean {
   if (!(error instanceof Error)) return false;
   const criticalPatterns = [
     '429', 'API exhausted', 'API agotada', 'API épuisée', 'API erschöpft',
-    'Too many requests', 'Too Many Requests', 'authentication failed', '403', '401'
+    'Too many requests', 'Too Many Requests'
   ];
   return criticalPatterns.some(pattern => error.message.includes(pattern));
 }
@@ -60,10 +62,25 @@ function getMemeTexts(template: string, parts: string[], cleanText: string): { t
   return { top: normalizeText(cleanText), bottom: 'yes' };
 }
 
-export async function generateMemeImage(template: string, text: string, skipFormatting: boolean = false, forceRegenerate: boolean = false): Promise<{ watermarkedUrl: string; originalUrl: string; formattedText: string }> {
+async function checkRateLimit(): Promise<void> {
+  const now = Date.now();
+  const data = await chrome.storage.local.get(['lastGenerationTime']);
+  const lastGenerationTime = data.lastGenerationTime || 0;
+
+  if (now - lastGenerationTime < MIN_GENERATION_INTERVAL) {
+    const waitTime = Math.ceil((MIN_GENERATION_INTERVAL - (now - lastGenerationTime)) / 1000);
+    throw new Error(`Please wait ${waitTime}s before generating another meme.`);
+  }
+
+  await chrome.storage.local.set({ lastGenerationTime: now });
+}
+
+export async function generateMemeImage(template: string, text: string, skipFormatting: boolean = false, _forceRegenerate: boolean = false): Promise<{ watermarkedUrl: string; originalUrl: string; formattedText: string }> {
+  await checkRateLimit();
+
   try {
     const formattedTemplate = template.trim().toLowerCase().replace(/\s+/g, '_');
-    const formattedText = (skipFormatting && text.includes(' / ')) ? text : await formatTextForTemplate(text, formattedTemplate, forceRegenerate);
+    const formattedText = skipFormatting && text.includes(' / ') ? text : await formatTextForTemplate(text);
     const cleanText = formattedText.replace(/['']/g, "'").replace(/…/g, '...');
 
     const parts = cleanText.split(' / ').map(p => p.trim()).filter(p => p.length > 0);
@@ -82,8 +99,13 @@ export async function generateMemeImage(template: string, text: string, skipForm
     const watermarkedUrl = await addWatermark(url);
     return { watermarkedUrl, originalUrl: url, formattedText: cleanText };
   } catch (error) {
-    logger.error('Meme image generation failed', error);
+    logger.error('Meme image generation failed', error, {
+      template,
+      textLength: text.length,
+      skipFormatting
+    });
     if (isCriticalError(error)) throw error;
     return { watermarkedUrl: CONFIG.FALLBACK_IMAGE_URL, originalUrl: CONFIG.FALLBACK_IMAGE_URL, formattedText: text };
   }
 }
+
