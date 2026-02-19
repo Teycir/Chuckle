@@ -1,5 +1,4 @@
 import { CONFIG } from './config';
-import { apiCache } from './cache';
 import { logger } from './logger';
 import { getErrorMessage } from './errorMessages';
 import { addWatermark } from './watermark';
@@ -18,50 +17,64 @@ export async function analyzeMemeContext(text: string, variant: number = 0): Pro
 function normalizeText(text: string): string {
   // Remove only truly problematic characters, keep accented letters
   const cleaned = text
-    .replace(/[<>"{}|\\^`]/g, '') // Remove URL-unsafe chars
-    .replace(/\s+/g, '_'); // Spaces to underscores
+    .replaceAll(/[<>"{}|\\^`]/g, '') // Remove URL-unsafe chars
+    .replaceAll(/\s+/g, '_'); // Spaces to underscores
 
   // URL encode to safely handle accents and special chars
   return encodeURIComponent(cleaned);
+}
+
+// Helper to determine text parts
+function getMemeTextParts(template: string, parts: string[], cleanText: string): { topText: string, bottomText: string } {
+  if (template === 'cmm') {
+    return { topText: '~', bottomText: normalizeText(parts.join('  ')) };
+  }
+
+  if (parts.length >= 2) {
+    return {
+      topText: normalizeText(parts[0]),
+      bottomText: normalizeText(parts.slice(1).join(' '))
+    };
+  }
+
+  if (parts.length === 1 && parts[0]) {
+    const words = parts[0].split(/\s+/);
+    const mid = Math.ceil(words.length / 2);
+    return {
+      topText: normalizeText(words.slice(0, mid).join(' ')),
+      bottomText: normalizeText(words.slice(mid).join(' ') || 'yes')
+    };
+  }
+
+  return { topText: normalizeText(cleanText), bottomText: 'yes' };
+}
+
+function constructMemeUrl(template: string, topText: string, bottomText: string): string {
+  if (template === 'cmm') {
+    return `${CONFIG.MEMEGEN_API_URL}/${template}/${bottomText}.png`;
+  }
+  return `${CONFIG.MEMEGEN_API_URL}/${template}/${topText}/${bottomText}.png`;
+}
+
+function isCriticalError(error: unknown): boolean {
+  if (!(error instanceof Error)) return false;
+  const criticalPhrases = [
+    '429', 'API exhausted', 'API agotada', 'API épuisée', 'API erschöpft',
+    'Too many requests', 'Too Many Requests', 'authentication failed', '403', '401'
+  ];
+  return criticalPhrases.some(phrase => error.message.includes(phrase));
 }
 
 export async function generateMemeImage(template: string, text: string, skipFormatting: boolean = false, forceRegenerate: boolean = false): Promise<{ watermarkedUrl: string; originalUrl: string; formattedText: string }> {
   try {
     const formattedTemplate = template.trim().toLowerCase().replace(/\s+/g, '_');
     const formattedText = (skipFormatting && text.includes(' / ')) ? text : await formatTextForTemplate(text, formattedTemplate, forceRegenerate);
-    const cleanText = formattedText.replace(/['']/g, "'").replace(/…/g, '...');
-
+    const cleanText = formattedText.replaceAll(/['']/g, "'").replace(/…/g, '...');
     const parts = cleanText.split(' / ').map(p => p.trim()).filter(p => p.length > 0);
-    let topText: string, bottomText: string;
 
+    const { topText, bottomText } = getMemeTextParts(formattedTemplate, parts, cleanText);
+    const url = constructMemeUrl(formattedTemplate, topText, bottomText);
 
-    if (formattedTemplate === 'cmm') {
-      topText = '~';
-      bottomText = normalizeText(parts.join('  '));
-    } else if (parts.length >= 2) {
-      const bottomParts = parts.slice(1);
-      const bottomJoined = bottomParts.join(' ');
-      topText = normalizeText(parts[0]);
-      bottomText = normalizeText(bottomJoined);
-    } else if (parts.length === 1 && parts[0]) {
-      const words = parts[0].split(/\s+/);
-      const mid = Math.ceil(words.length / 2);
-      topText = normalizeText(words.slice(0, mid).join(' '));
-      bottomText = normalizeText(words.slice(mid).join(' ') || 'yes');
-    } else {
-      topText = normalizeText(cleanText);
-      bottomText = 'yes';
-    }
-
-    let url: string;
-    if (formattedTemplate === 'cmm') {
-      url = `${CONFIG.MEMEGEN_API_URL}/${formattedTemplate}/${bottomText}.png`;
-    } else if (formattedTemplate === 'grumpycat') {
-      // Grumpy Cat uses a different format: /grumpycat/top_text/bottom_text.png
-      url = `${CONFIG.MEMEGEN_API_URL}/${formattedTemplate}/${topText}/${bottomText}.png`;
-    } else {
-      url = `${CONFIG.MEMEGEN_API_URL}/${formattedTemplate}/${topText}/${bottomText}.png`;
-    }
     const response = await fetch(url, { method: 'HEAD' });
     if (!response.ok) {
       if (response.status === 429) {
@@ -69,21 +82,12 @@ export async function generateMemeImage(template: string, text: string, skipForm
       }
       throw new Error('Template unavailable');
     }
+
     const watermarkedUrl = await addWatermark(url);
     return { watermarkedUrl, originalUrl: url, formattedText: cleanText };
   } catch (error) {
     logger.error('Meme image generation failed', error);
-    // Re-throw critical errors that user needs to see
-    if (error instanceof Error && (error.message.includes('429') ||
-      error.message.includes('API exhausted') ||
-      error.message.includes('API agotada') ||
-      error.message.includes('API épuisée') ||
-      error.message.includes('API erschöpft') ||
-      error.message.includes('Too many requests') ||
-      error.message.includes('Too Many Requests') ||
-      error.message.includes('authentication failed') ||
-      error.message.includes('403') ||
-      error.message.includes('401'))) {
+    if (isCriticalError(error)) {
       throw error;
     }
     return { watermarkedUrl: CONFIG.FALLBACK_IMAGE_URL, originalUrl: CONFIG.FALLBACK_IMAGE_URL, formattedText: text };
