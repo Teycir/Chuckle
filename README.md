@@ -235,6 +235,7 @@ A: Yes! Click on the meme text to edit it. Changes save automatically when you c
 npm install          # Install dependencies
 npm test            # Run all tests
 npm run build       # Build extension
+npm run build:browser # Build browser-runnable dist output
 npm run lint        # Check code quality
 npm run format      # Format code
 ```
