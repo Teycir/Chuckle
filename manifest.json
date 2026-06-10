@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Chuckle",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Transform any text into shareable memes",
   "permissions": ["contextMenus", "activeTab", "storage", "alarms"],
   "host_permissions": ["https://api.memegen.link/*"],
@@ -30,7 +30,7 @@
     "128": "icons/icon128.png"
   },
   "content_security_policy": {
-    "extension_pages": "default-src 'none'; script-src 'self'; object-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://api.memegen.link; connect-src https://api.memegen.link; font-src 'self';"
+    "extension_pages": "default-src 'none'; script-src 'self'; object-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://api.memegen.link; connect-src https://api.memegen.link data:; font-src 'self';"
   },
   "web_accessible_resources": [
     {
