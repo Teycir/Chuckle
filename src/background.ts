@@ -2,12 +2,14 @@ import { performCleanup } from './cleanup';
 import { logger } from './logger';
 
 chrome.runtime.onInstalled.addListener(() => {
-
   try {
-    chrome.contextMenus.create({
-      id: "remixAsMeme",
-      title: "Remix as a Meme",
-      contexts: ["selection"]
+    // Remove all existing menu items first to avoid duplicate-id errors on reload/update
+    chrome.contextMenus.removeAll(() => {
+      chrome.contextMenus.create({
+        id: "remixAsMeme",
+        title: "Remix as a Meme",
+        contexts: ["selection"]
+      });
     });
 
     // Schedule weekly cleanup
