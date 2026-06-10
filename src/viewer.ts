@@ -99,14 +99,21 @@ function initializeUI() {
   }
 
   document.getElementById('downloadBtn')?.addEventListener('click', async () => {
-    const response = await fetch(img.src);
-    const blob = await response.blob();
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `meme-${Date.now()}.png`;
-    a.click();
-    URL.revokeObjectURL(url);
+    try {
+      const response = await fetch(img.src);
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `meme-${Date.now()}.png`;
+      // Must be in DOM for Chrome to honour the download attribute
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      alert('Download failed: ' + (err instanceof Error ? err.message : String(err)));
+    }
   });
 
   document.getElementById('shareBtn')?.addEventListener('click', async () => {
@@ -139,9 +146,12 @@ function initializeUI() {
 
     platforms.forEach(platform => {
       const btn = document.createElement('button');
-      const doc = new DOMParser().parseFromString(platform.icon, 'image/svg+xml');
-      btn.appendChild(doc.documentElement);
-      btn.style.cssText = 'background: transparent; border: none; cursor: pointer; padding: 20px; border-radius: 20px; transition: all 0.2s;';
+      // importNode is required: DOMParser returns a separate document;
+      // Chrome silently drops foreign-document nodes without it.
+      const parsed = new DOMParser().parseFromString(platform.icon, 'image/svg+xml');
+      const svgNode = document.importNode(parsed.documentElement, true);
+      btn.appendChild(svgNode);
+      btn.style.cssText = 'background: transparent; border: none; cursor: pointer; padding: 20px; border-radius: 20px; transition: all 0.2s; display: flex; align-items: center; justify-content: center; min-width: 120px; min-height: 120px; flex-shrink: 0;';
       btn.onmouseover = () => { btn.style.transform = 'scale(1.1)'; btn.style.background = '#f5f5f5'; };
       btn.onmouseout = () => { btn.style.transform = 'scale(1)'; btn.style.background = 'transparent'; };
       btn.onclick = async () => {
@@ -157,7 +167,10 @@ function initializeUI() {
         const a = document.createElement('a');
         a.href = url;
         a.download = `meme-${Date.now()}.png`;
+        // Must be in DOM for Chrome to honour the download attribute
+        document.body.appendChild(a);
         a.click();
+        document.body.removeChild(a);
         URL.revokeObjectURL(url);
         await new Promise(resolve => setTimeout(resolve, 2000));
 

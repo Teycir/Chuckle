@@ -63,6 +63,7 @@ async function downloadMeme(imageUrl: string): Promise<void> {
   const a = document.createElement('a');
   a.href = url;
   a.download = `meme-${Date.now()}.png`;
+  // Must be in DOM for Chrome to honour the download attribute
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
@@ -129,8 +130,10 @@ function createShareModal(imageUrl: string, text: string, lang: string): HTMLDiv
 
   platforms.forEach(platform => {
     const btn = document.createElement('button');
-    const doc = new DOMParser().parseFromString(icons[platform.name as keyof typeof icons], 'image/svg+xml');
-    const svgElement = doc.documentElement;
+    // importNode is required: DOMParser returns a separate document;
+    // Chrome silently drops foreign-document SVG nodes without it.
+    const parsed = new DOMParser().parseFromString(icons[platform.name as keyof typeof icons], 'image/svg+xml');
+    const svgElement = document.importNode(parsed.documentElement, true);
     btn.appendChild(svgElement);
     btn.style.cssText = 'background: transparent; border: none; cursor: pointer; padding: 20px; border-radius: 20px; transition: all 0.2s; display: flex; align-items: center; justify-content: center; min-width: 120px; min-height: 120px; flex-shrink: 0;';
     btn.onmouseover = () => { btn.style.transform = 'scale(1.1)'; btn.style.background = '#f5f5f5'; };
@@ -167,8 +170,8 @@ export function createShareButton(imageUrl: string, text: string, lang: string =
   const btn = document.createElement('button');
   btn.className = 'chuckle-share-btn';
   const svgString = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="display: block; pointer-events: none;"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M15.5 6.5L8.5 10.5M8.5 13.5L15.5 17.5" stroke="currentColor" stroke-width="2" fill="none"/></svg>';
-  const doc = new DOMParser().parseFromString(svgString, 'image/svg+xml');
-  btn.appendChild(doc.documentElement);
+  const parsed = new DOMParser().parseFromString(svgString, 'image/svg+xml');
+  btn.appendChild(document.importNode(parsed.documentElement, true));
   btn.setAttribute('aria-label', getTranslation('shareMeme', lang));
 
   btn.onclick = (e) => {
